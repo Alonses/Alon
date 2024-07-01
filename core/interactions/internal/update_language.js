@@ -8,8 +8,6 @@ module.exports = async ({ client, interaction }) => {
     if (!existsSync(`./files/languages/`))
         mkdirSync(`./files/languages/`, { recursive: true })
 
-    const bot = await client.getBot()
-
     fetch("https://github.com/Alonses/Alondioma")
         .then(response => response.text())
         .then(async res => {
@@ -17,8 +15,7 @@ module.exports = async ({ client, interaction }) => {
             // Salvando o commit de traduções mais recente no banco 
             const cod_commit = res.split("<include-fragment src=\"/Alonses/Alondioma/spoofed_commit_check/")[1].split("\"")[0].slice(0, 7)
 
-            bot.persis.alondioma = cod_commit
-            await bot.save()
+            await client.prisma.bot.update({ where: { id: client.id() }, data: { persis_alondioma: cod_commit }})
 
             interaction.reply({
                 content: `:sa: | Pacote de traduções do Alonsal sincronizado com o commit \`${cod_commit}\``,
