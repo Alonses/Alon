@@ -26,6 +26,6 @@ gera_relatorio = async (client) => {
     const embed = await require('../generators/journal')({ client })
 
     await client.notify(process.env.channel_stats, { embeds: [embed] })
-    await dailyReset(client.id()) // Reseta o relatório
+    await dailyReset(client) // Reseta o relatório
     await cobra_modulo(client) // Cobra pelos módulos ativos pelos usuários
 }

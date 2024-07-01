@@ -44,7 +44,7 @@ async function getBot(bit) {
     })
 }
 
-async function dailyReset(bit) {
+async function dailyReset(client) {
 
     // Reseta os dados diários do bot
     const bot = {
@@ -68,8 +68,8 @@ async function dailyReset(bit) {
     })
 }
 
-async function dropBot(bit) {
-    await client.prisma.bot.delete({ where: { bit } })
+async function dropBot(client) {
+    await client.prisma.bot.delete({ where: { id: client.id() } })
 }
 
 module.exports.User = model

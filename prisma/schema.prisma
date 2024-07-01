@@ -11,8 +11,7 @@ datasource db {
 }
 
 model Bot {
-  id  String  @id
-  bit String?
+  id String @id
 
   persis_version          String  @default("1.0")
   persis_commands         Int     @default(0)
