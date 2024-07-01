@@ -6,11 +6,12 @@ module.exports = async ({ client, interaction, command }) => {
 
     if (client.x.relatorio) {
 
-        const bot = await client.getBot()
-        bot.persis.commands++
-        bot.save()
-
-        qtd_comandos = bot.persis.commands
+        const bot = await client.prisma.bot.findUnique({ where: { id: client.id() } })
+        const qtd_comandos = ++bot.persis_commands
+        await client.prisma.bot.update( {
+            where: { id: client.id() },
+            data: { persis_commands: qtd_comandos },
+        })
 
         const today = new Date()
         const day = today.toLocaleString("en-US", { weekday: "long" })

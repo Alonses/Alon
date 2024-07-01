@@ -14,7 +14,7 @@ async function loadAll(client) {
     if (!existsSync(`./files/languages/`))
         mkdirSync(`./files/languages/`, { recursive: true })
 
-    const bot = await client.getBot()
+    const bot = await client.prisma.bot.findUnique({ where: { id: client.id() } })
 
     fetch("https://github.com/Alonses/Alondioma")
         .then(response => response.text())
@@ -24,12 +24,11 @@ async function loadAll(client) {
             const cod_commit = res.split("<include-fragment src=\"/Alonses/Alondioma/spoofed_commit_check/")[1].split("\"")[0].slice(0, 7)
 
             // Sincroniza com os idiomas mais recentes caso haja atualização ou não haja arquivos
-            if (cod_commit !== bot.persis.alondioma || !existsSync(`./files/languages/pt-br.json`)) {
+            if (cod_commit !== bot.persis_alondioma || !existsSync(`./files/languages/pt-br.json`)) {
                 console.log("🟠 | Sincronizando com as traduções mais recentes.")
 
                 // Salvando o commit de traduções mais recente no banco
-                bot.persis.alondioma = cod_commit
-                await bot.save()
+                await client.prisma.bot.update( { where: { id: client.id() }, data: { persis_alondioma: cod_commit } })
 
                 if (client.id() === process.env.client_1 && process.env.channel_feeds) // Notifica no canal apenas para o bot principal
                     client.channels().get(process.env.channel_feeds).send({ content: `:sa: | Pacote de traduções do ${client.username()} sincronizado com o commit \`${cod_commit}\`` })

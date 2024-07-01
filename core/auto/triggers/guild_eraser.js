@@ -21,11 +21,10 @@ async function atualiza_eraser() {
 async function verifica_eraser(client) {
 
     readFile('./files/data/erase_guild.txt', 'utf8', async (err, data) => {
-
+        // Interrompe a operação caso não haja advertências salvas em cache
+        if (err || data === undefined || data.length < 1) return
         data = JSON.parse(data)
 
-        // Interrompe a operação caso não haja advertências salvas em cache
-        if (data.length < 1) return
 
         for (let i = 0; i < data.length; i++) {
 

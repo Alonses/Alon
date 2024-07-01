@@ -23,15 +23,14 @@ async function requisita_modulo(client) {
     const horario = formata_horas(data1.getHours() == 0 ? '0' : data1.getHours(), data1.getMinutes() === 0 ? '0' : data1.getMinutes()), dia = data1.getDay()
 
     readFile('./files/data/user_modules.txt', 'utf8', (err, data) => {
+        // Interrompe a operação caso não haja módulos salvos em cache
+        if (err || data === undefined || data.length < 1) return
 
         data = JSON.parse(data)
 
-        // Interrompe a operação caso não haja módulos salvos em cache
-        if (data.length < 1) return
-
         for (let i = 0; i < data.length; i++) {
             // Verificando se o horário está correto
-            if (data[i].stats.days == 2 && data[i].stats.hour === horario)
+            if (data[i].stats.days === 2 && data[i].stats.hour === horario)
                 lista_modulos.push({
                     uid: data[i].uid,
                     type: data[i].type

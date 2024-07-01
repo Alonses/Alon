@@ -9,7 +9,7 @@ const { activities } = require('../../../files/json/text/activities.json')
 
 module.exports = async ({ client, user, interaction, caso }) => {
 
-    const bot = await client.getBot()
+    const bot = await client.prisma.bot.findUnique({ where: { id: client.id() } })
     let botoes = [], ouvindo_agora = "", pagina = parseInt(caso) || 0
 
     if (pagina === 0)
@@ -25,7 +25,7 @@ module.exports = async ({ client, user, interaction, caso }) => {
         .setTitle(`> ${client.tls.phrase(user, "manu.info.infos")}`)
         .setColor(client.embed_color(user.misc.color))
         .setThumbnail("https://scontent-gru1-1.xx.fbcdn.net/v/t39.30808-6/271761723_4781205238660427_2679923254801920704_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=a2f6c7&_nc_eui2=AeEaDbTjIrwdCOtcagWWhVkesSC9z2rDnVexIL3PasOdV5UecFHHTVPIWqV19Eq3VfRZCnHRKRq1cLToTkrsKEim&_nc_ohc=0RgcC3ujltUAX97XDKA&_nc_oc=AQmx0z2kxoAK_y5WsuATe7C9j_M2uor_EZ2DjNPqmJD0olXXScM70c5xlhDQvVV3qVg&_nc_ht=scontent-gru1-1.xx&oh=00_AfDAgo9E37s4Nc_t_6Njz2Q3Ko5-A9be58np1JZJ0nNEOQ&oe=652140A5")
-        .setDescription(`${ouvindo_agora}\n${client.tls.phrase(user, "manu.info.conteudo_1")}\n\n${client.tls.phrase(user, "manu.info.invocado_1")} \`${client.locale(bot.persis.commands + 1)}\` ${client.tls.phrase(user, "manu.info.invocado_2")} ${client.emoji("emojis_dancantes")}\n[ _${client.tls.phrase(user, "manu.info.versao")} ${bot.persis.version}_ ]\n\n${client.tls.phrase(user, "manu.info.spawn_alonsal")} <t:1618756500>`)
+        .setDescription(`${ouvindo_agora}\n${client.tls.phrase(user, "manu.info.conteudo_1")}\n\n${client.tls.phrase(user, "manu.info.invocado_1")} \`${client.locale(bot.persis_commands + 1)}\` ${client.tls.phrase(user, "manu.info.invocado_2")} ${client.emoji("emojis_dancantes")}\n[ _${client.tls.phrase(user, "manu.info.versao")} ${bot.persis_version}_ ]\n\n${client.tls.phrase(user, "manu.info.spawn_alonsal")} <t:1618756500>`)
         .setFooter({
             text: client.username(),
             iconURL: client.user().avatarURL({ dynamic: true })
@@ -75,36 +75,36 @@ module.exports = async ({ client, user, interaction, caso }) => {
                 },
                 {
                     name: "⠀",
-                    value: `:trophy: **Ranking: **\`${bot.persis.ranking} EXP\`\n${client.emoji("carregando")} **${client.tls.phrase(user, "manu.info.modulos_ativos")}: **\`${(await getActiveModules()).length}\``,
+                    value: `:trophy: **Ranking: **\`${bot.persis_ranking} EXP\`\n${client.emoji("carregando")} **${client.tls.phrase(user, "manu.info.modulos_ativos")}: **\`${(await getActiveModules()).length}\``,
                     inline: true
                 },
                 {
                     name: "⠀",
-                    value: `:white_small_square: **${client.tls.phrase(user, "manu.info.versao")} ${bot.persis.version}**`,
+                    value: `:white_small_square: **${client.tls.phrase(user, "manu.info.versao")} ${bot.persis_version}**`,
                     inline: true
                 }
             )
             .addFields(
                 {
                     name: `${client.defaultEmoji("time")} **${client.tls.phrase(user, "manu.info.de_hoje")}**`,
-                    value: `${client.emoji("icon_slash_commands")} **${client.tls.phrase(user, "manu.info.comandos_usados")}: **\`${client.locale(bot.cmd.ativacoes)}\`\n${client.emoji("mc_esmeralda")} **Bufunfas: **\`${client.locale(bot.bfu.gerado)}\``,
+                    value: `${client.emoji("icon_slash_commands")} **${client.tls.phrase(user, "manu.info.comandos_usados")}: **\`${client.locale(bot.cmd_ativacoes)}\`\n${client.emoji("mc_esmeralda")} **Bufunfas: **\`${client.locale(bot_bfu.gerado)}\``,
                     inline: true
                 },
                 {
                     name: "⠀",
-                    value: `:mouse_three_button: **${client.tls.phrase(user, "manu.info.botoes_clicados")}: **\`${client.locale(bot.cmd.botoes)}\`\n${client.emoji("mc_nether_star")} **${client.tls.phrase(user, "manu.info.xp_gerado")}: **\`${client.locale(bot.exp.exp_concedido)}\``,
+                    value: `:mouse_three_button: **${client.tls.phrase(user, "manu.info.botoes_clicados")}: **\`${client.locale(bot.cmd_botoes)}\`\n${client.emoji("mc_nether_star")} **${client.tls.phrase(user, "manu.info.xp_gerado")}: **\`${client.locale(bot.exp_concedido)}\``,
                     inline: true
                 },
                 {
                     name: "⠀",
-                    value: `:card_box: **${client.tls.phrase(user, "manu.info.menus_abertos")}: **\`${client.locale(bot.cmd.menus)}\``,
+                    value: `:card_box: **${client.tls.phrase(user, "manu.info.menus_abertos")}: **\`${client.locale(bot.cmd_menus)}\``,
                     inline: true
                 }
             )
             .addFields(
                 {
                     name: `${client.defaultEmoji("calendar")} **${client.tls.phrase(user, "manu.info.historico")}**`,
-                    value: `${client.emoji("icon_slash_commands")} **${client.tls.phrase(user, "manu.info.comandos_usados")}: **\`${client.locale(bot.persis.commands)}\`\n:globe_with_meridians: **${client.tls.phrase(user, "mode.network.servidores")}: **\`${client.locale(client.guilds().size)}\`\n:name_badge: **${client.tls.phrase(user, "manu.info.spams_freados")}: **\`${client.locale(bot.persis.spam)}\`\n:link: **${client.tls.phrase(user, "mode.spam.links_suspeitos")}:** \`${links_suspeitos.length || 0}\`\n${client.emoji("mc_esmeralda")} **Bufunfas: **\`${client.locale(bot.persis.bufunfas)}\``,
+                    value: `${client.emoji("icon_slash_commands")} **${client.tls.phrase(user, "manu.info.comandos_usados")}: **\`${client.locale(bot.persis_commands)}\`\n:globe_with_meridians: **${client.tls.phrase(user, "mode.network.servidores")}: **\`${client.locale(client.guilds().size)}\`\n:name_badge: **${client.tls.phrase(user, "manu.info.spams_freados")}: **\`${client.locale(bot.persis_spam)}\`\n:link: **${client.tls.phrase(user, "mode.spam.links_suspeitos")}:** \`${links_suspeitos.length || 0}\`\n${client.emoji("mc_esmeralda")} **Bufunfas: **\`${client.locale(bot.persis_bufunfas)}\``,
                     inline: true
                 },
                 {

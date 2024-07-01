@@ -10,6 +10,7 @@ module.exports = {
                 .setRequired(true)
                 .setMinValue(1))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild | PermissionFlagsBits.Administrator),
+
     async execute({ client, user, interaction }) {
 
         if (!client.x.owners.includes(interaction.user.id)) return
@@ -19,9 +20,11 @@ module.exports = {
 
         client.cached.ranking_value = valor_ranking
 
-        const bot = await client.getBot()
-        bot.persis.ranking = valor_ranking
-        await bot.save()
+        // bot.persis_ranking = valor_ranking // old db
+        await client.prisma.bot.update({
+            where: { id: client.id() },
+            data: { persis_ranking: valor_ranking }
+        })
 
         interaction.reply({
             content: `:tropical_drink: | Agora o ranking dará \`${valor_ranking} EXP\` p/ mensagem e \`${valor_ranking * 1.5} EXP\` p/ comando`,

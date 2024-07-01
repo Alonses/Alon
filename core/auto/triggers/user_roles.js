@@ -13,11 +13,10 @@ async function atualiza_roles() {
 async function verifica_roles(client) {
 
     readFile('./files/data/user_timed_roles.txt', 'utf8', async (err, data) => {
+        // Interrompe a operação caso não haja cargos salvos em cache
+        if (err || data === undefined || data.length < 1) return
 
         data = JSON.parse(data)
-
-        // Interrompe a operação caso não haja cargos salvos em cache
-        if (data.length < 1) return
 
         for (let i = 0; i < data.length; i++) {
 

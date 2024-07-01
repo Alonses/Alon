@@ -169,8 +169,10 @@ async function nerfa_spam({ client, message, guild, suspect_link }) {
     }, 4000)
 
     // Registering neutralized spam in history
-    const bot = await client.getBot(client.x.id)
-    bot.persis.spam++
+    await client.prisma.bot.update({
+        where: { id: client.x.id },
+        data: { persis_span: { increment: 1 }}
+    })
 
     if (guild.spam.suspicious_links && user_messages.length > 0 && !suspect_link) { // Checking if the server has the suspicious links registry active
 
@@ -187,8 +189,6 @@ async function nerfa_spam({ client, message, guild, suspect_link }) {
             }
         }
     }
-
-    await bot.save()
 }
 
 remove_spam = (client, id_user, id_guild, user_message) => {

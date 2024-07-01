@@ -1,4 +1,5 @@
 const { Client, GatewayIntentBits, Partials } = require('discord.js')
+const { PrismaClient} = require("@prisma/client")
 
 const idioma = require('./core/data/language')
 const translate = require('./core/formatters/translate')
@@ -23,9 +24,12 @@ const cli = new Client({
     disableEveryone: false
 })
 
+const prisma = new PrismaClient()
+
 class CeiraClient {
     constructor() {
         this.discord = cli
+        this.prisma = prisma
         this.tls = translate
         this.idioma = idioma
         this.x = client_data

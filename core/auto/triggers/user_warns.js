@@ -24,11 +24,10 @@ async function atualiza_warns() {
 async function verifica_warns(client) {
 
     readFile('./files/data/user_timed_warns.txt', 'utf8', async (err, data) => {
+        // Interrompe a operação caso não haja advertências salvas em cache
+        if (err || data === undefined || data.length < 1) return
 
         data = JSON.parse(data)
-
-        // Interrompe a operação caso não haja advertências salvas em cache
-        if (data.length < 1) return
 
         const guilds_map = {}
 

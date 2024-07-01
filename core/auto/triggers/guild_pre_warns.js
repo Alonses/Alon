@@ -24,11 +24,10 @@ async function atualiza_pre_warns() {
 async function verifica_pre_warns(client) {
 
     readFile('./files/data/user_timed_pre_warns.txt', 'utf8', async (err, data) => {
+        // Interrompe a operação caso não haja anotações de advertências salvas em cache
+        if (err || data === undefined || data.length < 1) return
 
         data = JSON.parse(data)
-
-        // Interrompe a operação caso não haja anotações de advertências salvas em cache
-        if (data.length < 1) return
 
         const guilds_map = {}
 

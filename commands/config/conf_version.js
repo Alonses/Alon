@@ -14,15 +14,18 @@ module.exports = {
         if (interaction.user.id !== client.x.owners[0])
             return client.tls.reply(interaction, user, "inic.error.comando_restrito", true, 18)
 
-        const bot = await client.getBot()
-        bot.persis.version = interaction.options.getString("versao")
-        await bot.save()
+        const version = interaction.options.getString("versao")
+
+        await client.prisma.bot.update({
+            where: { id : client.id() },
+            data: { persis_version: version },
+        })
 
         interaction.reply({
-            content: `:placard: | A Versão do ${client.username()} foi atualizada para \`${bot.persis.version}\``,
+            content: `:placard: | A Versão do ${client.username()} foi atualizada para \`${version}\``,
             ephemeral: true
         })
 
-        client.notify(process.env.channel_feeds, { content: `:placard: | A Versão do ${client.username()} foi atualizada para \`${bot.persis.version}\`` })
+        client.notify(process.env.channel_feeds, { content: `:placard: | A Versão do ${client.username()} foi atualizada para \`${version}\`` })
     }
 }

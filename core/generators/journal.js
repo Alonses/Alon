@@ -2,7 +2,7 @@ const { EmbedBuilder } = require('discord.js')
 
 module.exports = async ({ client }) => {
 
-    const date1 = new Date(), bot = await client.getBot()
+    const date1 = new Date(), bot = await client.prisma.bot.findUnique({ where: { id: client.id() } })
 
     // Ficará esperando até meia noite para executar a rotina
     const proxima_att = ((23 - date1.getHours()) * 3600000) + ((60 - date1.getMinutes()) * 60000) + ((60 - date1.getSeconds()) * 1000)
@@ -22,24 +22,24 @@ module.exports = async ({ client }) => {
         .addFields(
             {
                 name: ":gear: **Comandos**",
-                value: `:dart: **Hoje:** \`${client.locale(bot.cmd.ativacoes)}\`\n:octagonal_sign: **Erros:** \`${client.locale(bot.cmd.erros)}\``,
+                value: `:dart: **Hoje:** \`${client.locale(bot.cmd_ativacoes)}\`\n:octagonal_sign: **Erros:** \`${client.locale(bot.cmd_erros)}\``,
                 inline: true
             },
             {
                 name: ":medal: **Experiência**",
-                value: `:dart: **Hoje:** \`${client.locale(bot.exp.exp_concedido)}\``,
+                value: `:dart: **Hoje:** \`${client.locale(bot.exp_concedido)}\``,
                 inline: true
             },
             {
                 name: ":e_mail: **Mensagens**",
-                value: `:dart: **Hoje:** \`${client.locale(bot.exp.msgs_lidas)}\`\n:white_check_mark: **Válidas:** \`${client.locale(bot.exp.msgs_validas)}\``,
+                value: `:dart: **Hoje:** \`${client.locale(bot.msgs_lidas)}\`\n:white_check_mark: **Válidas:** \`${client.locale(bot.msgs_validas)}\``,
                 inline: true
             }
         )
         .addFields(
             {
                 name: `${client.emoji("icon_slash_commands")} **Interações**`,
-                value: `:mouse_three_button: **Botões:** \`${(client.locale(bot.cmd.botoes))}\`\n:card_box: **Menus: **\`${client.locale(bot.cmd.menus)}\``,
+                value: `:mouse_three_button: **Botões:** \`${(client.locale(bot.cmd_botoes))}\`\n:card_box: **Menus: **\`${client.locale(bot.cmd_menus)}\``,
                 inline: true
             },
             {
@@ -49,7 +49,7 @@ module.exports = async ({ client }) => {
             },
             {
                 name: ":bank: Bufunfas",
-                value: `${client.emoji("mc_esmeralda")} **Distribuídas:** \`${client.locale(bot.bfu.gerado)}\`\n:money_with_wings: **Movimentado:** \`${client.locale(bot.bfu.movido)}\`\n:dollar: **Recolhido:** \`${client.locale(bot.bfu.reback)}\``,
+                value: `${client.emoji("mc_esmeralda")} **Distribuídas:** \`${client.locale(bot.bfu_gerado)}\`\n:money_with_wings: **Movimentado:** \`${client.locale(bot.bfu_movido)}\`\n:dollar: **Recolhido:** \`${client.locale(bot.bfu_reback)}\``,
                 inline: true
             }
         )

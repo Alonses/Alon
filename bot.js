@@ -8,7 +8,6 @@ const idioma = require('./core/data/language')
 const database = require('./core/database/database')
 
 const { nerfa_spam } = require('./core/events/spam')
-const { getBot } = require('./core/database/schemas/Bot')
 const { checkUser } = require('./core/database/schemas/User')
 const { getUserRankServer } = require('./core/database/schemas/User_rank_guild')
 const { verifySuspiciousLink } = require('./core/database/schemas/Spam_links')
@@ -23,7 +22,17 @@ client.discord.once("ready", async () => {
 
 	// Setting the default language and value for ranking
 	idioma.setDefault("pt-br")
-	client.cached.ranking_value = (await getBot(client.id())).persis.ranking || 5
+
+
+	// client.cached.ranking_value = (await getBot(client.id())).persis.ranking || 5 // old db
+	let bot = await client.prisma.bot.upsert({
+		where: { id: client.id() },
+		update: { },
+		create: {
+			id: client.id()
+		}
+	})
+	client.cached.ranking_value = bot.persis_ranking;
 
 	// Secondary events
 	await require("./core/auto/clock")({ client })

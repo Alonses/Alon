@@ -55,13 +55,13 @@ async function requisita_status(client) {
         texto_status = texto_status.replace("activities_repl", activities.length)
 
     if (texto_status.includes("version_repl")) {
-        const bot = await client.getBot()
-        texto_status = texto_status.replace("version_repl", bot.persis.version)
+        const bot = await client.prisma.bot.findUnique({ where: { id: client.id() } })
+        texto_status = texto_status.replace("version_repl", bot.persis_version)
     }
 
     if (texto_status.includes("commands_repl")) {
-        const bot = await client.getBot()
-        texto_status = texto_status.replace("commands_repl", bot.persis.commands)
+        const bot = await client.prisma.bot.findUnique({ where: { id: client.id() } })
+        texto_status = texto_status.replace("commands_repl", bot.persis_commands)
     }
 
     // Exibindo o status personalizado de forma aleatória por um tempo

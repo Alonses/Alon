@@ -82,6 +82,14 @@ Para uma melhor visualização dos códigos Alonsais, usamos padrões ao criar e
 > fetchReply <br>
 > ephemeral
 
+
+<h2>🗄️ Banco de dados 🗄️<h2/>
+Em migracao para [Prisma ORM](https://www.prisma.io/docs/orm)...
+
+Comandos uteis:
+- `npx prisma migrate dev --name <nome>` Cria uma migração para quando o schema.prisma seja alterado
+- `npx prisma studio` Inicia um editor visual do banco de dados
+
 <h2>🔣 Fontes 🔣</h2>
 
 O Alonsal faz uso direto da [APISAL](https://github.com/odnols/APISAL), uma API planejada do zero para fornecer diversas soluções de forma prática
