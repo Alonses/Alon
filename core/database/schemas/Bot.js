@@ -47,28 +47,29 @@ async function getBot(bit) {
 async function dailyReset(bit) {
 
     // Reseta os dados diários do bot
-    const bot = await getBot(bit)
+    const bot = {
+        cmd_ativacoes: 0,
+        cmd_botoes: 0,
+        cmd_menus: 0,
+        cmd_erros: 0,
 
-    bot.cmd.ativacoes = 0
-    bot.cmd.botoes = 0
-    bot.cmd.menus = 0
-    bot.cmd.erros = 0
+        exp_concedido: 0,
+        msgs_validas: 0,
+        msgs_lidas: 0,
 
-    bot.exp.exp_concedido = 0
-    bot.exp.msgs_validas = 0
-    bot.exp.msgs_lidas = 0
+        bfu_gerado: 0,
+        bfu_movido: 0,
+        bfu_reback: 0
+    }
 
-    bot.bfu.gerado = 0
-    bot.bfu.movido = 0
-    bot.bfu.reback = 0
-
-    await bot.save()
+    await client.prisma.bot.update({ 
+        where: { id: client.id() },
+        data: bot
+    })
 }
 
 async function dropBot(bit) {
-    await model.findOneAndDelete({
-        bit: bit
-    })
+    await client.prisma.bot.delete({ where: { bit } })
 }
 
 module.exports.User = model
