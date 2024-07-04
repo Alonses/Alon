@@ -19,6 +19,14 @@ module.exports = async ({ client, user, interaction, dados }) => {
         reback = reback.split("x/")[0]
     }
 
+    if (reback === "role_timed_assigner") // Menu de navegação dos cargos temporários
+        dados = `${interaction.user.id}.${cached.split(".")[3]}.${cached.split(".")[5]}`
+
+    if (reback === "role_assigner") {
+        dados = `${interaction.user.id}.${cached.split(".")[3]}.${cached.split(".")[5]}`
+        return require(`./role_assigner`)({ client, user, interaction, dados, pagina })
+    }
+
     // Redirecionando o evento
     require(`./${reback}`)({ client, user, interaction, dados, pagina })
 }

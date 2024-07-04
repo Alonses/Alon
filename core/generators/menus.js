@@ -11,6 +11,9 @@ function create_menus({ client, interaction, user, data, pagina, multi_select, g
     // Acrescenta um indice para evitar duplicatas
     if (pagina > 0) indice_start++
 
+    // Retorna para exibir mais dados em casos onde só há um item para escolher
+    if (pagina > 0 && indice_start - data.values.length < 3) indice_start -= 2
+
     // Percorrendo as entradas informadas
     if (data.values.length > 0)
         for (let x = indice_start; x < data.values.length; x++) {

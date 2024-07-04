@@ -67,13 +67,15 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
         const multi_select = true
         let row = client.menu_navigation(user, data, pagina || 0)
 
-        if (row.length > 0) // Botões de navegação
-            botoes = botoes.concat(row)
-
-        return interaction.update({
+        const obj = {
             components: [client.create_menus({ client, interaction, user, data, pagina, multi_select }), client.create_buttons(botoes, interaction)],
             ephemeral: true
-        })
+        }
+
+        if (row.length > 0) // Botões de navegação
+            obj.components = obj.components.concat(client.create_buttons(row, interaction))
+
+        return interaction.update(obj)
 
     } else if (operacao === 3) {
 
@@ -91,6 +93,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             alvo: "role_assigner_ignore#role",
             reback: "browse_button.role_assigner",
             operation: operacao,
+            submenu: "global",
             values: []
         }
 

@@ -29,7 +29,7 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
     })
 
     if (ranking.length < 1)
-        return client.tls.reply(interaction, user, "manu.data.sem_dados", true)
+        return client.tls.reply(interaction, user, "manu.data.sem_dados", true, 1)
 
     dados_conhecidos = `\n**${client.tls.phrase(user, "manu.data.ranking_guilds")}:**\`\`\`fix\n${lista_servidores(ranking, 250, client, user)}${nota_servidores}\`\`\``
 

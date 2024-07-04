@@ -20,7 +20,9 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
     // 7 -> Visibilidade global
     // 8 -> Network
 
-    const c_buttons = [false, false, false, false, false, false, false, false, false, false, false, false, false]
+    // 12 -> Cargos temporários
+
+    const c_buttons = [false, false, false, false, false, false, false, false, false, false, false, false, false, false]
     const c_menu = [false, false]
 
     if (pagina == 0) // Botão de voltar
@@ -63,11 +65,15 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
     if (!interaction.member.permissions.has(PermissionsBitField.Flags.ModerateMembers))
         c_buttons[11] = true
 
+    // Falta de permissões para gerenciar os cargos temporários
+    if (!interaction.member.permissions.has(PermissionsBitField.Flags.ModerateMembers || PermissionsBitField.Flags.ManageRoles))
+        c_buttons[12] = true
+
     /* Atalhos para as funções do painel */
 
     if (operador) // Verificando se o usuário possui permissão e ativando a função escolhida
         if (c_buttons[operation_codes[operador]])
-            return client.tls.reply(interaction, user, "manu.painel.user_sem_permissao", 7)
+            return client.tls.reply(interaction, user, "manu.painel.user_sem_permissao", true, 7)
         else {
 
             // Permissão válida
@@ -85,7 +91,7 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
                 }
 
                 if (c_buttons[operation_codes[operador]])
-                    return client.tls.reply(interaction, user, "manu.painel.user_sem_permissao", client.emoji(7))
+                    return client.tls.reply(interaction, user, "manu.painel.user_sem_permissao", true, 7)
 
                 return require(`./panel_guild_${operador}`)({ client, user, interaction, pagina_guia })
             }
@@ -181,7 +187,7 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
     // Cargos temporários, Denúncias in-server e Convites rastreados
     if (pagina === 2)
         botoes = botoes.concat([
-            { id: "guild_timed_roles_button", name: client.tls.phrase(user, "manu.painel.cargos_temporarios"), type: 1, emoji: client.emoji(41), data: '0', disabled: c_buttons[11] },
+            { id: "guild_timed_roles_button", name: client.tls.phrase(user, "manu.painel.cargos_temporarios"), type: 1, emoji: client.emoji(41), data: '0', disabled: c_buttons[12] },
             { id: "guild_tickets_button", name: client.tls.phrase(user, "manu.painel.denuncias_server"), type: 1, emoji: client.emoji(41), data: '0', disabled: c_buttons[3] },
             { id: "guild_panel_button", name: client.tls.phrase(user, "manu.painel.convites_rastreados"), type: client.execute("functions", "emoji_button.type_button", guild?.conf.nuke_invites), emoji: client.execute("functions", "emoji_button.emoji_button", guild?.conf.nuke_invites), data: '9', disabled: c_buttons[10] },
         ])

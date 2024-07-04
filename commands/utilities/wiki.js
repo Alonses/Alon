@@ -72,7 +72,7 @@ module.exports = {
             idioma_definido = interaction.options.getString("language")
 
         if (content.includes("slondo")) // Pesquisando por "slondo"
-            return client.tls.reply(interaction, user, "util.wiki.wiki_slondo", client.decider(user?.conf.ghost_mode, 0))
+            return client.tls.reply(interaction, user, "util.wiki.wiki_slondo", client.decider(user?.conf.ghost_mode, 0), 5)
 
         const url = `https://api.duckduckgo.com/?q=${encodeURI(content)}&format=json&pretty=0&skip_disambig=1&no_html=1`
 

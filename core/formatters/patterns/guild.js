@@ -56,7 +56,8 @@ const operation_codes = {
     "network": 8,
     "warns": 9,
     "tracked_invites": 10,
-    "hierarchy_warns": 11
+    "hierarchy_warns": 11,
+    "timed_roles": 12
 }
 
 const networkCases = {

@@ -1,9 +1,9 @@
 require('dotenv').config()
 
 /* --------------------------------------------------------------- */
-// Alterna entre o modo normal e modo de testes
+// Alterna entre o modo normal e modo de testes, limited limita processos secundários de funcionarem
 const update_commands = 0
-let modo_develop = 0, silent = 0
+let modo_develop = 0, silent = 0, limited = 0
 
 // Ative para limpar os comandos slash locais e globais
 let delete_slash = 0
@@ -20,8 +20,8 @@ const client_data = {
     force_update: update_commands ? 1 : 0,
     status: silent || modo_develop ? 0 : 1,
     logger: silent || modo_develop ? 0 : 1,
-    ranking: silent || modo_develop ? 0 : 1,
-    modules: update_commands || silent || modo_develop ? 0 : 1,
+    ranking: limited || silent || modo_develop ? 0 : 1,
+    modules: limited || update_commands || silent || modo_develop ? 0 : 1,
     relatorio: update_commands || silent || modo_develop ? 0 : 1,
 
     owners: process.env.owner_id.split(", "),

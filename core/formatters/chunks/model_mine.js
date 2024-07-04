@@ -116,7 +116,7 @@ module.exports = async (client, user, interaction) => {
                     }, fields
                 )
 
-            if ((parseFloat((dados_item.stats.version)) - 1) * 100 > 20) {
+            if (parseInt(`${dados_item.stats.version}`.split(".")[1]) > 21) {
                 nota_rodape = client.tls.phrase(user, "util.minecraft.nota_rodape")
 
                 if (nota_rodape.includes("item_repl"))

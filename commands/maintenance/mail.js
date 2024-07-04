@@ -82,7 +82,7 @@ module.exports = {
         if (corpo_mensagem.file)
             embed.setImage(corpo_mensagem.file.attachment)
 
-        client.tls.reply(interaction, user, "manu.mail.sucesso_1", true)
+        client.tls.reply(interaction, user, "manu.mail.sucesso_1", true, 31)
         client.notify(process.env.channel_mail, { embeds: [embed] })
     }
 }

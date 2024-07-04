@@ -8,7 +8,7 @@ module.exports = async ({ client, user, interaction }) => {
     const url_avatar = user_alvo.avatarURL({ dynamic: true, size: 2048 })
 
     if (!url_avatar)
-        return client.tls.reply(interaction, user, "util.avatar.sem_avatar", true)
+        return client.tls.reply(interaction, user, "util.avatar.sem_avatar", true, 1)
 
     const row = client.create_buttons([
         { name: client.tls.phrase(user, "menu.botoes.navegador"), type: 4, emoji: "🌐", value: url_avatar }

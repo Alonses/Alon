@@ -1,6 +1,6 @@
 const { ShardingManager } = require('discord.js')
 const { client_data } = require('./setup')
-// acorda
+
 // console.clear() // Limpando o console e inicializando o bot
 
 if (client_data.sharding) {
