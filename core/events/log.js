@@ -8,10 +8,7 @@ module.exports = async ({ client, interaction, command }) => {
 
         const bot = await client.getBot()
         const qtd_comandos = ++bot.persis_commands
-        await client.prisma.bot.update( {
-            where: { id: client.id() },
-            data: { persis_commands: qtd_comandos },
-        })
+        await client.updateBot({ persis_commands: qtd_comandos })
 
         const today = new Date()
         const day = today.toLocaleString("en-US", { weekday: "long" })

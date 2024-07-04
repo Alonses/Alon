@@ -4,7 +4,7 @@ const { readdirSync } = require('fs')
 
 const { alea_hex } = require('./core/functions/hex_color')
 
-const { getBot } = require('./core/database/schemas/Bot')
+const { getBot, updateBot } = require('./core/database/schemas/Bot')
 const { getUser } = require('./core/database/schemas/User')
 
 const { create_menus } = require('./core/generators/menus')
@@ -31,6 +31,7 @@ const { loggerMap } = require('./core/formatters/patterns/guild')
 const { spamTimeoutMap, defaultRoleTimes } = require('./core/formatters/patterns/timeout')
 const { badgeTypes, languagesMap } = require('./core/formatters/patterns/user')
 const { checkUserGuildPreWarned } = require('./core/database/schemas/User_pre_warns')
+const {data} = require("./commands/games/gta");
 
 function internal_functions(client) {
 
@@ -151,9 +152,13 @@ function internal_functions(client) {
         return links
     }
 
-    client.getBot = () => { return getBot(client) }
+    // Funcoes do banco de dados
+    client.getBot = () => getBot(client)
 
-    client.getGuild = (id_guild) => { return getGuild(id_guild) }
+    client.updateBot = (data) => updateBot(client, data)
+
+
+    client.getGuild = (id_guild) => getGuild(id_guild)
 
     client.getGuildChannels = async (interaction, user, tipo, id_configurado) => { // Lista todos os canais de um tipo especifico no servidor
 

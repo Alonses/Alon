@@ -169,10 +169,7 @@ async function nerfa_spam({ client, message, guild, suspect_link }) {
     }, 4000)
 
     // Registering neutralized spam in history
-    await client.prisma.bot.update({
-        where: { id: client.x.id },
-        data: { persis_span: { increment: 1 }}
-    })
+    await client.updateBot({ persis_span: { increment: 1 }})
 
     if (guild.spam.suspicious_links && user_messages.length > 0 && !suspect_link) { // Checking if the server has the suspicious links registry active
 

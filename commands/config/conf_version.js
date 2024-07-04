@@ -16,10 +16,7 @@ module.exports = {
 
         const version = interaction.options.getString("versao")
 
-        await client.prisma.bot.update({
-            where: { id : client.id() },
-            data: { persis_version: version },
-        })
+        await client.updateBot({ persis_version: version })
 
         interaction.reply({
             content: `:placard: | A Versão do ${client.username()} foi atualizada para \`${version}\``,

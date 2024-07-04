@@ -27,12 +27,17 @@ async function dailyReset(client) {
     })
 }
 
+async function updateBot(client, data) {
+
+}
+
 async function dropBot(client) {
     await client.prisma.bot.delete({ where: { id: client.id() } })
 }
 
 module.exports = {
     getBot,
+    updateBot,
     dropBot,
     dailyReset
 }
