@@ -10,22 +10,17 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("Charada", schema)
 
-var counter = 0
-
-async function createCharada(value) {
-    await model.create({
-        qid: counter,
-        question: value.pergunta,
-        answer: value.resposta
+async function createCharada(client, value) {
+    await client.prisma.charada.create({
+        data: value
     })
-
-    counter = counter++
 }
 
-async function getCharada() {
-
-    // Coletando uma charada aleatória do banco
-    return model.aggregate([{ $sample: { size: 1 } }])
+async function getCharada(client) {
+    return await client.prisma.$queryRaw`
+    SELECT * FROM "Charada"
+    ORDER BY RANDOM()
+    LIMIT 1;`
 }
 
 module.exports.Charada = model

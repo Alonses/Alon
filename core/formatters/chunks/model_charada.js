@@ -2,7 +2,7 @@ const { getCharada } = require('../../database/schemas/Charadas')
 
 module.exports = async (client, user, interaction) => {
 
-    const res = await getCharada()
+    const res = await getCharada(client)
     const texto = `🃏 | ${res[0].question}\n\n${res[0].answer}`
 
     if (interaction)

@@ -34,3 +34,9 @@ model Bot {
   bfu_movido Int @default(0)
   bfu_reback Int @default(0)
 }
+
+model Charada {
+  qid      Int    @id @default(autoincrement())
+  question String
+  answer   String
+}
