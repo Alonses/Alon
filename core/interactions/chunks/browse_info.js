@@ -9,7 +9,7 @@ const { activities } = require('../../../files/json/text/activities.json')
 
 module.exports = async ({ client, user, interaction, caso }) => {
 
-    const bot = await client.prisma.bot.findUnique({ where: { id: client.id() } })
+    const bot = await client.getBot()
     let botoes = [], ouvindo_agora = "", pagina = parseInt(caso) || 0
 
     if (pagina === 0)

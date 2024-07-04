@@ -23,7 +23,7 @@ module.exports = async ({ client }) => {
 }
 
 async function requisita_status(client) {
-
+    const bot = await client.getBot()
     let num
 
     if (selected.length === activities.length)
@@ -54,15 +54,11 @@ async function requisita_status(client) {
     if (texto_status.includes("activities_repl"))
         texto_status = texto_status.replace("activities_repl", activities.length)
 
-    if (texto_status.includes("version_repl")) {
-        const bot = await client.prisma.bot.findUnique({ where: { id: client.id() } })
+    if (texto_status.includes("version_repl"))
         texto_status = texto_status.replace("version_repl", bot.persis_version)
-    }
 
-    if (texto_status.includes("commands_repl")) {
-        const bot = await client.prisma.bot.findUnique({ where: { id: client.id() } })
+    if (texto_status.includes("commands_repl"))
         texto_status = texto_status.replace("commands_repl", bot.persis_commands)
-    }
 
     // Exibindo o status personalizado de forma aleatória por um tempo
     client.user().setActivity(texto_status, { type: actionTypes[activities[num].type] })

@@ -127,7 +127,7 @@ function internal_functions(client) {
 
     client.formatEmoji = (id, emoji) => {
 
-        if (!id) return
+        if (!id || !emoji) return ":epic_embed_fail:"
 
         const formatado = `<:${emoji.name}:${id}>`
 
@@ -151,7 +151,7 @@ function internal_functions(client) {
         return links
     }
 
-    client.getBot = () => { return getBot(client.x.id) }
+    client.getBot = () => { return getBot(client) }
 
     client.getGuild = (id_guild) => { return getGuild(id_guild) }
 

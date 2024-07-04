@@ -6,7 +6,7 @@ module.exports = async ({ client, interaction, command }) => {
 
     if (client.x.relatorio) {
 
-        const bot = await client.prisma.bot.findUnique({ where: { id: client.id() } })
+        const bot = await client.getBot()
         const qtd_comandos = ++bot.persis_commands
         await client.prisma.bot.update( {
             where: { id: client.id() },

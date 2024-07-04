@@ -14,7 +14,7 @@ async function loadAll(client) {
     if (!existsSync(`./files/languages/`))
         mkdirSync(`./files/languages/`, { recursive: true })
 
-    const bot = await client.prisma.bot.findUnique({ where: { id: client.id() } })
+    const bot = await client.getBot()
 
     fetch("https://github.com/Alonses/Alondioma")
         .then(response => response.text())

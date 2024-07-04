@@ -40,7 +40,7 @@ dispara_status = (client, status_apisal) => {
 
     if (process.env.channel_stats) {
         setTimeout(async () => {
-            const bot = await client.prisma.bot.findUnique({ where: { id: client.id() } })
+            const bot = await client.getBot()
 
             const commit_language = bot.persis_alondioma
             const canais_texto = client.channels(0).size

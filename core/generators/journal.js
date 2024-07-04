@@ -2,7 +2,7 @@ const { EmbedBuilder } = require('discord.js')
 
 module.exports = async ({ client }) => {
 
-    const date1 = new Date(), bot = await client.prisma.bot.findUnique({ where: { id: client.id() } })
+    const date1 = new Date(), bot = await client.getBot()
 
     // Ficará esperando até meia noite para executar a rotina
     const proxima_att = ((23 - date1.getHours()) * 3600000) + ((60 - date1.getMinutes()) * 60000) + ((60 - date1.getSeconds()) * 1000)
