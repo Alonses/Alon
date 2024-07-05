@@ -7,10 +7,10 @@ const { redes } = require('../../../files/json/text/anuncio.json')
 module.exports = async (client, user, interaction, pagina_guia) => {
 
     // Verificando pelos games que já expiraram
-    await verifyInvalidGames()
+    await verifyInvalidGames(client)
 
     // Listando os games que estão gratuitos no momento
-    const games = await getGames(), original_size = games.length
+    const games = await getGames(client), original_size = games.length
     let jogos_disponiveis = [], objeto_jogos = [], limitador = 3
     let pagina = pagina_guia || 0
 

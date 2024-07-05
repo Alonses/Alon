@@ -45,15 +45,15 @@ module.exports = {
             return client.tls.reply(interaction, user, "inic.error.comando_restrito", true, 18)
 
         // Verificando pelos games que já expiraram
-        await verifyInvalidGames()
+        await verifyInvalidGames(client)
         await interaction.deferReply({ ephemeral: true })
 
         const item = {
-            nome: interaction.options.getString("nome"),
-            tipo: interaction.options.getString("tipo"),
+            name: interaction.options.getString("nome"),
+            type: interaction.options.getString("tipo"),
             link: interaction.options.getString("link"),
-            preco: interaction.options.getNumber("preço"),
-            expira: client.timestamp(interaction.options.getString("expiração"), interaction.options.getString("horario")),
+            price: interaction.options.getNumber("preço"),
+            expire: client.timestamp(interaction.options.getString("expiração"), interaction.options.getString("horario")),
             thumbnail: interaction.options.getAttachment("imagem")
         }
 
@@ -61,10 +61,10 @@ module.exports = {
             item.thumbnail = item.thumbnail.attachment
 
         if (!item.tipo)
-            item.tipo = "game"
+            item.type = "game"
 
         const objetos_anunciados = [item]
-        await createGame(item)
+        await createGame(client, item)
 
         dispara_anuncio({ client, interaction, objetos_anunciados })
     }

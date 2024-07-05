@@ -40,3 +40,13 @@ model Charada {
   question String
   answer   String
 }
+
+model Game {
+  name        String  @id
+  description String?
+  thumbnail   String?
+  type        String  @default("game")
+  link        String?
+  price       Float   @default(0)
+  expire      Int?
+}

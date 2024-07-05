@@ -9,7 +9,7 @@ const { activities } = require('../../../files/json/text/activities.json')
 
 module.exports = async ({ client, user, interaction, caso }) => {
 
-    const bot = await client.getBot()
+    const bot = await client.getBot(client)
     let botoes = [], ouvindo_agora = "", pagina = parseInt(caso) || 0
 
     if (pagina === 0)
@@ -60,9 +60,9 @@ module.exports = async ({ client, user, interaction, caso }) => {
     else if (pagina === 3) {
 
         // Verificando pelos games que já expiraram
-        await verifyInvalidGames()
+        await verifyInvalidGames(client)
 
-        const games_free = await getGames()
+        const games_free = await getGames(client)
         const links_suspeitos = await listAllSuspiciouLinks()
 
         // Estatísticas do Alonsal

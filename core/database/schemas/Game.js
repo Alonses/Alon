@@ -12,66 +12,30 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("Game", schema)
 
-async function getGames() {
-    return model.find().sort({
-        expira: 1
-    })
+async function getGames(client) {
+    await client.prisma.game.findMany({ orderBy: { expire: "asc" } })
 }
 
 // Verifica se um game já foi registrado
-async function verifyGame(game) {
-    if (await model.exists({ nome: game.nome }))
-        return true
-
-    return false
+async function verifyGame(client, game) {
+    return (await client.prisma.game.count({ where: { name: game.name }})) > 0
 }
 
-async function createGame(game) {
-
-    if (!await model.exists({ nome: game.nome, expira: game.expira }))
-        await model.create({
-            nome: game.nome,
-            tipo: game.tipo,
-            link: game.link,
-            preco: game.preco,
-            expira: game.expira,
-            hora_expira: game.hora_expira,
-            thumbnail: game.thumbnail
-        })
-
-    return model.findOne({
-        nome: game.nome,
-        expira: game.expira
+async function createGame(client, game) {
+    await client.prisma.game.upsert({
+        where: { name: game.name },
+        update: game,
+        create: game
     })
 }
 
 // Apagando um game
-async function dropGame(game) {
-    await model.findOneAndDelete({
-        nome: game.nome,
-        expira: game.expira
-    })
+async function dropGame(client, game) {
+    await client.prisma.game.delete({ where: { name: game.name } })
 }
 
-async function verifyInvalidGames() {
-
-    const games = await getGames()
-    if (games.length < 1) return
-
-    let games_invalidos = []
-
-    // Listando os games que já expiraram
-    games.forEach(game => {
-        if (game.expira < parseInt(new Date().getTime() / 1000))
-            games_invalidos.push(game)
-    })
-
-    if (games_invalidos.length < 1) return
-
-    // Excluíndo do banco os games que já expiraram
-    games_invalidos.forEach(async game => {
-        await dropGame(game)
-    })
+async function verifyInvalidGames(client) {
+    await client.prisma.game.deleteMany({ where: { expire: { lt: parseInt(new Date().getTime() / 1000) } } })
 }
 
 module.exports.Game = model

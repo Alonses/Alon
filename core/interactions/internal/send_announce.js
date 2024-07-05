@@ -20,17 +20,17 @@ module.exports = async ({ client, interaction }) => {
             if (objetos_anunciados.length === 0)
                 return client.notify(process.env.channel_feeds, { content: ":stop_sign: | Não há jogos gratuitos disponíveis na Epic Games atualmente." })
 
-            if (await verifyGame(objetos_anunciados[0])) // Verificando se há jogos repetidos informados
+            if (await verifyGame(client, objetos_anunciados[0])) // Verificando se há jogos repetidos informados
                 return client.notify(process.env.channel_feeds, { content: ":stop_sign: | Envio de anúncio de jogos cancelado, há jogos repetidos sendo enviados." })
 
             // Registrando os games no banco
             objetos_anunciados.forEach(async game => {
-                game.expira = client.timestamp(game.expira, game.hora_expira)
-                await createGame(game)
+                game.expira = client.timestamp(game.expire, game.hora_expira)
+                await createGame(client, game)
             })
 
             // Verificando pelos games que já expiraram
-            await verifyInvalidGames()
+            await verifyInvalidGames(client)
             dispara_anuncio({ client, objetos_anunciados })
 
             interaction.reply({
