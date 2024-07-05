@@ -84,7 +84,7 @@ module.exports = {
         if (interaction.options.getSubcommand() === "custom") { // Entrada customizada
 
             let entrada = interaction.options.getInteger("time") || null
-            let timer = parseInt(interaction.options.getString("timer")) || 0
+            let timer = parseInt(interaction.options.getString("timer")) * 60 || 0
 
             if (!entrada)
                 entrada = client.timestamp() + timer // Iniciando o timestamp 
