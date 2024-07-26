@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -49,4 +49,11 @@ model Game {
   link        String?
   price       Float   @default(0)
   expire      Int?
+}
+
+model Guild {
+  id          String  @id
+  lang        String  @default("pt-br")
+  second_lang String?
+  inviter     String?
 }
