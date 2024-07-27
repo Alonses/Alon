@@ -7,8 +7,8 @@ const {updateGuild} = require("../../../database/schemas/Guild");
 
 const operations = {
     1: { action: "conf.logger", page: 0 },
-    5: { action: "death_note.note", page: 2 },
-    7: { action: "death_note.notify", page: 2 }
+    5: { action: "death.note", page: 2 },
+    7: { action: "death.note.notify", page: 2 }
 }
 
 module.exports = async ({ client, user, interaction, dados, pagina }) => {
@@ -57,8 +57,9 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             if (evento !== "logger_channel" && operacao === 2)
                 eventos.push({ type: evento.replace("logger_", ""), status: guild[evento] })
 
-            if (evento.includes("member_") && operacao === 6)
-                eventos.push({ type: evento.replace("member_", ""), status: guild[evento] })
+            if (evento.includes("member_") && operacao === 6) {
+                eventos.push({type: evento.replace("death_note_", ""), status: guild[evento]})
+            }
         })
 
         // Definindo os eventos que o log irá relatar no servidor

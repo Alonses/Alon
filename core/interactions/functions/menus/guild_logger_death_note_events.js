@@ -1,3 +1,4 @@
+const {updateGuild} = require("../../../database/schemas/Guild");
 module.exports = async ({ client, user, interaction, dados }) => {
 
     const guild = await client.getGuild(interaction.guild.id)
@@ -5,7 +6,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     // Invertendo os eventos
     Object.keys(interaction.values).forEach(indice => {
         const evento = "death_note_" + interaction.values[indice].split("|")[1]
-        update[evento] = !guild.death_note[evento]
+        update[evento] = !guild[evento]
     })
 
     await updateGuild(client, guild.id, update)

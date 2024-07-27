@@ -525,7 +525,6 @@ function internal_functions(client) {
     }
 
     client.switcher = ({ guild, operations, operacao }) => {
-
         // Inverte o valor de botões liga/desliga
         const local = (operations[operacao].action).replaceAll('.', '_')
 
