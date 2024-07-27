@@ -15,9 +15,9 @@ const {updateGuild} = require("../../../database/schemas/Guild");
 const operations = {
     1: { action: "conf.spam", page: 0 },
     2: { action: "spam.strikes", page: 0 },
-    3: { action: "spam.suspicious_links", page: 1 },
+    3: { action: "spam.suspicious.links", page: 1 },
     7: { action: "spam.notify", page: 2 },
-    8: { action: "spam.manage_mods", page: 1 },
+    8: { action: "spam.manage.mods", page: 1 },
     25: { action: "spam.scanner.links", page: 0 }
 }
 
