@@ -53,12 +53,12 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             digito = 2
         }
 
-        Object.keys(lista_eventos).forEach(evento => {
-            if (evento !== "channel" && operacao === 2)
-                eventos.push({ type: evento, status: lista_eventos[evento] })
+        lista_eventos.forEach(evento => {
+            if (evento !== "logger_channel" && operacao === 2)
+                eventos.push({ type: evento.replace("logger_", ""), status: guild[evento] })
 
             if (evento.includes("member_") && operacao === 6)
-                eventos.push({ type: evento, status: lista_eventos[evento] })
+                eventos.push({ type: evento.replace("member_", ""), status: guild[evento] })
         })
 
         // Definindo os eventos que o log irá relatar no servidor

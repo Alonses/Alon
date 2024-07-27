@@ -7,7 +7,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     // Invertendo os eventos
     Object.keys(interaction.values).forEach(indice => {
         const evento = "logger_" + interaction.values[indice].split("|")[1]
-        update[evento] = !guild.logger[evento]
+        update[evento] = !guild[evento]
     })
 
     await updateGuild(client, guild.id, update)
