@@ -158,7 +158,7 @@ function internal_functions(client) {
     client.updateBot = (data) => updateBot(client, data)
 
 
-    client.getGuild = (id_guild) => getGuild(id_guild)
+    client.getGuild = (id_guild) => getGuild(client, id_guild)
 
     client.getGuildChannels = async (interaction, user, tipo, id_configurado) => { // Lista todos os canais de um tipo especifico no servidor
 
@@ -349,7 +349,7 @@ function internal_functions(client) {
 
         const servers_link = []
 
-        let servers_cache = await getNetworkedGuilds(link)
+        let servers_cache = await getNetworkedGuilds(client, link)
         for (let i = 0; i < servers_cache.length; i++) {
             if (servers_cache[i].sid !== interaction.guild.id) {
                 const nome_servidor = (await client.guilds(servers_cache[i].sid))?.name || client.tls.phrase(user, "menu.invalid.servidor_desconhecido")

@@ -20,7 +20,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
     // Verificando se existem advertências para as próximas punições do usuário
     let indice_warn = user_warns.length > guild_warns.length ? guild_warns.length - 1 : user_warns.length
-    const notas_requeridas = guild_warns[indice_warn - 1].strikes || guild.warn.hierarchy.strikes
+    const notas_requeridas = guild_warns[indice_warn - 1].strikes || guild.warn_hierarchy_strikes
 
     const embed = new EmbedBuilder()
         .setTitle(`${client.tls.phrase(user, "mode.hierarquia.verificando_anotacao_titulo")} ${client.defaultEmoji("pen")}`)

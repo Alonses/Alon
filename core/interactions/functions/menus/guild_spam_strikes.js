@@ -1,9 +1,6 @@
+const {updateGuild} = require("../../../database/schemas/Guild");
 module.exports = async ({ client, user, interaction, dados }) => {
-
-    const guild = await client.getGuild(interaction.guild.id)
-    guild.spam.trigger_amount = parseInt(dados)
-
-    await guild.save()
+    await updateGuild(client, interaction.guild.id, { spam_trigger_amount: parseInt(dados) })
 
     // Redirecionando o evento
     const pagina_guia = 2

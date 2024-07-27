@@ -1,16 +1,12 @@
+const {updateGuild} = require("../../../database/schemas/Guild");
 module.exports = async ({ client, user, interaction, dados }) => {
 
     const guild = await client.getGuild(interaction.guild.id)
-    guild.warn.announce.channel = dados
+    const update = {}
+    update.warn_announce_channel = dados === "none" ? null : dados
+    update.warn_announce_status = guild.warn_announce_channel || !guild.warn_announce_status // Desativando o recurso de advertências públicas caso não haja um canal definido
 
-    if (dados === "none") // Removendo canal selecionado
-        guild.warn.announce.channel = null
-
-    // Desativando o recurso de advertências públicas caso não haja um canal definido
-    if (!guild.warn.announce.channel && guild.warn.announce.status)
-        guild.warn.announce.status = false
-
-    await guild.save()
+    await updateGuild(client, guild.id, update)
 
     // Redirecionando o evento
     const pagina_guia = 1

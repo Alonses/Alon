@@ -1,4 +1,5 @@
 const { ChannelType } = require('discord.js')
+const {updateGuild} = require("../../../database/schemas/Guild");
 
 // 1 -> Ativar ou desativar o log de eventos
 // 5 -> Ativar ou desativar o registro de punições em canal separado
@@ -16,13 +17,13 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     let guild = await client.getGuild(interaction.guild.id)
 
     // Sem canal de avisos definido, solicitando um canal
-    if (!guild.logger.channel) {
+    if (!guild.logger_channel) {
         reback = "panel_guild.0"
         operacao = 3
     }
 
     // Sem canal de aviso para o Death note escolhido
-    if (operacao === 5 && !guild.death_note.channel)
+    if (operacao === 5 && !guild.death_note_channel)
         operacao = 8
 
     // Tratamento dos cliques
@@ -44,10 +45,10 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     else if (operacao === 2 || operacao === 6) {
 
         const eventos = []
-        let lista_eventos = guild.logger, alvo = "guild_logger#events", digito = 0
+        let lista_eventos = Object.keys(guild).filter(prop => prop.startsWith("logger")), alvo = "guild_logger#events", digito = 0
 
         if (operacao === 6) {
-            lista_eventos = guild.death_note
+            lista_eventos = Object.keys(guild).filter(prop => prop.startsWith("death_note"))
             alvo = "guild_logger_death_note#events"
             digito = 2
         }
@@ -80,10 +81,10 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
     } else if (operacao === 3 || operacao === 8) {
 
-        let canal = guild.logger.channel, alvo = "guild_logger#channel", digito = 1
+        let canal = guild.logger_channel, alvo = "guild_logger#channel", digito = 1
 
         if (operacao === 8) {
-            canal = guild.death_note.channel
+            canal = guild.death_note_channel
             alvo = "guild_logger_death_note#channel"
             digito = 2
         }
@@ -138,7 +139,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     if (operacao === 10) pagina_guia = 2
 
     // Salvando os dados atualizados
-    if (operations[operacao]) await guild.save()
+    if (operations[operacao]) await updateGuild(client, guild.id, guild)
 
     // Redirecionando a função para o painel do log de eventos
     require('../../chunks/panel_guild_logger')({ client, user, interaction, operacao, pagina_guia })

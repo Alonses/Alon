@@ -1,6 +1,7 @@
 const { ChannelType } = require('discord.js')
 
 const { banMessageEraser } = require('../../../formatters/patterns/timeout')
+const {updateGuild} = require("../../../database/schemas/Guild");
 
 // 1 -> Ativar ou desativar o módulo de reportes externos
 // 2 -> Ativar ou desativar o AutoBan
@@ -18,7 +19,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     let guild = await client.getGuild(interaction.guild.id)
 
     // Sem canal de avisos definido, solicitando um canal
-    if (!guild.reports.channel) {
+    if (!guild.reports_channel) {
         reback = "panel_guild.1"
         operacao = 4
     }
@@ -45,7 +46,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             alvo: "guild_reports#channel",
             reback: "browse_button.guild_reports_button",
             operation: operacao,
-            values: await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.reports.channel)
+            values: await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.reports_channel)
         }
 
         // Subtrai uma página do total ( em casos de exclusão de itens e pagina em cache )
@@ -78,10 +79,10 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             values: []
         }
 
-        if (guild.reports.role)
+        if (guild.reports_role)
             data.values.push({ name: client.tls.phrase(user, "manu.guild_data.remover_cargo"), id: "none" })
 
-        data.values = data.values.concat(await client.getGuildRoles(interaction, guild.reports.role, true))
+        data.values = data.values.concat(await client.getGuildRoles(interaction, guild.reports_role, true))
 
         // Subtrai uma página do total ( em casos de exclusão de itens e pagina em cache )
         if (data.values.length < pagina * 24) pagina--
@@ -105,7 +106,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
         // Escolhendo o tempo de exclusão das mensagens para membros banidos pelo AutoBan
         const valores = []
-        Object.keys(banMessageEraser).forEach(key => { if (parseInt(key) !== guild.reports.erase_ban_messages) valores.push(key) })
+        Object.keys(banMessageEraser).forEach(key => { if (parseInt(key) !== guild.reports_erase_ban_messages) valores.push(key) })
 
         const data = {
             title: { tls: "menu.menus.escolher_expiracao" },
@@ -125,7 +126,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     }
 
     // Salvando os dados atualizados
-    if (operations[operacao]) await guild.save()
+    if (operations[operacao]) await updateGuild(client, guild.id, guild)
 
     if (operacao === 20) pagina_guia = 1
     else if (operacao === 21) pagina_guia = 2

@@ -1,6 +1,7 @@
 const { EmbedBuilder, AuditLogEvent, PermissionsBitField } = require('discord.js')
 
 const { dropUserGuild } = require('../../../database/schemas/User_guilds.js')
+const {updateGuild} = require("../../../database/schemas/Guild");
 
 module.exports = async (client, dados) => {
 
@@ -11,17 +12,17 @@ module.exports = async (client, dados) => {
     if (user.conf?.cached_guilds) dropUserGuild(user.uid, dados.guild.id)
 
     // Verificando se a guild habilitou o logger
-    if (!guild.conf.logger) return
+    if (!guild.conf_logger) return
 
     // Permissão para ver o registro de auditoria, desabilitando o logger
     if (!await client.permissions(dados, client.id(), PermissionsBitField.Flags.ViewAuditLog)) {
+        await updateGuild(client, guild.id, {
+            logger_member_left: false,
+            logger_member_kick: false,
+            logger_member_ban_add: false
+        })
 
-        guild.logger.member_left = false
-        guild.logger.member_kick = false
-        guild.logger.member_ban_add = false
-        guild.save()
-
-        return client.notify(guild.logger.channel, { content: client.tls.phrase(guild, "mode.logger.permissao", 7) })
+        return client.notify(guild.logger_channel, {content: client.tls.phrase(guild, "mode.logger.permissao", 7)})
     }
 
     // Verificando se o usuário foi expulso do servidor
@@ -46,7 +47,7 @@ module.exports = async (client, dados) => {
     const registroAudita = fetchedLogs.entries.first()
 
     if (registroAudita)
-        if (registroAudita.targetId === user_alvo.id || !guild.logger.member_left)
+        if (registroAudita.targetId === user_alvo.id || !guild.logger_member_left)
             return // Usuário foi banido ou recurso desativado
 
     const embed = new EmbedBuilder()
@@ -69,5 +70,5 @@ module.exports = async (client, dados) => {
     const url_avatar = user_alvo.avatarURL({ dynamic: true, size: 2048 })
     if (url_avatar) embed.setThumbnail(url_avatar)
 
-    client.notify(guild.logger.channel, { embeds: [embed] })
+    client.notify(guild.logger_channel, { embeds: [embed] })
 }

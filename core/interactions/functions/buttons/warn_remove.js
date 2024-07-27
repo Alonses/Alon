@@ -1,4 +1,5 @@
 const { listAllGuildWarns, dropGuildWarn } = require("../../../database/schemas/Guild_warns")
+const {updateGuild} = require("../../../database/schemas/Guild");
 
 module.exports = async ({ client, user, interaction, dados }) => {
 
@@ -18,13 +19,8 @@ module.exports = async ({ client, user, interaction, dados }) => {
         dropGuildWarn(interaction.guild.id, id_alvo)
 
         // Menos que o limite necessário para o recurso ser ativo
-        if ((warns_guild.length - 1) < 2) {
-            const guild = await client.getGuild(interaction.guild.id)
-
-            // Desativando as advertências do servidor
-            guild.conf.warn = false
-            await guild.save()
-        }
+        if ((warns_guild.length - 1) < 2)
+            await updateGuild(client, interaction.guild.id, { conf_warn: false })
 
         dados = "0.3"
         return require('./guild_warns_button')({ client, user, interaction, dados })

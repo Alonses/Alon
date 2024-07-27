@@ -28,7 +28,10 @@ async function dailyReset(client) {
 }
 
 async function updateBot(client, data) {
-
+    await client.prisma.bot.update({
+        where: { id: client.id() },
+        data: data
+    })
 }
 
 async function dropBot(client) {

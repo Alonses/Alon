@@ -1,8 +1,10 @@
 const { EmbedBuilder, PermissionsBitField } = require('discord.js')
+const { updateGuild } = require("../../../core/database/schemas/Guild")
 
 module.exports = async ({ client, user, interaction }) => {
 
-    let guild = await client.getGuild(interaction.guild.id)
+    const guild = await client.getGuild(interaction.guild.id)
+    let update = {}
 
     const dados = {
         role: interaction.options.getRole("role"),
@@ -12,7 +14,7 @@ module.exports = async ({ client, user, interaction }) => {
 
     if (dados.role) {
         dados.role = dados.role.id
-        guild.games.role = dados.role
+        update.games_role = dados.role
     }
 
     if (dados.channel) {
@@ -23,12 +25,12 @@ module.exports = async ({ client, user, interaction }) => {
             return client.tls.reply(interaction, user, "mode.anuncio.tipo_canal", true, client.defaultEmoji("types"))
 
         dados.channel = dados.channel.id
-        guild.games.channel = dados.channel
+        update.games_channel = dados.channel
     }
 
     if (!guild.lang) {
-        guild.lang = client.idioma.getLang(interaction)
-        dados.lang = guild.lang
+        update.lang = client.idioma.getLang(interaction)
+        dados.lang = update.lang
     }
 
     if (!dados.lang)
@@ -68,7 +70,7 @@ module.exports = async ({ client, user, interaction }) => {
             }
         )
 
-    await guild.save()
+    await updateGuild(client, guild.id, update)
 
     interaction.reply({
         embeds: [embed],

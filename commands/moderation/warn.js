@@ -108,7 +108,7 @@ module.exports = {
 
         const guild = await client.getGuild(interaction.guild.id)
 
-        if (!guild.conf.warn || !guild.warn.channel) // Verificando se o comando está configurado
+        if (!guild.conf_warn || !guild.warn_channel) // Verificando se o comando está configurado
             return client.tls.reply(interaction, user, "mode.warn.nao_configurado_2", true, 7)
 
         // Redirecionando o evento

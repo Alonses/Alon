@@ -1,4 +1,5 @@
 const { free_games } = require('../../../functions/free_games.js')
+const {updateGuild} = require("../../../database/schemas/Guild");
 
 module.exports = async ({ client, user, interaction, dados }) => {
 
@@ -21,21 +22,22 @@ module.exports = async ({ client, user, interaction, dados }) => {
     // Ativando o anúncio de games do servidor
     let guild = await client.getGuild(interaction.guild.id)
 
-    guild.conf.games = true
-    guild.lang = idioma
-    await guild.save()
+    await updateGuild(client, guild.id, {
+        lang: idioma,
+        conf_games: true
+    })
 
     client.notify(process.env.channel_feeds, { content: `:video_game: :mega: | O Servidor ( \`${interaction.guild.name}\` | \`${interaction.guild.id}\` ) agora recebe atts de jogos grátis` })
 
     interaction.update({
-        content: client.tls.phrase(user, "mode.anuncio.anuncio_games", client.emoji(29), `<#${guild.games.channel}>`),
+        content: client.tls.phrase(user, "mode.anuncio.anuncio_games", client.emoji(29), `<#${guild.games_channel}>`),
         embeds: [],
         components: [],
         ephemeral: true
     })
 
     if (operacao === 2) {
-        const guild_channel = guild.games.channel
+        const guild_channel = guild.games_channel
         free_games({ client, guild_channel })
     }
 }

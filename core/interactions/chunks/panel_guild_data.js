@@ -13,7 +13,7 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
     const reportes = await checkUserGuildReported(interaction.guild.id)
 
     const guild = await client.getGuild(interaction.guild.id), pagina = pagina_guia || 0
-    const network = guild.network.link ? (await getNetworkedGuilds(guild.network.link)).length - 1 : 0
+    const network = guild.network_link ? (await getNetworkedGuilds(client, guild.network_link)).length - 1 : 0
 
     await client.deferedResponse({ interaction })
 
@@ -37,7 +37,7 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
 
     if (network > 1) {
         dados += `\n${client.emoji(36)} **Network**\n\`${network > 1 ? client.tls.phrase(user, "manu.guild_data.network_servidores", null, network) : client.tls.phrase(user, "manu.guild_data.network_unico")}\``
-        dados += `\n:link: **${client.tls.phrase(user, "manu.guild_data.outros_servidores")}:**\n${guild.network.link ? await client.getNetWorkGuildNames(user, guild.network.link, interaction) : client.tls.phrase(user, "manu.guild_data.sem_servidores")}\n`
+        dados += `\n:link: **${client.tls.phrase(user, "manu.guild_data.outros_servidores")}:**\n${guild.network_link ? await client.getNetWorkGuildNames(user, guild.network_link, interaction) : client.tls.phrase(user, "manu.guild_data.sem_servidores")}\n`
     }
 
     const embed = new EmbedBuilder()
@@ -45,18 +45,18 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
         .setColor(client.embed_color(user.misc.color))
         .setFields(
             {
-                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf.logger)} **${client.tls.phrase(user, "manu.painel.log_eventos")}**`,
-                value: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf.network)} **Network**\n${client.execute("functions", "emoji_button.emoji_button", guild?.conf.tickets)} **${client.tls.phrase(user, "manu.painel.denuncias_server")}**`,
+                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf_logger)} **${client.tls.phrase(user, "manu.painel.log_eventos")}**`,
+                value: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf_network)} **Network**\n${client.execute("functions", "emoji_button.emoji_button", guild?.conf_tickets)} **${client.tls.phrase(user, "manu.painel.denuncias_server")}**`,
                 inline: true
             },
             {
-                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf.warn)} **${client.tls.phrase(user, "mode.warn.advertencias")}**`,
-                value: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf.reports)} **${client.tls.phrase(user, "manu.painel.reports_externos")}**`,
+                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf_warn)} **${client.tls.phrase(user, "mode.warn.advertencias")}**`,
+                value: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf_reports)} **${client.tls.phrase(user, "manu.painel.reports_externos")}**`,
                 inline: true
             },
             {
-                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf.spam)} **${client.tls.phrase(user, "manu.painel.anti_spam")}**`,
-                value: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf.games)} **${client.tls.phrase(user, "manu.painel.anuncio_games")}**\n${client.execute("functions", "emoji_button.emoji_button", guild?.conf.nuke_invites)} **${client.tls.phrase(user, "manu.painel.convites_rastreados")}**`,
+                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf_spam)} **${client.tls.phrase(user, "manu.painel.anti_spam")}**`,
+                value: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf_games)} **${client.tls.phrase(user, "manu.painel.anuncio_games")}**\n${client.execute("functions", "emoji_button.emoji_button", guild?.conf_nuke_invites)} **${client.tls.phrase(user, "manu.painel.convites_rastreados")}**`,
                 inline: true
             }
         )
@@ -71,8 +71,8 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
 
         let tempo_exclusao = ""
 
-        if (guild.erase.timeout)
-            tempo_exclusao = `\n**${client.defaultEmoji("time")} ${client.tls.phrase(user, "manu.guild_data.tempo_exclusao")}**:\n${client.tls.phrase(user, "manu.guild_data.excluir_apos", null, defaultEraser[guild.erase.timeout] / 86400)}`
+        if (guild.erase_timeout)
+            tempo_exclusao = `\n**${client.defaultEmoji("time")} ${client.tls.phrase(user, "manu.guild_data.tempo_exclusao")}**:\n${client.tls.phrase(user, "manu.guild_data.excluir_apos", null, defaultEraser[guild.erase_timeout] / 86400)}`
 
         embed.setDescription(client.tls.phrase(user, "manu.guild_data.resumo_expandido", null, tempo_exclusao))
     }

@@ -21,8 +21,8 @@ module.exports = async ({ client }) => {
     const date1 = new Date() // Trava o cronometro em um intervalo de 60 segundos
     const tempo_restante = 10 - date1.getSeconds()
 
-    atualiza_warns()
-    atualiza_pre_warns()
+    atualiza_warns(client)
+    atualiza_pre_warns(client)
 
     atualiza_roles()
     atualiza_join_guilds(client)
@@ -30,7 +30,7 @@ module.exports = async ({ client }) => {
     atualiza_modulos()
     atualiza_fixed_badges(client)
 
-    atualiza_eraser()
+    atualiza_eraser(client)
     atualiza_user_eraser(client)
 
     console.log("📣 | Disparando o relógio interno")

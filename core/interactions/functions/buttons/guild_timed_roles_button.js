@@ -8,7 +8,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     const guild = await client.getGuild(interaction.guild.id)
 
     // Sem canal definido, solicitando um canal
-    if (!guild.timed_roles.channel) {
+    if (!guild.timed_roles_channel) {
         reback = "panel_guild.2"
         operacao = 2
     }
@@ -23,7 +23,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
         // Submenu para escolher o tempo de expiração dos cargos
         const valores = []
-        Object.keys(defaultRoleTimes).forEach(key => { if (parseInt(key) !== guild.timed_roles.timeout) valores.push(`${key}.${defaultRoleTimes[key]}`) })
+        Object.keys(defaultRoleTimes).forEach(key => { if (parseInt(key) !== guild.timed_roles_timeout) valores.push(`${key}.${defaultRoleTimes[key]}`) })
 
         const data = {
             title: { tls: "menu.menus.escolher_tempo_remocao" },
@@ -50,7 +50,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             alvo: "guild_timed_roles#channel",
             reback: "browse_button.guild_timed_roles_button",
             operation: operacao,
-            values: await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.timed_roles.channel)
+            values: await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.timed_roles_channel)
         }
 
         // Subtrai uma página do total ( em casos de exclusão de itens e pagina em cache )

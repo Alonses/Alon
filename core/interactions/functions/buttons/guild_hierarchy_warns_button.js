@@ -1,6 +1,7 @@
 const { ChannelType } = require('discord.js')
 
 const { defaultWarnStrikes, defaultEraser } = require('../../../formatters/patterns/timeout')
+const {updateGuild} = require("../../../database/schemas/Guild");
 
 // 1 -> Ativar ou desativar as advertências com hierarquia
 // 2 -> Ativar ou desativar a expiração de anotações
@@ -16,8 +17,8 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     let guild = await client.getGuild(interaction.guild.id)
 
     // Sem canal de avisos definido, solicitando um canal
-    if (!guild.warn.hierarchy.channel) {
-        reback = "panel_guild_warns.0"
+    if (!guild.warn_hierarchy_channel) {
+        // reback = "panel_guild_warns.0"
         operacao = 5
     }
 
@@ -54,7 +55,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     } else if (operacao === 5) {
 
         // Definindo o canal de avisos das advertências hierárquicas
-        let canal = guild.warn.hierarchy.channel
+        let canal = guild.warn_hierarchy_channel
 
         const data = {
             title: { tls: "menu.menus.escolher_canal" },
@@ -90,7 +91,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
         // Escolhendo o tempo de expiração dos avisos de advertência
         const valores = []
-        Object.keys(defaultEraser).forEach(key => { if (parseInt(key) !== guild.warn.hierarchy.reset) valores.push(`${key}.${defaultEraser[key]}`) })
+        Object.keys(defaultEraser).forEach(key => { if (parseInt(key) !== guild.warn_hierarchy_reset) valores.push(`${key}.${defaultEraser[key]}`) })
 
         const data = {
             title: { tls: "mode.warn.definir_tempo" },
@@ -111,7 +112,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     }
 
     // Salvando os dados atualizados
-    if (operations[operacao]) await guild.save()
+    if (operations[operacao]) await updateGuild(client, guild.id, guild)
 
     // Redirecionando a função para o painel das advertências com hierarquia
     require('../../chunks/panel_guild_hierarchy_warns')({ client, user, interaction, pagina_guia })

@@ -41,7 +41,7 @@ module.exports = async ({ client, user, interaction }) => {
         return client.tls.reply(interaction, user, "mode.report.usuario_bot", true, client.emoji(0))
 
     // Usado apenas em servidores com advertências hierarquias desativadas
-    if (!guild.warn.hierarchy.status) {
+    if (!guild.warn_hierarchy_status) {
 
         // Verificando se a hierarquia do membro que ativou o warn é maior que o do alvo
         if (interaction.member.roles.highest.position < guild_member.roles.highest.position)

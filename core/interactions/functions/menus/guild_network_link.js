@@ -1,29 +1,29 @@
 const { createNetworkLink } = require('../../../database/schemas/Guild_network')
+const {updateGuild} = require("../../../database/schemas/Guild");
 
 module.exports = async ({ client, user, interaction, dados }) => {
 
     const guild = await client.getGuild(interaction.guild.id)
 
-    if (!guild.network.link) { // Criando um link de network para o servidor
-        guild.network.link = await createNetworkLink(client)
-        await guild.save()
-    }
+    if (!guild.network_link) // Criando um link de network para o servidor
+        await updateGuild(client, guild.id, { network_link: await createNetworkLink(client)})
 
     // Atualizando o link dos servidores
     for (let i = 0; i < interaction.values.length; i++) {
 
         const internal_guild = await client.getGuild(interaction.values[i].split("|")[1])
+        const update = {}
 
         // Desvinculando o servidor
-        if (internal_guild.network.link === guild.network.link) {
-            internal_guild.conf.network = false
-            internal_guild.network.link = null
+        if (internal_guild.network_link === guild.network_link) {
+            update.conf_network = false
+            update.network_link = null
         } else { // Vinculando o servidor
-            internal_guild.conf.network = true
-            internal_guild.network.link = guild.network.link
+            update.conf_network = true
+            update.network_link = guild.network_link
         }
 
-        await internal_guild.save()
+        await updateGuild(client, internal_guild.id, update)
     }
 
     // Redirecionando o evento

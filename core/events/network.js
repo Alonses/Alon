@@ -17,7 +17,7 @@ module.exports = async ({ client, guild, caso, id_alvo }) => {
         if (!await client.permissions(guild.sid, client.id(), [PermissionsBitField.Flags.ViewAuditLog]))
             return client.notify(guild.logger.channel, { content: client.tls.phrase(guild, "mode.network.sem_permissao", 7) })
 
-        const guilds_network = await getNetworkedGuilds(guild.network.link)
+        const guilds_network = await getNetworkedGuilds(client, guild.network.link)
         const guild_evento = await client.guilds(guild.sid)
         let fetchedLogs
 

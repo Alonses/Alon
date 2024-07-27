@@ -3,6 +3,7 @@ const { ChannelType, EmbedBuilder } = require('discord.js')
 const { listAllGuildStrikes, getGuildStrike } = require('../../../database/schemas/Guild_strikes')
 
 const { loggerMap } = require('../../../formatters/patterns/guild')
+const {updateGuild} = require("../../../database/schemas/Guild");
 
 // 1 -> Ativar ou desativar o módulo anti-spam
 // 2 -> Ativar ou desativar os strikes
@@ -28,7 +29,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     if (operacao > 3) pagina_guia = 2
 
     // Sem canal de avisos definido, solicitando um canal
-    if (!guild.spam.channel && !guild.logger.channel) {
+    if (!guild.spam_channel && !guild.logger_channel) {
         reback = "panel_guild.0"
         operacao = 6
     }
@@ -123,11 +124,11 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             values: []
         }
 
-        if (guild.spam.channel)
+        if (guild.spam_channel)
             data.values.push({ name: client.tls.phrase(user, "manu.guild_data.remover_canal"), id: "none" })
 
         // Listando os canais do servidor
-        data.values = data.values.concat(await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.spam.channel))
+        data.values = data.values.concat(await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.spam_channel))
 
         // Subtrai uma página do total ( em casos de exclusão de itens e pagina em cache )
         if (data.values.length < pagina * 24) pagina--
@@ -151,7 +152,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     if (operacao === 10) pagina_guia = 1
 
     // Salvando os dados atualizados
-    if (operations[operacao]) await guild.save()
+    if (operations[operacao]) await updateGuild(client, guild.id, guild)
 
     // Redirecionando a função para o painel de anti-spam
     require('../../chunks/panel_guild_anti_spam')({ client, user, interaction, pagina_guia })

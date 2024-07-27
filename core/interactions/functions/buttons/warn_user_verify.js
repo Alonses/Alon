@@ -42,7 +42,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
         const guild = await client.getGuild(interaction.guild.id)
 
-        if (guild.warn.notify_exclusion) { // Embed de aviso que o membro teve uma advertência apagada
+        if (guild.warn_notify_exclusion) { // Embed de aviso que o membro teve uma advertência apagada
 
             let warns_restantes = client.tls.phrase(user, "mode.warn.advertencias_restantes", null, user_warns.length - 1), motivo_remocao = ""
 
@@ -73,8 +73,8 @@ module.exports = async ({ client, user, interaction, dados }) => {
                 )
                 .setTimestamp()
 
-            client.notify(guild.warn.channel, {
-                content: guild.warn.notify ? "@here" : "", // Servidor com ping de advertência ativo
+            client.notify(guild.warn_channel, {
+                content: guild.warn_notify ? "@here" : "", // Servidor com ping de advertência ativo
                 embeds: [embed]
             })
         }

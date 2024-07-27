@@ -1,10 +1,8 @@
+const {updateGuild} = require("../../../database/schemas/Guild");
 module.exports = async ({ client, user, interaction, dados }) => {
-
-    const guild = await client.getGuild(interaction.guild.id)
     const acao = parseInt(dados.split(".")[0])
 
-    guild.warn.reset = acao
-    await guild.save()
+    await updateGuild(client, interaction.guild.id, { warn_reset: acao })
 
     // Redirecionando o evento
     const pagina_guia = 2

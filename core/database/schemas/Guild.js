@@ -122,82 +122,72 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("Guild", schema)
 
-async function getGuild(sid) {
-    if (!await model.exists({ sid: sid }))
-        await model.create({
-            sid: sid
-        })
-
-    return model.findOne({
-        sid: sid
+async function getGuild(client, gid) {
+    return await client.prisma.guild.upsert({
+        where: { id: gid },
+        update: {},
+        create: { id: gid }
     })
 }
 
-async function getSpecificGameChannel(gcid) {
-
-    // Busca apenas o servidor com o canal ativo
-    return model.find({
-        "games.channel": gcid,
-        "conf.games": true
+async function getSpecificGameChannel(client, gcid) {
+    return await client.prisma.guild.findUnique({
+        where: {
+            games_channel: gcid,
+            conf_games: true
+        }
     })
 }
 
-async function getGameChannels() {
-    // Lista todos os servidores com anúncios de games ativos
-    return model.find({
-        "conf.games": true
+async function getGameChannels(client) {
+    return await client.prisma.guild.findMany({ where: { conf_games: true } })
+}
+
+async function getGameChannelById(client, gcid) {
+    return await client.prisma.guild.findUnique({ where: { games_channel: gcid } })
+}
+
+async function getReportChannels(client) {
+    return await client.prisma.guild.findMany({ where: { conf_reports: true } })
+}
+
+async function getReportNetworkChannels(client, link) {
+    return await client.prisma.guild.findMany({
+        where: {
+            network_link: link,
+            conf_reports: true
+        }
     })
 }
 
-async function getGameChannelById(id) {
-    return model.findOne({
-        "games.channel": id
+async function disableGuildFeatures(client, gid) {
+    const guild = await getGuild(client, gid)
+
+    await client.prisma.guild.update({
+        where: { id: gid },
+        data: {
+            inviter: null,
+            network_link: null,
+            erase_timestamp: client.timestamp() + defaultEraser[guild?.erase.timeout || 5],
+            erase_valid: true
+        }
     })
 }
 
-async function getReportChannels() {
-    // Lista todos os servidores com reports de usuários ativos
-    return model.find({
-        "conf.reports": true
-    })
-}
-
-async function getReportNetworkChannels(link) {
-
-    // Lista todos os servidores com reports de usuários ativos que fazem parte de um network específico
-    return model.find({
-        "network.link": link,
-        "conf.reports": true
-    })
-}
-
-async function disableGuildFeatures(client, sid) {
-    // Desliga os recursos do servidor
-    const guild = await getGuild(sid)
-
-    guild.inviter = null
-    guild.network.link = null
-
-    // Registrando a exclusão de dados do servidor
-    guild.erase.timestamp = client.timestamp() + defaultEraser[guild?.erase.timeout || 5]
-    guild.erase.valid = true
-
-    await guild.save()
-}
-
-async function getNetworkedGuilds(link) {
-    // Lista todos os servidores com network ativo
-    return model.find({
-        "network.link": link
-    })
+async function getNetworkedGuilds(client, link) {
+    return await client.prisma.guild.findMany({ where: { network_link: link } })
 }
 
 async function getRankHosters(client) {
 
     // Lista todos os servidores com hosters salvos
-    const guilds = await model.find({
-        "inviter": { $ne: null }
-    })
+    const guilds = await client.prisma.guild.findMany({
+        where: {
+            inviter: {
+                not: null
+            }
+        }
+    });
 
     const users_map = {}
     const rank = []
@@ -228,45 +218,36 @@ async function getRankHosters(client) {
     return [await client.getUser(rank[0].uid), await client.getUser(rank[1].uid)]
 }
 
-async function getTimedGuilds() {
-    // Lista todas as advertências que se expirão
-    return model.find({
-        "warn.timed": true
-    })
+async function getTimedGuilds(client) {
+    return await client.prisma.guild.findMany({ where: { warn_timed: true } })
 }
 
-async function getTimedPreGuilds() {
-    // Lista todas as anotações de advertências que se expirão
-    return model.find({
-        "warn.hierarchy.timed": true
-    })
+async function getTimedPreGuilds(client) {
+    return await client.prisma.guild.findMany({ where: { warn_hierarchy_timed: true } })
 }
 
 // Lista todos os servidores salvos
-async function listAllGuilds() {
-    return model.find()
+async function listAllGuilds(client) {
+    return await client.prisma.guild.findMany()
 }
 
-async function getEraseGuilds() {
-
-    // Lista todos os servidores que estão marcados para exclusão
-    return model.find({
-        "erase.valid": true
-    })
+async function getEraseGuilds(client) {
+    return await client.prisma.guild.findMany({ where: { erase_valid: true } })
 }
 
 // Exclui o servidor por completo
-async function dropGuild(sid) {
-
-    await model.findOneAndDelete({
-        sid: sid
-    })
+async function dropGuild(client, gid) {
+    await client.prisma.guild.delete({ where: { id: gid } })
 }
 
-async function listAllGuildHoster(user_id) {
-    // Lista todos os servidores onde o Alonsal foi adicionado por um membro
-    return model.find({
-        "inviter": user_id
+async function listAllGuildHoster(client, user_id) {
+    return await client.prisma.guild.findMany({ where: { inviter: user_id } })
+}
+
+async function updateGuild(client, gid, data) {
+    await client.prisma.guild.update({
+        where: { id: gid },
+        data: data
     })
 }
 
@@ -286,5 +267,6 @@ module.exports = {
     getTimedGuilds,
     getTimedPreGuilds,
     getEraseGuilds,
+    updateGuild,
     dropGuild
 }

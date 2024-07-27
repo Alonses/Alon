@@ -1,6 +1,7 @@
 const { PermissionsBitField, ChannelType } = require('discord.js')
 
 const { free_games } = require('../../../functions/free_games.js')
+const {updateGuild} = require("../../../database/schemas/Guild");
 
 module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
@@ -8,13 +9,13 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     const guild = await client.getGuild(interaction.guild.id)
 
     // Sem canal de avisos definido, solicitando um canal
-    if (!guild.games.channel) {
+    if (!guild.games_channel) {
         reback = "panel_guild.1"
         operacao = 4
     }
 
     // Sem cargo de avisos definido, solicitando um cargo
-    if (guild.games.channel && !guild.games.role) {
+    if (guild.games_channel && !guild.games_role) {
         reback = "panel_guild.1"
         operacao = 3
     }
@@ -27,15 +28,11 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     // 4 -> Escolher canal para enviar o anúncio
 
     // Ativa ou desativa o módulo de jogos gratuitos do servidor
-    if (operacao === 1) {
-
-        guild.conf.games = !guild.conf.games
-        await guild.save()
-
-    } else if (operacao === 2) {
-
+    if (operacao === 1)
+        await updateGuild(client, guild.id, { conf_games: !guild.conf_games })
+    else if (operacao === 2) {
         // Enviando um anúncio com os titulos de graça no momento
-        const canal_alvo = client.discord.channels.cache.get(guild.games.channel)
+        const canal_alvo = client.discord.channels.cache.get(guild.games_channel)
 
         if (canal_alvo) {
 
@@ -47,7 +44,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
                 free_games({ client, guild_channel })
 
                 return interaction.update({
-                    content: client.tls.phrase(user, "mode.anuncio.anuncio_enviado_duplicatas", client.emoji(29), `<#${guild.games.channel}>`),
+                    content: client.tls.phrase(user, "mode.anuncio.anuncio_enviado_duplicatas", client.emoji(29), `<#${guild.games_channel}>`),
                     ephemeral: true
                 })
             } else // Sem permissão para enviar mensagens no canal
@@ -78,7 +75,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             alvo: "guild_free_games#role",
             reback: "browse_button.guild_free_games_button",
             operation: operacao,
-            values: await client.getGuildRoles(interaction, guild.games.role, true)
+            values: await client.getGuildRoles(interaction, guild.games_role, true)
         }
 
         // Subtrai uma página do total ( em casos de exclusão de itens e pagina em cache )
@@ -108,7 +105,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             alvo: "guild_free_games#channel",
             reback: "browse_button.guild_free_games_button",
             operation: operacao,
-            values: await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.games.channel)
+            values: await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.games_channel)
         }
 
         // Subtrai uma página do total ( em casos de exclusão de itens e pagina em cache )

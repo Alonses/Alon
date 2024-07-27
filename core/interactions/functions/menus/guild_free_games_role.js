@@ -1,9 +1,6 @@
+const {updateGuild} = require("../../../database/schemas/Guild");
 module.exports = async ({ client, user, interaction, dados }) => {
-
-    const guild = await client.getGuild(interaction.guild.id)
-    guild.games.role = dados
-
-    await guild.save()
+    await updateGuild(client, interaction.guild.id, {games_role: dados })
 
     // Redirecionando o evento
     require('../../chunks/panel_guild_free_games')({ client, user, interaction })

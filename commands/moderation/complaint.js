@@ -57,7 +57,7 @@ module.exports = {
         const guild = await client.getGuild(interaction.guild.id)
 
         // Verificando se as denúncias em canais privados estão ativas no servidor
-        if (!guild.conf.tickets)
+        if (!guild.conf_tickets)
             return client.tls.reply(interaction, user, "mode.denuncia.desativado", true, 3)
 
         const channel = await getTicket(interaction.guild.id, interaction.user.id)

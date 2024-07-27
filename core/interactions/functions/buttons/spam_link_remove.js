@@ -38,7 +38,7 @@ module.exports = async ({ client, user, interaction, dados, pagina_guia }) => {
 
         // Notificando sobre a adição de um novo link suspeito ao banco do Alonsal e ao servidor original
         client.notify(process.env.channel_feeds, { content: `:link: :no_entry_sign: | Um link suspeito foi removido manualmente!\n( \`${link.link.split("").join(" ")}\` )` })
-        client.notify(guild.spam.channel || guild.logger.channel, { content: client.tls.phrase(guild, "mode.link_suspeito.excluido_manual", [44, 13], link.link.split("").join(" ")) })
+        client.notify(guild.spam_channel || guild.logger_channel, { content: client.tls.phrase(guild, "mode.link_suspeito.excluido_manual", [44, 13], link.link.split("").join(" ")) })
 
         // Excluindo o link suspeito
         await dropSuspiciousLink(link.link)
@@ -51,7 +51,7 @@ module.exports = async ({ client, user, interaction, dados, pagina_guia }) => {
             ], interaction)
 
         return client.reply(interaction, {
-            content: client.tls.phrase(user, "mode.link_suspeito.aviso_remocao", 44, guild.spam.channel || guild.logger.channel),
+            content: client.tls.phrase(user, "mode.link_suspeito.aviso_remocao", 44, guild.spam_channel || guild.logger_channel),
             embeds: [],
             components: [row],
             ephemeral: true

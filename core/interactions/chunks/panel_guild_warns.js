@@ -13,10 +13,10 @@ module.exports = async ({ client, user, interaction, pagina_guia }) => {
 
     // Permissões do bot no servidor
     const membro_sv = await client.getMemberGuild(interaction, client.id())
-    const advertencias = await listAllGuildWarns(interaction.guild.id), status = guild.conf.warn
+    const advertencias = await listAllGuildWarns(interaction.guild.id)// , status = guild.conf.warn
     const indice_matriz = client.verifyMatrixIndex(advertencias)
 
-    if (guild.conf.warn !== status) await guild.save()
+    // if (guild.conf.warn !== status) await guild.save()
 
     const embed = new EmbedBuilder()
         .setTitle(`> ${client.tls.phrase(user, "mode.warn.advertencias")} :octagonal_sign:`)
@@ -24,28 +24,28 @@ module.exports = async ({ client, user, interaction, pagina_guia }) => {
         .setDescription(client.tls.phrase(user, "mode.warn.descricao_advertencias"))
         .setFields(
             {
-                name: `${client.execute("functions", "emoji_button.emoji_button", guild.conf.warn)} **${client.tls.phrase(user, "mode.report.status")}**`,
-                value: `${client.execute("functions", "emoji_button.emoji_button", guild.warn.timed)} **${client.tls.phrase(user, "mode.warn.com_validade")}**\n${client.execute("functions", "emoji_button.emoji_button", guild.warn.announce.status)} **${client.tls.phrase(user, "mode.warn.anuncio_publico")}**\n${client.emoji(47)} **${client.tls.phrase(user, "mode.warn.advertencias")}: \`${advertencias.length} / 5\`**${indice_matriz ? `\n${client.emoji(54)} **${client.tls.phrase(user, "mode.warn.expulsao_na")} \`${indice_matriz}°\`**` : ""}`,
+                name: `${client.execute("functions", "emoji_button.emoji_button", guild.conf_warn)} **${client.tls.phrase(user, "mode.report.status")}**`,
+                value: `${client.execute("functions", "emoji_button.emoji_button", guild.warn_timed)} **${client.tls.phrase(user, "mode.warn.com_validade")}**\n${client.execute("functions", "emoji_button.emoji_button", guild.warn_announce_status)} **${client.tls.phrase(user, "mode.warn.anuncio_publico")}**\n${client.emoji(47)} **${client.tls.phrase(user, "mode.warn.advertencias")}: \`${advertencias.length} / 5\`**${indice_matriz ? `\n${client.emoji(54)} **${client.tls.phrase(user, "mode.warn.expulsao_na")} \`${indice_matriz}°\`**` : ""}`,
                 inline: true
             },
             {
                 name: `${client.defaultEmoji("channel")} **${client.tls.phrase(user, "mode.report.canal_de_avisos")}**`,
-                value: `${client.emoji(20)} ${client.execute("functions", "emoji_button.emoji_button", guild.warn.notify)} **${client.tls.phrase(user, "mode.spam.mencoes")}**\n${guild.warn.channel ? `${client.emoji("icon_id")} \`${guild.warn.channel}\`\n( <#${guild.warn.channel}> )` : `\`❌ ${client.tls.phrase(user, "mode.network.sem_canal")}\``}`,
+                value: `${client.emoji(20)} ${client.execute("functions", "emoji_button.emoji_button", guild.warn_notify)} **${client.tls.phrase(user, "mode.spam.mencoes")}**\n${guild.warn_channel ? `${client.emoji("icon_id")} \`${guild.warn_channel}\`\n( <#${guild.warn_channel}> )` : `\`❌ ${client.tls.phrase(user, "mode.network.sem_canal")}\``}`,
                 inline: true
             },
             {
                 name: `${client.defaultEmoji("time")} **${client.tls.phrase(user, "mode.warn.validade")}**`,
-                value: `:wastebasket: **${client.tls.phrase(user, "mode.warn.expira_em")} \`${client.tls.phrase(user, `menu.times.${spamTimeoutMap[guild.warn.reset]}`)}\`**${guild.warn.timed ? "" : `\n( **⛔ ${client.tls.phrase(user, "mode.warn.no_momento")}** )`}`,
+                value: `:wastebasket: **${client.tls.phrase(user, "mode.warn.expira_em")} \`${client.tls.phrase(user, `menu.times.${spamTimeoutMap[guild.warn_reset]}`)}\`**${guild.warn_timed ? "" : `\n( **⛔ ${client.tls.phrase(user, "mode.warn.no_momento")}** )`}`,
                 inline: true
             },
             {
                 name: `:wastebasket: **${client.tls.phrase(user, "mode.warn.excluir_banidos")}**`,
-                value: `\`${client.tls.phrase(user, `menu.network.${banMessageEraser[guild.warn.erase_ban_messages]}`)}\``,
+                value: `\`${client.tls.phrase(user, `menu.network.${banMessageEraser[guild.warn_erase_ban_messages]}`)}\``,
                 inline: false
             },
             {
                 name: `${client.defaultEmoji("channel")} **${client.tls.phrase(user, "mode.timed_roles.canal_avisos_temporario")}**`,
-                value: guild.warn.timed_channel ? client.tls.phrase(user, "mode.timed_roles.enviando", null, guild.warn.timed_channel) : `\`❌ ${client.tls.phrase(user, "mode.timed_roles.sem_canal_temporario")}\``,
+                value: guild.warn.timed_channel ? client.tls.phrase(user, "mode.timed_roles.enviando", null, guild.warn_timed_channel) : `\`❌ ${client.tls.phrase(user, "mode.timed_roles.sem_canal_temporario")}\``,
                 inline: false
             },
             {
@@ -75,23 +75,23 @@ module.exports = async ({ client, user, interaction, pagina_guia }) => {
             .setFields(
                 {
                     name: `${client.defaultEmoji("channel")} **${client.tls.phrase(user, "mode.report.canal_de_avisos")}**`,
-                    value: `${client.emoji(20)} ${client.execute("functions", "emoji_button.emoji_button", guild.warn.notify)} **${client.tls.phrase(user, "mode.spam.mencoes")}**\n${guild.warn.channel ? `${client.emoji("icon_id")} \`${guild.warn.channel}\`\n( <#${guild.warn.channel}> )` : `\`❌ ${client.tls.phrase(user, "mode.network.sem_canal")}\``}`,
+                    value: `${client.emoji(20)} ${client.execute("functions", "emoji_button.emoji_button", guild.warn_notify)} **${client.tls.phrase(user, "mode.spam.mencoes")}**\n${guild.warn_channel ? `${client.emoji("icon_id")} \`${guild.warn_channel}\`\n( <#${guild.warn_channel}> )` : `\`❌ ${client.tls.phrase(user, "mode.network.sem_canal")}\``}`,
                     inline: true
                 },
                 {
                     name: "⠀",
-                    value: `${client.emoji(20)} ${client.execute("functions", "emoji_button.emoji_button", guild.warn.notify_exclusion)} **${client.tls.phrase(user, "menu.botoes.notificar_remocao")}**`,
+                    value: `${client.emoji(20)} ${client.execute("functions", "emoji_button.emoji_button", guild.warn_notify_exclusion)} **${client.tls.phrase(user, "menu.botoes.notificar_remocao")}**`,
                     inline: true
                 },
                 { name: "⠀", value: "⠀", inline: false },
                 {
-                    name: `📢 **${client.tls.phrase(user, "mode.warn.advertencias_publicas")}**\n${client.execute("functions", "emoji_button.emoji_button", guild.warn?.announce?.status)} **${client.tls.phrase(user, "mode.warn.anunciar_publicamente")}**`,
+                    name: `📢 **${client.tls.phrase(user, "mode.warn.advertencias_publicas")}**\n${client.execute("functions", "emoji_button.emoji_button", guild.warn_announce_status)} **${client.tls.phrase(user, "mode.warn.anunciar_publicamente")}**`,
                     value: "⠀",
                     inline: true
                 },
                 {
                     name: `${client.defaultEmoji("channel")} **${client.tls.phrase(user, "mode.warn.canal_publico")}**`,
-                    value: `${guild.warn.announce.channel ? `${client.emoji("icon_id")} \`${guild.warn.announce.channel}\`\n( <#${guild.warn.announce.channel}> )` : `\`❌ ${client.tls.phrase(user, "mode.network.sem_canal")}\``}`,
+                    value: `${guild.warn.announce.channel ? `${client.emoji("icon_id")} \`${guild.warn_announce_channel}\`\n( <#${guild.warn_announce_channel}> )` : `\`❌ ${client.tls.phrase(user, "mode.network.sem_canal")}\``}`,
                     inline: true
                 }
             )
@@ -103,16 +103,16 @@ module.exports = async ({ client, user, interaction, pagina_guia }) => {
 
     if (pagina === 0) // Página inicial da guia de advertências
         botoes = botoes.concat([
-            { id: "guild_warns_button", name: client.tls.phrase(user, "mode.warn.advertencias"), type: client.execute("functions", "emoji_button.type_button", guild.conf.warn), emoji: client.execute("functions", "emoji_button.emoji_button", guild.conf.warn), data: "1" },
-            { id: "guild_warns_button", name: client.tls.phrase(user, "mode.warn.com_validade"), type: client.execute("functions", "emoji_button.type_button", guild.warn.timed), emoji: client.execute("functions", "emoji_button.emoji_button", guild.warn.timed), data: "6" },
+            { id: "guild_warns_button", name: client.tls.phrase(user, "mode.warn.advertencias"), type: client.execute("functions", "emoji_button.type_button", guild.conf_warn), emoji: client.execute("functions", "emoji_button.emoji_button", guild.conf_warn), data: "1" },
+            { id: "guild_warns_button", name: client.tls.phrase(user, "mode.warn.com_validade"), type: client.execute("functions", "emoji_button.type_button", guild.warn_timed), emoji: client.execute("functions", "emoji_button.emoji_button", guild.warn_timed), data: "6" },
             { id: "guild_warns_button", name: client.tls.phrase(user, "menu.botoes.notificacoes"), type: 1, emoji: client.emoji(41), data: "15" },
             { id: "guild_warns_button", name: client.tls.phrase(user, "menu.botoes.ajustes"), type: 1, emoji: client.emoji(41), data: "9" }
         ])
     else if (pagina === 1) // Página de notificações de advertências
         botoes = botoes.concat([
-            { id: "guild_warns_button", name: client.tls.phrase(user, "mode.spam.mencoes"), type: client.execute("functions", "emoji_button.type_button", guild.warn.notify), emoji: client.execute("functions", "emoji_button.emoji_button", guild.warn.notify), data: "8", disabled: guild.warn?.announce?.status },
-            { id: "guild_warns_button", name: client.tls.phrase(user, "menu.botoes.notificar_remocao"), type: client.execute("functions", "emoji_button.type_button", guild.warn.notify_exclusion), emoji: client.execute("functions", "emoji_button.emoji_button", guild.warn.notify_exclusion), data: "10" },
-            { id: "guild_warns_button", name: client.tls.phrase(user, "mode.warn.anunciar_publicamente"), type: client.execute("functions", "emoji_button.type_button", guild.warn?.announce?.status), emoji: client.execute("functions", "emoji_button.emoji_button", guild.warn?.announce?.status), data: "11", disabled: guild.warn?.announce?.channel ? false : true },
+            { id: "guild_warns_button", name: client.tls.phrase(user, "mode.spam.mencoes"), type: client.execute("functions", "emoji_button.type_button", guild.warn_notify), emoji: client.execute("functions", "emoji_button.emoji_button", guild.warn_notify), data: "8", disabled: guild.warn_announce_status },
+            { id: "guild_warns_button", name: client.tls.phrase(user, "menu.botoes.notificar_remocao"), type: client.execute("functions", "emoji_button.type_button", guild.warn.notify_exclusion), emoji: client.execute("functions", "emoji_button.emoji_button", guild.warn_notify_exclusion), data: "10" },
+            { id: "guild_warns_button", name: client.tls.phrase(user, "mode.warn.anunciar_publicamente"), type: client.execute("functions", "emoji_button.type_button", guild.warn_announce_status), emoji: client.execute("functions", "emoji_button.emoji_button", guild.warn_announce_status), data: "11", disabled: !guild.warn_announce_channel },
             { id: "guild_warns_button", name: client.tls.phrase(user, "mode.warn.canal_publico"), type: 1, emoji: client.defaultEmoji("channel"), data: "12" },
         ])
     else // Página de configurações das advertências

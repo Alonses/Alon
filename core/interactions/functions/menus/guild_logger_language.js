@@ -1,11 +1,8 @@
 const { languagesMap } = require('../../../formatters/patterns/user')
+const {updateGuild} = require("../../../database/schemas/Guild");
 
 module.exports = async ({ client, user, interaction, dados }) => {
-
-    const guild = await client.getGuild(interaction.guild.id)
-    guild.lang = languagesMap[dados][0]
-
-    await guild.save()
+    await updateGuild(client, interaction.guild.id, { lang: languagesMap[dados][0] })
 
     // Redirecionando o evento
     const pagina_guia = 1

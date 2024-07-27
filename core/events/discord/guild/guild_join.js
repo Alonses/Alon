@@ -3,14 +3,13 @@ const { EmbedBuilder, AuditLogEvent, PermissionsBitField } = require('discord.js
 const { verifyDynamicBadge } = require('../../../database/schemas/User_badges')
 
 const { badges } = require('../../../formatters/patterns/user')
+const {updateGuild} = require("../../../database/schemas/Guild");
 
 module.exports = async ({ client, guild }) => {
 
     if (client.id() !== process.env.client_1 || !process.env.channel_server) return
 
-    const internal_guild = await client.getGuild(guild.id)
-    internal_guild.erase.valid = false
-    await internal_guild.save()
+    await updateGuild(client, guild.id, { erase_valid: false })
 
     const canais = guild.channels.cache.filter((c) => c.type !== "GUILD_CATEGORY").size
     const server_info = `\n\n:busts_in_silhouette: **Members** ( \`${guild.memberCount - 1}\` )\n:placard: **Channels** ( \`${canais}\` )`
@@ -27,10 +26,8 @@ module.exports = async ({ client, guild }) => {
             if (user) {
 
                 // Apenas contabiliza o hoster caso o servidor possua muitos membros
-                if ((guild.memberCount - 1) > 20) {
-                    internal_guild.inviter = user.id
-                    await internal_guild.save()
-                }
+                if ((guild.memberCount - 1) > 20)
+                    await updateGuild(client, guild.id, { inviter: user.id })
 
                 const inviter = await client.getUser(user.id)
 

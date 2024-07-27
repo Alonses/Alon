@@ -10,9 +10,9 @@ const { dropRoleAssigner } = require('../../database/schemas/Guild_role_assigner
 const { dropAllGuildStrikes } = require('../../database/schemas/Guild_strikes.js')
 const { dropAllUserGuilds } = require('../../database/schemas/User_guilds.js')
 
-async function atualiza_eraser() {
+async function atualiza_eraser(client) {
 
-    const dados = await getEraseGuilds()
+    const dados = await getEraseGuilds(client)
 
     // Salvando os servidores marcados para exclusão no cache do bot
     writeFileSync("./files/data/erase_guild.txt", JSON.stringify(dados))
@@ -60,12 +60,12 @@ async function verifica_eraser(client) {
                 await updateGuildSuspectLink(servidor.sid)
 
                 // Exclui o servidor por completo
-                await dropGuild(servidor.sid)
+                await dropGuild(client, servidor.sid)
             }
         }
 
         // Atualizando as solicitações de exclusão em cache
-        atualiza_eraser()
+        atualiza_eraser(client)
     })
 }
 

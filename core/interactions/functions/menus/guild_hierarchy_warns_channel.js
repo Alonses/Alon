@@ -1,9 +1,6 @@
+const {updateGuild} = require("../../../database/schemas/Guild");
 module.exports = async ({ client, user, interaction, dados }) => {
-
-    const guild = await client.getGuild(interaction.guild.id)
-    guild.warn.hierarchy.channel = dados
-
-    await guild.save()
+    await updateGuild(client, interaction.guild.id, { warn_hierarchy_channel: dados })
 
     // Redirecionando o evento
     require('../../chunks/panel_guild_hierarchy_warns')({ client, user, interaction })

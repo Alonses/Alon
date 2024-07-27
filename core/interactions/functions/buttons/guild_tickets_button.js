@@ -1,4 +1,5 @@
 const { ChannelType, PermissionsBitField } = require('discord.js')
+const {updateGuild} = require("../../../database/schemas/Guild");
 
 module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
@@ -26,8 +27,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
         // Ativa ou desativa a função de denúncias in-server
         guild.conf.tickets = !guild.conf.tickets
-        await guild.save()
-
+        await updateGuild(client, guild.id, { conf_tickets: !guild.conf_tickets })
     } else if (operacao === 2) {
 
         // Definindo a categoria do sistema de denúncias in-server
@@ -37,7 +37,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             alvo: "guild_tickets#category",
             reback: "browse_button.guild_tickets_button",
             operation: operacao,
-            values: await client.getGuildChannels(interaction, user, ChannelType.GuildCategory, guild.tickets.category)
+            values: await client.getGuildChannels(interaction, user, ChannelType.GuildCategory, guild.tickets_category)
         }
 
         // Subtrai uma página do total ( em casos de exclusão de itens e pagina em cache )

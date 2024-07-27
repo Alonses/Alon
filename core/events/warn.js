@@ -51,7 +51,7 @@ module.exports = async function ({ client, interaction, user, member_guild, user
         embed_guild
             .addFields({
                 name: `${client.defaultEmoji("time")} **${client.tls.phrase(guild, "menu.botoes.expiracao")}**`,
-                value: `**${client.tls.phrase(guild, "mode.warn.remocao_em")} \`${client.tls.phrase(guild, `menu.times.${spamTimeoutMap[guild.warn.reset]}`)}\`**\n( <t:${client.timestamp() + spamTimeoutMap[guild.warn.reset]}:f> )`,
+                value: `**${client.tls.phrase(guild, "mode.warn.remocao_em")} \`${client.tls.phrase(guild, `menu.times.${spamTimeoutMap[guild.warn_reset]}`)}\`**\n( <t:${client.timestamp() + spamTimeoutMap[guild.warn_reset]}:f> )`,
                 inline: true
             })
             .setFooter({
@@ -73,17 +73,17 @@ module.exports = async function ({ client, interaction, user, member_guild, user
         inline: true
     })
 
-    let canal_envio = guild.warn.channel, texto_embed = guild.warn.notify ? "@here" : ""
+    let canal_envio = guild.warn_channel, texto_embed = guild.warn_notify ? "@here" : ""
 
     // Altera o destino para o canal de avisos temporários
-    if (guild.warn.timed_channel) interaction.channel.id = guild.warn.timed_channel
+    if (guild.warn_timed_channel) interaction.channel.id = guild.warn_timed_channel
 
     // Envia uma mensagem temporária no canal onde foi gerada a advertência
     client.timed_message(interaction, { content: client.tls.phrase(guild, "mode.warn.anuncio_temporario", null, [id_alvo, `${active_user_warns.length} / ${indice_matriz}`, client.verifyAction(guild_warns[indice_warn], guild), client.timestamp() + 60]) }, 60)
 
     // Servidor com anúncio de advertências público configurado
-    if (guild.warn?.announce?.status && guild.warn?.announce?.channel) {
-        canal_envio = guild.warn.announce.channel
+    if (guild.warn_announce_status && guild.warn_announce_channel) {
+        canal_envio = guild.warn_announce_channel
         texto_embed = `<@${id_alvo}>`
 
         embed_guild.setDescription(`\`\`\`fix\n📠 | ${client.tls.phrase(guild, "mode.warn.descricao_fornecida")}\n\n${user_warn.relatory}\`\`\``)

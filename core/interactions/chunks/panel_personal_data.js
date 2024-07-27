@@ -48,7 +48,7 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
     }
 
     const user_guilds = await listAllUserGuilds(user.uid)
-    const guilds_hoster = await listAllGuildHoster(user.uid)
+    const guilds_hoster = await listAllGuildHoster(client, user.uid)
 
     if (user_guilds.length > 0)
         dados_conhecidos += `\n\n**${client.defaultEmoji("earth")} ${client.tls.phrase(user, "manu.data.servidores_com_moderacao")}:**\n\`${user_guilds.length} ${client.tls.phrase(user, "manu.data.servidores_conhecidos")}\``

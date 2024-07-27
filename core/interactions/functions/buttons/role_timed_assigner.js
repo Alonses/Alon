@@ -168,7 +168,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             const guild = await client.getGuild(interaction.guild.id)
 
             // Enviando o aviso ao canal do servidor
-            client.notify(guild.timed_roles.channel, { content: `${membro_guild}`, embeds: [embed] })
+            client.notify(guild.timed_roles_channel, { content: `${membro_guild}`, embeds: [embed] })
             atualiza_roles()
 
             return interaction.update({

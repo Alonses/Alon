@@ -189,7 +189,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     }
 
     // Salvando os dados atualizados
-    if (operations[operacao]) await guild.save()
+    if (operations[operacao]) await updateGuild(client, guild.id, guild)
 
     require('../../chunks/warn_configure')({ client, user, interaction, dados })
 }

@@ -5,9 +5,9 @@ const { checkUserGuildWarned, removeUserWarn } = require('../../database/schemas
 
 const { spamTimeoutMap } = require('../../formatters/patterns/timeout.js')
 
-async function atualiza_warns() {
+async function atualiza_warns(client) {
 
-    const dados = await getTimedGuilds()
+    const dados = await getTimedGuilds(client)
     const warns = []
 
     dados.forEach(async guild => {
@@ -40,7 +40,7 @@ async function verifica_warns(client) {
                 guilds_map[warn.sid] = guild
 
             // Verificando se a advertência ultrapassou o tempo de exclusão
-            if (client.timestamp() > (warn.timestamp + spamTimeoutMap[guild.warn.reset])) {
+            if (client.timestamp() > (warn.timestamp + spamTimeoutMap[guild.warn_reset])) {
 
                 // Excluindo o registro da advertência caso tenha zerado e verificando os cargos do usuário
                 await removeUserWarn(warn.uid, warn.sid, warn.timestamp)
@@ -49,7 +49,7 @@ async function verifica_warns(client) {
         }
 
         // Atualizando as advertências em cache
-        atualiza_warns()
+        atualiza_warns(client)
     })
 }
 

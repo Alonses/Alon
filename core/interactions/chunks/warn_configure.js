@@ -15,7 +15,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const warn = await getGuildWarn(interaction.guild.id, id_warn)
 
     if (!warn.strikes) { // Concede os strikes minimos para cada advertência conforme a configuração do servidor
-        warn.strikes = guild.warn.hierarchy.strikes
+        warn.strikes = guild.warn_hierarchy_strikes
         warn.save()
     }
 
@@ -52,7 +52,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
         embed.addFields(
             {
                 name: `${client.defaultEmoji("time")} **${client.tls.phrase(user, "mode.warn.expiracao_status")} ( 🔀 )**`,
-                value: guild.warn.timed ? `**${client.tls.phrase(user, "mode.warn.expira_em")} \`${client.tls.phrase(user, `menu.times.${spamTimeoutMap[guild.warn.reset]}`)}\`**` : `\`${client.tls.phrase(user, "mode.warn.expiracao_desligada")}\``,
+                value: guild.warn.timed ? `**${client.tls.phrase(user, "mode.warn.expira_em")} \`${client.tls.phrase(user, `menu.times.${spamTimeoutMap[guild.warn_reset]}`)}\`**` : `\`${client.tls.phrase(user, "mode.warn.expiracao_desligada")}\``,
                 inline: false
             }
         )
@@ -64,7 +64,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     embed.addFields(
         {
             name: `👑 **${client.tls.phrase(user, "mode.hierarquia.status_ativacao")}**`,
-            value: `\`${guild.warn.hierarchy.status ? client.tls.phrase(user, "mode.hierarquia.ativo") : client.tls.phrase(user, "mode.hierarquia.desativado")}\` \`${client.defaultEmoji("paper")} ${warn.strikes || guild.warn.hierarchy.strikes} ${client.tls.phrase(user, "mode.hierarquia.anotacoes_ativacao")}\``,
+            value: `\`${guild.warn_hierarchy_status ? client.tls.phrase(user, "mode.hierarquia.ativo") : client.tls.phrase(user, "mode.hierarquia.desativado")}\` \`${client.defaultEmoji("paper")} ${warn.strikes || guild.warn_hierarchy_strikes} ${client.tls.phrase(user, "mode.hierarquia.anotacoes_ativacao")}\``,
             inline: false
         },
         {
@@ -111,9 +111,9 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const row = [
         { id: "guild_warns_button", name: client.tls.phrase(user, "menu.botoes.retornar"), type: 0, emoji: client.emoji(19), data: "3" },
         { id: "warn_remove", name: client.tls.phrase(user, "menu.botoes.excluir_advertencia"), type: 3, emoji: client.emoji(13), data: `2|${id_warn}` },
-        { id: "warn_configure_button", name: client.tls.phrase(user, "menu.botoes.expirar"), type: client.execute("functions", "emoji_button.type_button", guild.warn.timed), emoji: client.defaultEmoji("time"), data: `11.${id_warn}` },
-        { id: "warn_configure_button", name: client.tls.phrase(user, "menu.botoes.usar_hierarquia"), type: client.execute("functions", "emoji_button.type_button", guild.warn.hierarchy.status), emoji: client.emoji(65), data: `10.${id_warn}`, disabled: !interaction.member.permissions.has(PermissionsBitField.Flags.ModerateMembers, PermissionsBitField.Flags.BanMembers, PermissionsBitField.Flags.KickMembers) },
-        { id: "warn_configure_button", name: client.tls.phrase(user, "menu.botoes.anotacoes"), type: 1, emoji: default_emoji["numbers"][warn.strikes || guild.warn.hierarchy.strikes], data: `12.${id_warn}` }
+        { id: "warn_configure_button", name: client.tls.phrase(user, "menu.botoes.expirar"), type: client.execute("functions", "emoji_button.type_button", guild.warn_timed), emoji: client.defaultEmoji("time"), data: `11.${id_warn}` },
+        { id: "warn_configure_button", name: client.tls.phrase(user, "menu.botoes.usar_hierarquia"), type: client.execute("functions", "emoji_button.type_button", guild.warn_hierarchy_status), emoji: client.emoji(65), data: `10.${id_warn}`, disabled: !interaction.member.permissions.has(PermissionsBitField.Flags.ModerateMembers, PermissionsBitField.Flags.BanMembers, PermissionsBitField.Flags.KickMembers) },
+        { id: "warn_configure_button", name: client.tls.phrase(user, "menu.botoes.anotacoes"), type: 1, emoji: default_emoji["numbers"][warn.strikes || guild.warn_hierarchy_strikes], data: `12.${id_warn}` }
     ]
 
     const obj = {

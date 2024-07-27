@@ -33,7 +33,7 @@ module.exports = async ({ client, user, interaction }) => {
     const guild = await client.getGuild(interaction.guild.id)
 
     // Servidor sem canal de avisos definido
-    if (!guild.timed_roles.channel)
+    if (!guild.timed_roles_channel)
         return interaction.reply({
             content: ":radio: | Antes de utilizar este comando você deve configurar um canal de avisos para notificarmos os membros sobre a atribuição!!\n\nVocê pode configurar o canal através do </panel guild:1107163338930126869> ou através do </conf guild:1094346210636214304>, ambos em `⌚ Timed roles`",
             ephemeral: true
@@ -42,8 +42,8 @@ module.exports = async ({ client, user, interaction }) => {
     const user_alvo = interaction.options.getUser("user")
     const role = await getUserRole(user_alvo.id, interaction.guild.id, client.timestamp())
 
-    if (guild.timed_roles.timeout) // Sincroniza o cargo temporário com o tempo minimo do servidor
-        role.timeout = guild.timed_roles.timeout
+    if (guild.timed_roles_timeout) // Sincroniza o cargo temporário com o tempo minimo do servidor
+        role.timeout = guild.timed_roles_timeout
 
     role.rid = interaction.options.getRole("role").id
     role.nick = user_alvo.username

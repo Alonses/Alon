@@ -1,21 +1,21 @@
 const { EmbedBuilder, AuditLogEvent, PermissionsBitField } = require('discord.js')
 
 const { channelTypes } = require('../../../formatters/patterns/guild')
+const { updateGuild } = require("../../../database/schemas/Guild");
 
 module.exports = async ({ client, channel }) => {
 
     const guild = await client.getGuild(channel.guildId)
 
     // Verificando se a guild habilitou o logger
-    if (!guild.logger.channel_delete || !guild.conf.logger) return
+    if (!guild.logger_channel_delete || !guild.conf_logger) return
 
     // Permissão para ver o registro de auditoria, desabilitando o logger
     if (!await client.permissions(channel, client.id(), PermissionsBitField.Flags.ViewAuditLog)) {
 
-        guild.logger.channel_delete = false
-        guild.save()
+        await updateGuild(client, guild.id, { logger_channel_delete: false })
 
-        return client.notify(guild.logger.channel, { content: client.tls.phrase(guild, "mode.logger.permissao", 7) })
+        return client.notify(guild.logger_channel, { content: client.tls.phrase(guild, "mode.logger.permissao", 7) })
     }
 
     // Coletando dados sobre o evento
@@ -58,5 +58,5 @@ module.exports = async ({ client, channel }) => {
             }
         )
 
-    client.notify(guild.logger.channel, { embeds: [embed] })
+    client.notify(guild.logger_channel, { embeds: [embed] })
 }

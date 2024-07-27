@@ -15,18 +15,18 @@ module.exports = async ({ client, user, interaction }) => {
         .setDescription(client.tls.phrase(user, "mode.anuncio.descricao"))
         .setFields(
             {
-                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf.games)} **${client.tls.phrase(user, "mode.report.status")}**`,
+                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf_games)} **${client.tls.phrase(user, "mode.report.status")}**`,
                 value: "⠀",
                 inline: true
             },
             {
                 name: `:label: **${client.tls.phrase(user, "mode.anuncio.cargo")}**`,
-                value: `${client.emoji("icon_id")} \`${guild.games.role}\`\n( <@&${guild.games.role}> )`,
+                value: `${client.emoji("icon_id")} \`${guild.games_role}\`\n( <@&${guild.games_role}> )`,
                 inline: true
             },
             {
                 name: `${client.defaultEmoji("channel")} **${client.tls.phrase(user, "mode.report.canal_de_avisos")}**`,
-                value: `${client.emoji("icon_id")} \`${guild.games.channel}\`\n( <#${guild.games.channel}> )`,
+                value: `${client.emoji("icon_id")} \`${guild.games_channel}\`\n( <#${guild.games_channel}> )`,
                 inline: true
             },
             {
@@ -51,12 +51,12 @@ module.exports = async ({ client, user, interaction }) => {
     }
 
     botoes = botoes.concat([
-        { id: "guild_free_games_button", name: client.tls.phrase(user, "manu.painel.anuncio_games"), type: client.execute("functions", "emoji_button.type_button", guild?.conf.games), emoji: client.execute("functions", "emoji_button.emoji_button", guild?.conf.games), data: "1" },
+        { id: "guild_free_games_button", name: client.tls.phrase(user, "manu.painel.anuncio_games"), type: client.execute("functions", "emoji_button.type_button", guild?.conf_games), emoji: client.execute("functions", "emoji_button.emoji_button", guild?.conf_games), data: "1" },
         { id: "guild_free_games_button", name: client.tls.phrase(user, "mode.anuncio.cargo"), type: 1, emoji: client.defaultEmoji("role"), data: "3", disabled: b_cargos },
         { id: "guild_free_games_button", name: client.tls.phrase(user, "mode.report.canal_de_avisos"), type: 1, emoji: client.defaultEmoji("channel"), data: "4" }
     ])
 
-    if (guild.games.channel && guild.games.role) // Mostrado apenas quando um canal e um cargo está definido para o anúncio de games no servidor
+    if (guild.games_channel && guild.games_role) // Mostrado apenas quando um canal e um cargo está definido para o anúncio de games no servidor
         botoes = botoes.concat([{ id: "guild_free_games_button", name: client.tls.phrase(user, "menu.botoes.anunciar_agora"), type: 1, emoji: client.emoji(6), data: "2" }])
 
     client.reply(interaction, {

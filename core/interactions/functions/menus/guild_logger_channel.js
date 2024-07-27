@@ -1,9 +1,6 @@
+const {updateGuild} = require("../../../database/schemas/Guild");
 module.exports = async ({ client, user, interaction, dados }) => {
-
-    const guild = await client.getGuild(interaction.guild.id)
-    guild.logger.channel = dados
-
-    await guild.save()
+    await updateGuild(client, interaction.guild.id, { logger_channel: dados })
 
     // Redirecionando o evento
     const pagina_guia = 1

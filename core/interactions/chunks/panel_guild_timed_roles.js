@@ -1,5 +1,6 @@
 const { EmbedBuilder, PermissionsBitField } = require("discord.js")
 const { defaultRoleTimes } = require("../../formatters/patterns/timeout")
+const {updateGuild} = require("../../database/schemas/Guild");
 
 module.exports = async ({ client, user, interaction }) => {
 
@@ -9,10 +10,8 @@ module.exports = async ({ client, user, interaction }) => {
     const bot_member = await client.getMemberGuild(interaction, client.id())
 
     // Desabilitando os tickets caso o bot não possa gerenciar os canais e cargos do servidor
-    if (!bot_member.permissions.has([PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.ManageRoles])) {
-        guild.conf.timed_roles = false
-        await guild.save()
-    }
+    if (!bot_member.permissions.has([PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.ManageRoles]))
+        await updateGuild(client, guild.id, { conf_timed_roles: false })
 
     const embed = new EmbedBuilder()
         .setTitle(`${client.tls.phrase(user, "mode.timed_roles.titulo_painel")} :passport_control: ${client.defaultEmoji("time")}`)
@@ -21,12 +20,12 @@ module.exports = async ({ client, user, interaction }) => {
         .setFields(
             {
                 name: `${client.defaultEmoji("time")} **${client.tls.phrase(user, "menu.botoes.expiracao")}**`,
-                value: guild.timed_roles.timeout ? `\`${client.tls.phrase(user, `menu.times.${defaultRoleTimes[guild.timed_roles.timeout]}`)}\`` : `\`${client.tls.phrase(user, "mode.timed_roles.sem_expiracao")}\``,
+                value: guild.timed_roles_timeout ? `\`${client.tls.phrase(user, `menu.times.${defaultRoleTimes[guild.timed_roles_timeout]}`)}\`` : `\`${client.tls.phrase(user, "mode.timed_roles.sem_expiracao")}\``,
                 inline: true
             },
             {
                 name: `${client.defaultEmoji("channel")} **${client.tls.phrase(user, "mode.report.canal_de_avisos")}**`,
-                value: `${client.emoji("icon_id")} ${guild.timed_roles.channel ? `\`${guild.timed_roles.channel}\`\n( <#${guild.timed_roles.channel}> )` : `\`❌ ${client.tls.phrase(user, "mode.network.sem_canal")}\``}`,
+                value: `${client.emoji("icon_id")} ${guild.timed_roles_channel ? `\`${guild.timed_roles_channel}\`\n( <#${guild.timed_roles_channel}> )` : `\`❌ ${client.tls.phrase(user, "mode.network.sem_canal")}\``}`,
                 inline: true
             },
             { name: "⠀", value: "⠀", inline: false },

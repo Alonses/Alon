@@ -22,7 +22,7 @@ module.exports = async ({ client, user, interaction, channel, solicitante, canal
     interaction.guild.channels.create({
         name: interaction.user.username,
         type: ChannelType.GuildText,
-        parent: guild.tickets.category,
+        parent: guild.tickets_category,
         permissionOverwrites: [
             {
                 id: everyone.id,

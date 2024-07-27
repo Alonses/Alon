@@ -5,9 +5,9 @@ const { defaultEraser } = require('../../formatters/patterns/timeout.js')
 const { getTimedPreGuilds } = require('../../database/schemas/Guild.js')
 const { checkUserGuildPreWarned, removeUserPreWarn } = require('../../database/schemas/User_pre_warns.js')
 
-async function atualiza_pre_warns() {
+async function atualiza_pre_warns(client) {
 
-    const dados = await getTimedPreGuilds()
+    const dados = await getTimedPreGuilds(client)
     const warns = []
 
     dados.forEach(async guild => {
@@ -40,7 +40,7 @@ async function verifica_pre_warns(client) {
                 guilds_map[warn.sid] = guild
 
             // Verificando se a anotação de advertência ultrapassou o tempo de exclusão
-            if (client.timestamp() > (warn.timestamp + defaultEraser[guild.warn.hierarchy.reset])) {
+            if (client.timestamp() > (warn.timestamp + defaultEraser[guild.warn_hierarchy_reset])) {
 
                 // Excluindo o registro da anotação de advertência caso tenha zerado e verificando os cargos do usuário
                 await removeUserPreWarn(warn.uid, warn.sid, warn.timestamp)
@@ -48,7 +48,7 @@ async function verifica_pre_warns(client) {
         }
 
         // Atualizando as anotações de advertência em cache
-        atualiza_pre_warns()
+        atualiza_pre_warns(client)
     })
 }
 

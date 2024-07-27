@@ -1,4 +1,5 @@
 const { PermissionsBitField } = require('discord.js')
+const {updateGuild} = require("../../../database/schemas/Guild");
 
 module.exports = async ({ client, user, interaction, dados }) => {
 
@@ -23,8 +24,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
             return interaction.update({ content: client.tls.phrase(user, "mode.invites.sem_permissao", 7), ephemeral: true })
 
         // Ativa ou desativa os convites rastreados
-        guild.conf.nuke_invites = !guild.conf.nuke_invites
-        await guild.save()
+        await updateGuild(client, guild.id, { conf_nuke_invites: !guild.conf_nuke_invites })
     }
 
     const pagina_guia = 2

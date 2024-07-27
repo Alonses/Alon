@@ -47,7 +47,7 @@ envia_logger = (client, user_alvo, attachment) => {
             const internal_guild = await client.getGuild(guild.id)
 
             // Notificando a guild sobre a alteração do avatar de um membro
-            if (internal_guild.logger.member_image && internal_guild.conf.logger) {
+            if (internal_guild.logger_member_image && internal_guild.conf_logger) {
                 const user = await guild.members.fetch(user_alvo.id)
                     .catch(() => { return null })
 
@@ -79,7 +79,7 @@ envia_logger = (client, user_alvo, attachment) => {
                         if (user_alvo.avatarURL({ dynamic: true }))
                             embed.setImage(user_alvo.avatarURL({ dynamic: true }))
 
-                    client.notify(internal_guild.logger.channel, objeto)
+                    client.notify(internal_guild.logger_channel, objeto)
                 }
             }
         })

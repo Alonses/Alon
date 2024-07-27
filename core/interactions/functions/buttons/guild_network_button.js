@@ -1,6 +1,6 @@
 const { ChannelType, PermissionsBitField, EmbedBuilder } = require('discord.js')
 
-const { getNetworkedGuilds } = require('../../../database/schemas/Guild')
+const { getNetworkedGuilds, updateGuild} = require('../../../database/schemas/Guild')
 
 const { banMessageEraser } = require('../../../formatters/patterns/timeout')
 
@@ -11,7 +11,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     const guild = await client.getGuild(interaction.guild.id)
 
     // Sem servidores para o link definidos, criando um grupo
-    if (!guild.network.link) {
+    if (!guild.network_link) {
         reback = "panel_guild.1"
         operacao = 3
     }
@@ -36,13 +36,13 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
         // Verificando as permissões necessárias conforme os casos
         let niveis_permissao = [PermissionsBitField.Flags.ViewAuditLog]
 
-        if (guild.network.member_ban_add) // Banimentos automaticos
+        if (guild.network_member_ban_add) // Banimentos automaticos
             niveis_permissao.push(PermissionsBitField.Flags.BanMembers)
 
-        if (guild.network.member_kick) // Expulsões automaticas
+        if (guild.network_member_kick) // Expulsões automaticas
             niveis_permissao.push(PermissionsBitField.Flags.KickMembers)
 
-        if (guild.network.member_punishment) // Castigos automaticos
+        if (guild.network_member_punishment) // Castigos automaticos
             niveis_permissao.push(PermissionsBitField.Flags.ModerateMembers)
 
         // Verificando se o bot possui permissões requeridas conforme os recursos ativos
@@ -53,16 +53,15 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             })
 
         // Ativa ou desativa o network do servidor
-        guild.conf.network = !guild.conf.network
-        await guild.save()
-
+        await updateGuild(client, guild.id, {
+            conf_network: !guild.conf_network
+        })
     } else if (operacao === 2) {
-
         const eventos = []
 
-        Object.keys(guild.network).forEach(evento => {
-            if (evento !== "link" && evento !== "channel")
-                eventos.push({ type: evento, status: guild.network[evento] })
+        Object.keys(guild).filter(prop => prop.startsWith("network")).forEach(evento => {
+            if (evento !== "network_link" && evento !== "network_channel")
+                eventos.push({ type: evento, status: guild[evento] })
         })
 
         // Definindo os eventos que o network irá sincronizar no servidor
@@ -133,7 +132,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             .setDescription(client.tls.phrase(user, "manu.guild_data.descricao_quebra_link", 2))
             .setFields({
                 name: `:link: **${client.tls.phrase(user, "manu.guild_data.outros_servidores")}:**`,
-                value: guild.network.link ? await client.getNetWorkGuildNames(user, guild.network.link, interaction) : client.tls.phrase(user, "manu.guild_data.sem_servidores"),
+                value: guild.network_link ? await client.getNetWorkGuildNames(user, guild.network_link, interaction) : client.tls.phrase(user, "manu.guild_data.sem_servidores"),
                 inline: true
             })
             .setFooter({
@@ -163,11 +162,11 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             values: []
         }
 
-        if (guild.network.channel)
+        if (guild.network_channel)
             data.values.push({ name: client.tls.phrase(user, "manu.guild_data.remover_canal"), id: "none" })
 
         // Listando os canais do servidor
-        data.values = data.values.concat(await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.network.channel))
+        data.values = data.values.concat(await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.network_channel))
 
         // Subtrai uma página do total ( em casos de exclusão de itens e pagina em cache )
         if (data.values.length < pagina * 24) pagina--
@@ -191,7 +190,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
         // Escolhendo o tempo de exclusão das mensagens para membros banidos no network
         const valores = []
-        Object.keys(banMessageEraser).forEach(key => { if (parseInt(key) !== guild.network.erase_ban_messages) valores.push(key) })
+        Object.keys(banMessageEraser).forEach(key => { if (parseInt(key) !== guild.network_erase_ban_messages) valores.push(key) })
 
         const data = {
             title: { tls: "menu.menus.escolher_expiracao" },
@@ -212,27 +211,22 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     } else if (operacao === 10) {
 
         // Alterando o estilo de filtragem por ações moderativas geradas por bots ou apenas moderadores humanos
-        guild.network.scanner.type = !guild.network.scanner.type
-        await guild.save()
+        await updateGuild(client, guild.id, { network_scanner_type: !guild.network_scanner_type })
 
-        const network_guilds = await getNetworkedGuilds(guild.network.link)
+        const network_guilds = await getNetworkedGuilds(client, guild.network_link)
 
         // Sincronizando os servidores com a nova configuração de filtragem
         for (let i = 0; i < network_guilds.length; i++) {
-
-            if (network_guilds[i].sid !== guild.sid) {
-                network_guilds[i].network.scanner.type = guild.network.scanner.type
-                network_guilds[i].save()
-            }
+            if (network_guilds[i].id !== guild.id)
+                await updateGuild(client, network_guilds[i].id, { network_scanner_type: guild.network_scanner_type })
         }
 
     } else if (operacao === 11) {
-
         // Confirmando a remoção do servidor do link do network
-        guild.conf.network = false
-        guild.network.link = null
-
-        await guild.save()
+        await updateGuild(client, guild.id, {
+            conf_network: false,
+            network_link: true
+        })
     }
 
     if (operacao >= 4) pagina_guia = 1

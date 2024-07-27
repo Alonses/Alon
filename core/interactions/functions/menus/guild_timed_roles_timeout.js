@@ -1,9 +1,6 @@
+const {updateGuild} = require("../../../database/schemas/Guild");
 module.exports = async ({ client, user, interaction, dados }) => {
-
-    const guild = await client.getGuild(interaction.guild.id)
-    guild.timed_roles.timeout = dados
-
-    await guild.save()
+    await updateGuild(client, interaction.guild.id, { timed_roles_timeout: dados })
 
     // Redirecionando o evento
     require('../../chunks/panel_guild_timed_roles')({ client, user, interaction })

@@ -50,7 +50,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
         alvo.archived = false
         await alvo.save()
 
-        const link = guild.network.link
+        const link = guild.network_link
         texto_retorno = client.tls.phrase(user, "mode.report.anuncio_network", client.defaultEmoji("guard"))
         require('../../../auto/send_report')({ client, alvo, link })
     }
@@ -59,7 +59,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     client.registryBadge(user, badges.REPORTER)
 
     // Verificando se a opção de banir o usuário ao fazer um report está ativa
-    if (guild?.reports.auto_ban) {
+    if (guild?.reports_auto_ban) {
 
         const bot_member = await client.getMemberGuild(interaction, client.id())
 
@@ -82,7 +82,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
             // Banindo o usuário do servidor automaticamente
             interaction.guild.members.ban(guild_member, {
                 reason: alvo.relatory,
-                deleteMessageSeconds: banMessageEraser[guild.reports.erase_ban_messages]
+                deleteMessageSeconds: banMessageEraser[guild.reports_erase_ban_messages]
             }).catch(console.error)
 
             texto_retorno += `\n${client.tls.phrase(user, "mode.report.auto_ban_banido", client.emoji("banidos"))}`

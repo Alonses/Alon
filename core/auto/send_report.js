@@ -4,11 +4,11 @@ const { getReportChannels, getReportNetworkChannels } = require("../database/sch
 
 module.exports = async ({ client, alvo, id_canal, link }) => {
 
-    let canais_reporte = await getReportChannels()
+    let canais_reporte = await getReportChannels(client)
     let network_descricao = ""
 
     if (link) // Listando os canais com base no link do network
-        canais_reporte = await getReportNetworkChannels(link)
+        canais_reporte = await getReportNetworkChannels(client, link)
 
     if (canais_reporte.length < 1)
         return client.notify(process.env.channel_feeds, { content: ":man_guard: | Reporte de usuários não completado, não há canais clientes registrados para receberem a notificação." })

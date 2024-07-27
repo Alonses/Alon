@@ -1,4 +1,5 @@
 const { EmbedBuilder, PermissionsBitField } = require("discord.js")
+const {updateGuild} = require("../../database/schemas/Guild");
 
 module.exports = async ({ client, user, interaction }) => {
 
@@ -8,10 +9,8 @@ module.exports = async ({ client, user, interaction }) => {
     const membro_sv = await client.getMemberGuild(interaction, client.id())
 
     // Desabilitando os tickets caso o bot não possa gerenciar os canais e cargos do servidor
-    if (!membro_sv.permissions.has([PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.ManageRoles])) {
-        guild.conf.tickets = false
-        await guild.save()
-    }
+    if (!membro_sv.permissions.has([PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.ManageRoles]))
+        await updateGuild(client, guild.id, { conf_tickets: false })
 
     const embed = new EmbedBuilder()
         .setTitle(`> ${client.tls.phrase(user, "manu.painel.denuncias_server")} ${client.defaultEmoji("guard")}`)
@@ -19,13 +18,13 @@ module.exports = async ({ client, user, interaction }) => {
         .setDescription(client.tls.phrase(user, "mode.ticket.descricao"))
         .setFields(
             {
-                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf.tickets)} **${client.tls.phrase(user, "mode.report.status")}**`,
+                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf_tickets)} **${client.tls.phrase(user, "mode.report.status")}**`,
                 value: "⠀",
                 inline: true
             },
             {
                 name: `${client.defaultEmoji("channel")} **${client.tls.phrase(user, "util.server.categoria")}**`,
-                value: `${client.emoji("icon_id")} \`${guild.tickets.category}\`\n( <#${guild.tickets.category}> )`,
+                value: `${client.emoji("icon_id")} \`${guild.tickets_category}\`\n( <#${guild.tickets_category}> )`,
                 inline: true
             },
             { name: "⠀", value: "⠀", inline: true },
@@ -46,7 +45,7 @@ module.exports = async ({ client, user, interaction }) => {
         })
 
     const botoes = [
-        { id: "guild_tickets_button", name: client.tls.phrase(user, "manu.painel.denuncias_server"), type: client.execute("functions", "emoji_button.type_button", guild?.conf.tickets), emoji: client.execute("functions", "emoji_button.emoji_button", guild?.conf.tickets), data: "1" },
+        { id: "guild_tickets_button", name: client.tls.phrase(user, "manu.painel.denuncias_server"), type: client.execute("functions", "emoji_button.type_button", guild?.conf_tickets), emoji: client.execute("functions", "emoji_button.emoji_button", guild?.conf_tickets), data: "1" },
         { id: "guild_tickets_button", name: client.tls.phrase(user, "util.server.categoria"), type: 1, emoji: client.defaultEmoji("channel"), data: "2" }
     ]
 

@@ -31,16 +31,8 @@ async function dropNetwork(link) {
     })
 }
 
-async function getLink(link) {
-    const guilds = await getNetworkedGuilds()
-    let valid_guilds = []
-
-    guilds.forEach(guild => {
-        if (guild.network.link === link)
-            valid_guilds.push(guild)
-    })
-
-    return valid_guilds
+async function getLink(client, link) {
+    return await getNetworkedGuilds(client, link)
 }
 
 module.exports.Network = model

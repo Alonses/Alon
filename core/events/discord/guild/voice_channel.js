@@ -8,7 +8,7 @@ module.exports = async ({ client, oldState, newState }) => {
     const guild = await client.getGuild(oldState.guild.id)
 
     // Verificando se a guild habilitou o logger
-    if (!guild.logger.member_voice_status || !guild.conf.logger) return
+    if (!guild.logger_member_voice_status || !guild.conf_logger) return
 
     let frase
 
@@ -25,5 +25,5 @@ module.exports = async ({ client, oldState, newState }) => {
             text: `${client.tls.phrase(guild, "mode.logger.id_membro")} ${oldState.id}`
         })
 
-    client.notify(guild.logger.channel, { embeds: [embed] })
+    client.notify(guild.logger_channel, { embeds: [embed] })
 }
