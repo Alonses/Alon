@@ -33,7 +33,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
         // Escolher o número de avisos prévios
         const valores = []
-        defaultWarnStrikes.forEach(key => { if (parseInt(key) !== guild.warn.hierarchy.strikes) valores.push(key) })
+        defaultWarnStrikes.forEach(key => { if (parseInt(key) !== guild.warn_hierarchy_strikes) valores.push(key) })
 
         const data = {
             title: { tls: "menu.menus.escolher_numero" },

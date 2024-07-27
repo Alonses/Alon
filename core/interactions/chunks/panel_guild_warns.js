@@ -45,7 +45,7 @@ module.exports = async ({ client, user, interaction, pagina_guia }) => {
             },
             {
                 name: `${client.defaultEmoji("channel")} **${client.tls.phrase(user, "mode.timed_roles.canal_avisos_temporario")}**`,
-                value: guild.warn.timed_channel ? client.tls.phrase(user, "mode.timed_roles.enviando", null, guild.warn_timed_channel) : `\`❌ ${client.tls.phrase(user, "mode.timed_roles.sem_canal_temporario")}\``,
+                value: guild.warn_timed_channel ? client.tls.phrase(user, "mode.timed_roles.enviando", null, guild.warn_timed_channel) : `\`❌ ${client.tls.phrase(user, "mode.timed_roles.sem_canal_temporario")}\``,
                 inline: false
             },
             {
@@ -68,7 +68,7 @@ module.exports = async ({ client, user, interaction, pagina_guia }) => {
 
         let descricao = client.tls.phrase(user, "mode.warn.descricao_notificacao_advertencia")
 
-        if (guild.warn.announce.status) // Sobrescreve a descrição na guia para as advertências públicas
+        if (guild.warn_announce_status) // Sobrescreve a descrição na guia para as advertências públicas
             descricao = client.tls.phrase(user, "mode.warn.descricao_adv_publica")
 
         embed.setDescription(descricao)

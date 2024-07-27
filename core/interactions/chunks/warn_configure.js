@@ -48,11 +48,11 @@ module.exports = async ({ client, user, interaction, dados }) => {
             }
         )
 
-    if (guild.warn.reset)
+    if (guild.warn_reset)
         embed.addFields(
             {
                 name: `${client.defaultEmoji("time")} **${client.tls.phrase(user, "mode.warn.expiracao_status")} ( 🔀 )**`,
-                value: guild.warn.timed ? `**${client.tls.phrase(user, "mode.warn.expira_em")} \`${client.tls.phrase(user, `menu.times.${spamTimeoutMap[guild.warn_reset]}`)}\`**` : `\`${client.tls.phrase(user, "mode.warn.expiracao_desligada")}\``,
+                value: guild.warn_timed ? `**${client.tls.phrase(user, "mode.warn.expira_em")} \`${client.tls.phrase(user, `menu.times.${spamTimeoutMap[guild.warn_reset]}`)}\`**` : `\`${client.tls.phrase(user, "mode.warn.expiracao_desligada")}\``,
                 inline: false
             }
         )

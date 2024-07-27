@@ -1,3 +1,4 @@
+const {updateGuild} = require("../../../database/schemas/Guild");
 module.exports = async ({ client, user, interaction, dados }) => {
     const acao = parseInt(dados.split(".")[0])
 
