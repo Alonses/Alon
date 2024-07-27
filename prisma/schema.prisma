@@ -145,4 +145,5 @@ model Guild {
   conf_network      Boolean @default(false)
   conf_warn         Boolean @default(false)
   conf_nuke_invites Boolean @default(false)
+  conf_timed_roles  Boolean @default(false)
 }

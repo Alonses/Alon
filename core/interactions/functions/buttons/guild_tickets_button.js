@@ -7,7 +7,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     const guild = await client.getGuild(interaction.guild.id)
 
     // Sem categoria definida, solicitando uma categoria
-    if (!guild.tickets.category) {
+    if (!guild.tickets_category) {
         reback = "panel_guild.2"
         operacao = 2
     }

@@ -26,9 +26,9 @@ module.exports = async ({ client, user, interaction, pagina_guia }) => {
     }
 
     if (pagina !== 2)
-        Object.keys(guild.logger).forEach(evento => {
-            if (evento !== "channel") {
-                if (guild.logger[evento])
+        Object.keys(guild).forEach(evento => {
+            if (evento !== "logger_channel") {
+                if (guild[evento])
                     eventos.ativos++ // Apenas eventos ativos
 
                 eventos.total++
