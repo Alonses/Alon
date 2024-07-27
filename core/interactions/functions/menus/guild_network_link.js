@@ -1,5 +1,5 @@
-const { createNetworkLink } = require('../../../database/schemas/Guild_network')
 const {updateGuild} = require("../../../database/schemas/Guild");
+const { randomString } = require("../../functions/random_string")
 
 module.exports = async ({ client, user, interaction, dados }) => {
 
@@ -28,4 +28,14 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
     // Redirecionando o evento
     require('../../chunks/panel_guild_network')({ client, user, interaction })
+}
+
+async function createNetworkLink(client) {
+    let new_link = ''
+
+    do {
+        new_link = randomString(10, client)
+    } while (await client.prisma.guild.findFirst({ where: { network_link: new_link } }))
+
+    return new_link
 }
