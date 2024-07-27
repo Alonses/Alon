@@ -527,15 +527,9 @@ function internal_functions(client) {
     client.switcher = ({ guild, operations, operacao }) => {
 
         // Inverte o valor de botões liga/desliga
-        const local = (operations[operacao].action).split(".")
+        const local = (operations[operacao].action).replace('.', '_')
 
-        // Vasculha o objeto do servidor a procura do valor para alterar
-        local.reduce((acc, key, index) => {
-            if (index === local.length - 1)
-                acc[key] = !acc[key]
-
-            return acc[key]
-        }, guild)
+        guild[local] = !guild[local];
 
         const pagina_guia = operations[operacao].page
 
