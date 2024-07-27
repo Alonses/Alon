@@ -131,7 +131,7 @@ async function getGuild(client, gid) {
 }
 
 async function getSpecificGameChannel(client, gcid) {
-    return await client.prisma.guild.findUnique({
+    return await client.prisma.guild.findFirst({
         where: {
             games_channel: gcid,
             conf_games: true
@@ -152,7 +152,7 @@ async function getReportChannels(client) {
 }
 
 async function getReportNetworkChannels(client, link) {
-    return await client.prisma.guild.findMany({
+    return await client.prisma.guild.findFirst({
         where: {
             network_link: link,
             conf_reports: true

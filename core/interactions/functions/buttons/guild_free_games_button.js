@@ -40,7 +40,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             if (await client.permissions(null, client.id(), [PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ViewChannel], canal_alvo)) {
 
                 // Enviando os games para anunciar no servidor
-                const guild_channel = guild.games.channel
+                const guild_channel = guild.games_channel
                 free_games({ client, guild_channel })
 
                 return interaction.update({
