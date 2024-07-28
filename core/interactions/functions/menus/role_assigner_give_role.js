@@ -9,7 +9,9 @@ module.exports = async ({ client, user, interaction, dados }) => {
         roles.push(interaction.values[indice].split("|")[1].split(".")[0])
     })
 
-    await updateRoleAssigner(client, interaction.guild.id, {attribute: roles.length < 1 ? null : roles.join(".")}, true)
+    const roleAssigner = await getRoleAssigner(client, interaction.guild.id, caso)
+
+    await updateRoleAssigner(client, roleAssigner.id, {attribute: roles.length < 1 ? null : roles.join(".")})
 
     // Redirecionando o evento
     require('../../chunks/role_assigner')({ client, user, interaction, caso })

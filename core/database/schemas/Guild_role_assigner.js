@@ -14,17 +14,19 @@ const schema = new mongoose.Schema({
 const model = mongoose.model("Role_Assigner", schema)
 
 async function getRoleAssigner(client, id, type) {
-    return client.prisma.guildRoleAssigner.upsert({
-        where: {
-            guild_id: id,
-            type: type
-        },
-        update: { },
-        create: {
-            guild_id: id,
-            type: type
-        }
-    })
+    const key = {
+        guild_id: id,
+        type: type
+    }
+
+    const roleAssigner = await client.prisma.guildRoleAssigner.findFirst({ where: key });
+
+    if (!roleAssigner) {
+        await client.prisma.guildRoleAssigner.create({ data: key });
+        return client.prisma.guildRoleAssigner.findFirst({ where: key });
+    }
+
+    return roleAssigner;
 }
 
 async function getActiveRoleAssigner(client, type) {
@@ -44,9 +46,9 @@ async function dropRoleAssigner(client, id) {
     })
 }
 
-async function updateRoleAssigner(client, id, data, isGuildId = false) {
+async function updateRoleAssigner(client, id, data) {
     await client.prisma.guildRoleAssigner.update({
-        where: isGuildId ? { guild_id: id } : { id: id },
+        where: { id: id },
         data: data
     })
 }
