@@ -1,6 +1,6 @@
 const { PermissionsBitField } = require('discord.js')
 
-const { getRoleAssigner } = require('../../../database/schemas/Guild_role_assigner')
+const { getRoleAssigner, updateRoleAssigner} = require('../../../database/schemas/Guild_role_assigner')
 
 module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
@@ -20,7 +20,8 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     // 10 -> Confirmar atribuição de cargos para o servidor
     // 20 -> Inverte o status para conceder ou não cargos ao entrar no servidor 
 
-    const cargos = await getRoleAssigner(interaction.guild.id, caso)
+    const cargos = await getRoleAssigner(client, interaction.guild.id, caso)
+    const update = {}
 
     if (operacao === 1) {
 
@@ -61,7 +62,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             { id: "role_assigner", name: client.tls.phrase(user, "menu.botoes.atualizar"), type: 1, emoji: client.emoji(42), data: `2.${caso}` }
         ]
 
-        if (cargos.atribute)
+        if (cargos.attribute)
             botoes.push({ id: "role_assigner", name: client.tls.phrase(user, "menu.botoes.remover_todos"), type: 3, emoji: client.emoji(13), data: `4.${caso}` })
 
         const multi_select = true
@@ -103,8 +104,8 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
         const cargos_server = await client.getGuildRoles(interaction)
 
         cargos_server.forEach(cargo => {
-            if (cargos.atribute) {
-                if (!cargos.atribute.includes(cargo.id)) data.values.push(cargo)
+            if (cargos.attribute) {
+                if (!cargos.attribute.includes(cargo.id)) data.values.push(cargo)
             } else data.values.push(cargo)
         })
 
@@ -131,7 +132,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
         })
 
     } else if (operacao === 20) { // Inverte o funcionamento do atribuidor de cargos ao entrar no servidor
-        cargos.status = !cargos.status
+        update.status = !cargos.status
 
         // Salvando a alteração no cache do bot
         client.cached.join_guilds.set(interaction.guild.id, true)
@@ -146,18 +147,18 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     }
 
     // Removendo os cargos salvos em cache
-    if (operacao === 4) cargos.atribute = null
-    else if (operacao === 5) cargos.ignore = null
+    if (operacao === 4) update.attribute = null
+    else if (operacao === 5) update.ignore = null
 
     // Desliga a atribuição de cargos em entradas caso seja removido os cargos selecionados
-    if (!cargos.atribute && caso === "join") {
-        cargos.status = false
+    if (!cargos.attribute && caso === "join") {
+        update.status = false
 
         // Salvando a alteração no cache do bot
         client.cached.join_guilds.delete(interaction.guild.id)
     }
 
-    await cargos.save()
+    await updateRoleAssigner(client, cargos.id, update)
 
     require('../../chunks/role_assigner')({ client, user, interaction, caso })
 }

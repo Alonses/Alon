@@ -5,7 +5,7 @@ let updates = [0, 0, 0, 0, 0], emoji_dancante, cargos, repeticao, timestamp
 
 module.exports = async ({ client, user, interaction, force_stop }) => {
 
-    cargos = await getRoleAssigner(interaction.guild.id, "global")
+    cargos = await getRoleAssigner(client, interaction.guild.id, "global")
 
     if (force_stop) {
 
@@ -76,7 +76,7 @@ async function alterar_users(client, user, interaction, contador) {
             })
         }
 
-        cargos.atribute.split(".").forEach(async cargo_interno => {
+        cargos.attribute.split(".").forEach(async cargo_interno => {
 
             if (!member.roles.cache.has(cargo_interno)) // Adicionando
 

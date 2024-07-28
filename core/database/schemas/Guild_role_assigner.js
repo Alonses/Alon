@@ -13,33 +13,41 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("Role_Assigner", schema)
 
-async function getRoleAssigner(sid, type) {
-
-    if (!await model.exists({ sid: sid, type: type }))
-        await model.create({
-            sid: sid,
+async function getRoleAssigner(client, id, type) {
+    return client.prisma.guildRoleAssigner.upsert({
+        where: {
+            guild_id: id,
             type: type
-        })
-
-    return model.findOne({
-        sid: sid,
-        type: type
+        },
+        update: { },
+        create: {
+            guild_id: id,
+            type: type
+        }
     })
 }
 
-async function getActiveRoleAssigner(type) {
-
-    return model.find({
-        type: type,
-        status: true
+async function getActiveRoleAssigner(client, type) {
+    return client.prisma.guildRoleAssigner.findMany({
+        where: {
+            type: type,
+            status: true,
+        }
     })
 }
 
-async function dropRoleAssigner(sid, type) {
+async function dropRoleAssigner(client, id) {
+    await client.prisma.deleteOne({
+        where: {
+            guild_id: id
+        }
+    })
+}
 
-    await model.findOneAndDelete({
-        sid: sid,
-        type: type
+async function updateRoleAssigner(client, id, data, isGuildId = false) {
+    await client.prisma.guildRoleAssigner.update({
+        where: isGuildId ? { guild_id: id } : { id: id },
+        data: data
     })
 }
 
@@ -47,5 +55,6 @@ module.exports.Role_Assigner = model
 module.exports = {
     getRoleAssigner,
     getActiveRoleAssigner,
-    dropRoleAssigner
+    dropRoleAssigner,
+    updateRoleAssigner
 }

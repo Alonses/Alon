@@ -11,13 +11,13 @@ module.exports = async ({ client, guild, interaction, dados, acionador, indice_w
     if (acionador === "join") {
 
         // Concedendo cargos para novos membros que entram no servidor
-        const cargos = await getRoleAssigner(interaction.guild.id, "join")
+        const cargos = await getRoleAssigner(client, interaction.guild.id, "join")
         const membro_guild = await client.getMemberGuild(interaction, interaction.user.id)
 
         // Checking bot permissions on the server
         if (!await client.permissions(interaction, client.id(), [PermissionsBitField.Flags.ManageRoles, PermissionsBitField.Flags.ModerateMembers])) return
 
-        cargos.atribute.split(".").forEach(async cargo => {
+        cargos.attribute.split(".").forEach(async cargo => {
 
             // Verificando se o membro ainda não possui o cargo
             if (!await client.hasRole(interaction, cargo, interaction.user.id)) {

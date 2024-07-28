@@ -42,7 +42,7 @@ async function verifica_eraser(client) {
                 await dropAllGuildTickets(servidor.sid)
 
                 // Excluindo a configuração de cargos automáticos do servidor
-                await dropRoleAssigner(servidor.sid)
+                await dropRoleAssigner(client, servidor.sid)
 
                 // Excluindo todos os strikes criados no servidor
                 await dropAllGuildStrikes(servidor.sid)

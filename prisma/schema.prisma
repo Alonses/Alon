@@ -147,3 +147,13 @@ model Guild {
   conf_nuke_invites Boolean @default(false)
   conf_timed_roles  Boolean @default(false)
 }
+
+model GuildRoleAssigner {
+  id          Int     @id @default(autoincrement())
+  guild_id    String
+  interaction String?
+  attribute   String?
+  ignore      String?
+  type        String  @default("global")
+  status      Boolean @default(false)
+}

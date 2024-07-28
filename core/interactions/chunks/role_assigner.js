@@ -11,9 +11,9 @@ module.exports = async ({ client, user, interaction, caso }) => {
         .setColor(client.embed_color(user.misc.color))
         .setDescription(client.tls.phrase(user, caso === "global" ? "mode.roles.descricao_atribuidor" : "mode.roles.descricao_atribuidor_join"))
 
-    const cargos = await getRoleAssigner(interaction.guild.id, caso)
+    const cargos = await getRoleAssigner(client, interaction.guild.id, caso)
 
-    if (!cargos.atribute)
+    if (!cargos.attribute)
         embed.addFields(
             {
                 name: `${client.emoji("mc_name_tag")} **${client.tls.phrase(user, "mode.roles.cargo_selecionado")}**`,
@@ -24,7 +24,7 @@ module.exports = async ({ client, user, interaction, caso }) => {
         embed.addFields(
             {
                 name: `${client.emoji("mc_name_tag")} **${client.tls.phrase(user, "mode.roles.atribuir_selecionados")}**`,
-                value: listar_cargos(client, user, cargos.atribute)
+                value: listar_cargos(client, user, cargos.attribute)
             }
         )
 
