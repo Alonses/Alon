@@ -17,39 +17,48 @@ const schema = new mongoose.Schema({
 const model = mongoose.model("Strike_guild", schema)
 
 // Procurando por um strike
-async function getGuildStrike(sid, rank) {
-
-    if (!await model.exists({ sid: sid, rank: rank }))
-        await model.create({
-            sid: sid,
-            rank: rank
-        })
-
-    return model.findOne({
-        sid: sid,
+async function getGuildStrike(client, id, rank) {
+    const key = {
+        guild_id: id,
         rank: rank
-    })
+    }
+
+    const strike = await client.prisma.guildRoleAssigner.findFirst({ where: key });
+
+    if (!strike) {
+        await client.prisma.guildRoleAssigner.create({ data: key });
+        return client.prisma.guildRoleAssigner.findFirst({ where: key });
+    }
+
+    return strike;
 }
 
 // Listando todos os strikes do servidor
-async function listAllGuildStrikes(sid) {
-    return model.find({
-        sid: sid
-    })
+async function listAllGuildStrikes(client, id) {
+    return client.prisma.guildStrike.findMany({where: {guild_id: id}});
 }
 
 // Apaga o strike customizado
-async function dropGuildStrike(sid, rank) {
-    await model.findOneAndDelete({
-        sid: sid,
-        rank: rank
+async function dropGuildStrike(client, id, rank) {
+    await client.prisma.guildStrike.delete({
+        where: {
+            guild_id: id,
+            rank: rank
+        }
     })
 }
 
 // Apaga todos os strikes criados no servidor
-async function dropAllGuildStrikes(sid) {
-    await model.deleteMany({
-        sid: sid
+async function dropAllGuildStrikes(client, id) {
+    await client.prisma.guildStrike.deleteMany({ where: { guild_id: id } })
+}
+
+async function updateGuildStrike(client, id, data) {
+    await client.prisma.guildStrike.update({
+        where: {
+            id: id
+        },
+        data: data
     })
 }
 
@@ -58,5 +67,6 @@ module.exports = {
     getGuildStrike,
     listAllGuildStrikes,
     dropGuildStrike,
-    dropAllGuildStrikes
+    dropAllGuildStrikes,
+    updateGuildStrike
 }

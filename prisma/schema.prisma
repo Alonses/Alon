@@ -157,3 +157,14 @@ model GuildRoleAssigner {
   type        String  @default("global")
   status      Boolean @default(false)
 }
+
+model GuildStrike {
+  id                 Int     @id @default(autoincrement())
+  guild_id           String
+  rank               Int     @default(0)
+  action             String?
+  role               String?
+  timeout            Float
+  timed_role_status  Boolean @default(false)
+  timed_role_timeout Float   @default(12)
+}

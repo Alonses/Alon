@@ -39,7 +39,7 @@ async function getActiveRoleAssigner(client, type) {
 }
 
 async function dropRoleAssigner(client, id) {
-    await client.prisma.deleteOne({
+    await client.prisma.guildRoleAssigner.delete({
         where: {
             guild_id: id
         }

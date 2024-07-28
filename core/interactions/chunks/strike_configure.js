@@ -2,7 +2,7 @@ const { EmbedBuilder, PermissionsBitField } = require("discord.js")
 
 const { emoji_button } = require("../../functions/emoji_button")
 
-const { getGuildStrike } = require("../../database/schemas/Guild_strikes")
+const { getGuildStrike, updateGuildStrike} = require("../../database/schemas/Guild_strikes")
 
 const { loggerMap } = require("../../formatters/patterns/guild")
 const { spamTimeoutMap, defaultRoleTimes } = require("../../formatters/patterns/timeout")
@@ -10,7 +10,7 @@ const { spamTimeoutMap, defaultRoleTimes } = require("../../formatters/patterns/
 module.exports = async ({ client, user, interaction, dados }) => {
 
     const id_strike = dados.split(".")[2]
-    const strike = await getGuildStrike(interaction.guild.id, id_strike)
+    const strike = await getGuildStrike(client, interaction.guild.id, id_strike)
 
     const embed = new EmbedBuilder()
         .setTitle(`> Strike N° ${strike.rank + 1} 📛`)
@@ -29,7 +29,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
             },
             {
                 name: `${client.defaultEmoji("time")} **${client.tls.phrase(user, "menu.botoes.cargo_temporario")}**`,
-                value: `**${strike.timed_role.status ? `\`${client.tls.phrase(user, "status.ativo")}\` \`${client.defaultEmoji("time")} ${client.tls.phrase(user, `menu.times.${defaultRoleTimes[strike.timed_role.timeout]}`)}\`` : `\`${client.tls.phrase(user, "status.desativado")}\` \`${client.defaultEmoji("time")} ${client.tls.phrase(user, `menu.times.${defaultRoleTimes[strike.timed_role.timeout]}`)}\``}**`,
+                value: `**${strike.timed_role_status ? `\`${client.tls.phrase(user, "status.ativo")}\` \`${client.defaultEmoji("time")} ${client.tls.phrase(user, `menu.times.${defaultRoleTimes[strike.timed_role_timeout]}`)}\`` : `\`${client.tls.phrase(user, "status.desativado")}\` \`${client.defaultEmoji("time")} ${client.tls.phrase(user, `menu.times.${defaultRoleTimes[strike.timed_role_timeout]}`)}\``}**`,
                 inline: true
             }
         )
@@ -78,17 +78,15 @@ module.exports = async ({ client, user, interaction, dados }) => {
             iconURL: interaction.user.avatarURL({ dynamic: true })
         })
 
-        if (strike.role) { // Removendo o cargo definido anteriormente
-            strike.role = null
-            strike.save()
-        }
+        if (strike.role) // Removendo o cargo definido anteriormente
+            await updateGuildStrike(client, strike.id, { role: null })
     }
 
     const botoes = [
         { id: "strike_configure_button", name: client.tls.phrase(user, "menu.botoes.penalidade"), type: 1, emoji: loggerMap[strike.action] || loggerMap["none"], data: `1.${id_strike}` },
         { id: "strike_configure_button", name: client.tls.phrase(user, "menu.botoes.tempo_mute"), type: 1, emoji: client.defaultEmoji("time"), data: `3.${id_strike}` },
         { id: "strike_configure_button", name: client.tls.phrase(user, "mode.anuncio.cargo"), type: 1, emoji: client.defaultEmoji("role"), data: `2.${id_strike}`, disabled: b_cargos },
-        { id: "strike_configure_button", name: client.tls.phrase(user, "menu.botoes.cargo_temporario"), type: client.execute("functions", "emoji_button.type_button", strike.timed_role.status), emoji: client.execute("functions", "emoji_button.emoji_button", strike.timed_role.status), data: `20|${id_strike}`, disabled: !strike.role }
+        { id: "strike_configure_button", name: client.tls.phrase(user, "menu.botoes.cargo_temporario"), type: client.execute("functions", "emoji_button.type_button", strike.timed_role_status), emoji: client.execute("functions", "emoji_button.emoji_button", strike.timed_role_status), data: `20|${id_strike}`, disabled: !strike.role }
     ]
 
     const row = [

@@ -43,7 +43,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     if (operations[operacao]) ({ guild, pagina_guia } = client.switcher({ guild, operations, operacao }))
     else if (operacao === 4) {
 
-        const strikes = await listAllGuildStrikes(interaction.guild.id)
+        const strikes = await listAllGuildStrikes(client, interaction.guild.id)
 
         // Submenu para navegar pelos strikes do servidor
         let botoes = [], row = [{
@@ -51,7 +51,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
         }], indice_matriz = 5
 
         if (strikes.length < 1) {
-            await getGuildStrike(interaction.guild.id, 0)
+            await getGuildStrike(client, interaction.guild.id, 0)
 
             botoes.push({
                 id: "strike_configure_button", name: "1°", type: 1, emoji: client.emoji(39), data: `9|0`

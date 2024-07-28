@@ -1,5 +1,5 @@
 
-const { getGuildStrike } = require('../../../database/schemas/Guild_strikes')
+const { getGuildStrike, updateGuildStrike} = require('../../../database/schemas/Guild_strikes')
 
 const { spamTimeoutMap, defaultRoleTimes } = require('../../../formatters/patterns/timeout')
 const { guildPermissions, guildActions } = require('../../../formatters/patterns/guild')
@@ -9,7 +9,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     const id_strike = parseInt(dados.split(".")[2])
     let operacao = parseInt(dados.split(".")[1]), reback = `strike_configure_button.${id_strike}`
 
-    const strike = await getGuildStrike(interaction.guild.id, id_strike) // Cria um novo strike caso o ID passado não exista
+    const strike = await getGuildStrike(client, interaction.guild.id, id_strike) // Cria um novo strike caso o ID passado não exista
 
     // Tratamento dos cliques
     // 1 -> Escolher penalidade
@@ -119,17 +119,13 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             ephemeral: true
         })
 
-    } else if (operacao === 20) {
-
-        // Inverte o status de ativação dos cargos temporários no strike selecionado
-        strike.timed_role.status = !strike.timed_role.status
-        await strike.save()
-
+    } else if (operacao === 20) { // Inverte o status de ativação dos cargos temporários no strike selecionado
+        await updateGuildStrike(client, strike.id, { timed_role_status: !strike.timed_role_status })
     } else if (operacao === 21) {
 
         // Submenu para escolher o tempo de duração do cargo temporário do strike
         const valores = []
-        Object.keys(defaultRoleTimes).forEach(key => { if (parseInt(key) >= 5 && parseInt(key) !== strike.timed_role.timeout) valores.push(`${key}.${defaultRoleTimes[key]}`) })
+        Object.keys(defaultRoleTimes).forEach(key => { if (parseInt(key) >= 5 && parseInt(key) !== strike.timed_role_timeout) valores.push(`${key}.${defaultRoleTimes[key]}`) })
 
         // Definindo o tempo que o cargo ficará com o membro que receber o strike
         const data = {

@@ -5,7 +5,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const escolha = parseInt(dados.split(".")[1])
     const id_alvo = parseInt(dados.split(".")[2])
 
-    const strikes_guild = await listAllGuildStrikes(interaction.guild.id)
+    const strikes_guild = await listAllGuildStrikes(client, interaction.guild.id)
 
     // Tratamento dos cliques
     // 0 -> Cancela
@@ -15,7 +15,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     if (escolha === 1) {
 
         // Removendo o strike
-        await dropGuildStrike(interaction.guild.id, id_alvo)
+        await dropGuildStrike(client, interaction.guild.id, id_alvo)
 
         dados = "0.4"
         return require('./guild_anti_spam_button')({ client, user, interaction, dados })

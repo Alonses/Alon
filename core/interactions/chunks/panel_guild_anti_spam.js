@@ -8,7 +8,7 @@ module.exports = async ({ client, user, interaction, pagina_guia }) => {
     const pagina = pagina_guia || 0
 
     const guild = await client.getGuild(interaction.guild.id)
-    const strikes_guild = await listAllGuildStrikes(interaction.guild.id)
+    const strikes_guild = await listAllGuildStrikes(client, interaction.guild.id)
     const indice_matriz = client.verifyMatrixIndex(strikes_guild)
 
     let botoes = [], descr_rodape

@@ -110,11 +110,11 @@ async function nerfa_spam({ client, message, guild, suspect_link }) {
     let user_guild = await client.getMemberGuild(message, message.author.id)
     let tempo_timeout = spamTimeoutMap[2]
 
-    let strikes = await listAllGuildStrikes(message.guild.id)
+    let strikes = await listAllGuildStrikes(client, message.guild.id)
     let strike_aplicado = { action: "member_mute", timeout: 2 }
 
     // Creating a new strike for the server
-    if (strikes.length < 1) await getGuildStrike(message.guild.id, 0)
+    if (strikes.length < 1) await getGuildStrike(client, message.guild.id, 0)
     else strike_aplicado = strikes[0]
 
     if (strikes.length > 0) // Server mute time
