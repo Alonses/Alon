@@ -3,7 +3,7 @@ const { EmbedBuilder } = require('discord.js')
 const { getGames, verifyInvalidGames } = require('../../database/schemas/Game')
 
 const { getActiveModules } = require('../../database/schemas/User_modules')
-const { listAllSuspiciouLinks } = require('../../database/schemas/Spam_links')
+const { listAllSuspiciousLinks } = require('../../database/schemas/Spam_links')
 
 const { activities } = require('../../../files/json/text/activities.json')
 
@@ -63,7 +63,7 @@ module.exports = async ({ client, user, interaction, caso }) => {
         await verifyInvalidGames(client)
 
         const games_free = await getGames(client)
-        const links_suspeitos = await listAllSuspiciouLinks()
+        const links_suspeitos = await listAllSuspiciousLinks(client)
 
         // Estatísticas do Alonsal
         embed.setDescription(`${client.defaultEmoji("metrics")} ${client.tls.phrase(user, "manu.info.guia_estatisticas")}`)

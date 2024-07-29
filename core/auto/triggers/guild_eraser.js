@@ -54,7 +54,7 @@ async function verifica_eraser(client) {
                 await updateGuildReport(servidor.sid)
 
                 // Atualizando os links suspeitos no servidor
-                await updateGuildSuspectLink(servidor.sid)
+                await updateGuildSuspectLink(client, servidor.sid)
 
                 // Exclui o servidor por completo
                 await dropGuild(client, servidor.sid)

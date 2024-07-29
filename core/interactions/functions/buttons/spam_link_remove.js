@@ -1,4 +1,4 @@
-const { dropSuspiciousLink, getCachedSuspiciousLink, getAllGuildSuspiciousLinks } = require("../../../database/schemas/Spam_links")
+const { getCachedSuspiciousLink, getAllGuildSuspiciousLinks } = require("../../../database/schemas/Spam_links")
 
 module.exports = async ({ client, user, interaction, dados, pagina_guia }) => {
 
@@ -13,7 +13,7 @@ module.exports = async ({ client, user, interaction, dados, pagina_guia }) => {
 
     if (!operacao) {
 
-        const links = await getAllGuildSuspiciousLinks(interaction.guild.id)
+        const links = await getAllGuildSuspiciousLinks(client, interaction.guild.id)
 
         if (links.length > 0) // Verificando se há links suspeitos no servidor
             row = client.create_buttons([
@@ -33,7 +33,7 @@ module.exports = async ({ client, user, interaction, dados, pagina_guia }) => {
         const timestamp = dados.split(".")[2]
         const guild_id = dados.split(".")[3]
 
-        const link = await getCachedSuspiciousLink(timestamp)
+        const link = await getCachedSuspiciousLink(client, timestamp)
         const guild = await client.getGuild(interaction.guild.id)
 
         // Notificando sobre a adição de um novo link suspeito ao banco do Alonsal e ao servidor original
@@ -41,9 +41,9 @@ module.exports = async ({ client, user, interaction, dados, pagina_guia }) => {
         client.notify(guild.spam_channel || guild.logger_channel, { content: client.tls.phrase(guild, "mode.link_suspeito.excluido_manual", [44, 13], link.link.split("").join(" ")) })
 
         // Excluindo o link suspeito
-        await dropSuspiciousLink(link.link)
+        await client.prisma.spamLinks.delete({ where: { id: link.id } })
 
-        const links = await getAllGuildSuspiciousLinks(interaction.guild.id)
+        const links = await getAllGuildSuspiciousLinks(client, interaction.guild.id)
 
         if (links.length > 0) // Verificando se há links suspeitos no servidor
             row = client.create_buttons([

@@ -1,14 +1,16 @@
 const { EmbedBuilder } = require("discord.js")
 
-const { dropSuspiciousLink, getCachedSuspiciousLink, getAllGuildSuspiciousLinks, listAllSuspiciouLinks } = require("../../../database/schemas/Spam_links")
+const { getAllGuildSuspiciousLinks, listAllSuspiciousLinks } = require("../../../database/schemas/Spam_links")
 
 module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
     pagina = pagina || 0
 
     // Gerenciamento de links suspeitos
-    const operacao = parseInt(dados.split(".")[1])
-    const timestamp = parseInt(dados.split(".")[2])
+    const data = dados.split(".");
+    const operacao = parseInt(data[1])
+    const id = parseInt(data[2])
+    const link = data[3]
 
     // Códigos de operação
     // 0 -> Apagar link em cache
@@ -16,12 +18,10 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
     // 2 -> Menu de links suspeitos
 
-    const link = await getCachedSuspiciousLink(timestamp)
-
     if (!operacao) {
 
         // Removendo o link suspeito em cache
-        await dropSuspiciousLink(link.link)
+        await client.prisma.spamLinks.delete({ where: { id: id } })
 
         return client.reply(interaction, {
             content: client.tls.phrase(user, "mode.link_suspeito.operacao_cancelada_adicao", client.emoji(0)),
@@ -34,17 +34,23 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     if (operacao === 1) {
 
         // Atualizando o status de validade do link suspeito
-        link.valid = true
-        await link.save()
+        await client.prisma.spamLinks.update({
+            where: {
+                id: id
+            },
+            data: {
+                valid: true
+            }
+        })
 
         const guild = await client.getGuild(interaction.guild.id)
 
         // Notificando sobre a adição de um novo link suspeito ao banco do Alonsal e ao servidor original
-        client.notify(process.env.channel_feeds, { content: `:link: :inbox_tray: | Um novo link suspeito foi adicionado manualmente!\n( \`${link.link.split("").join(" ")}\` )` })
-        client.notify(guild.spam_channel || guild.logger_channel, { content: client.tls.phrase(user, "mode.link_suspeito.adicionado_manualmente", [44, 10], link.link.split("").join(" ")) })
+        client.notify(process.env.channel_feeds, { content: `:link: :inbox_tray: | Um novo link suspeito foi adicionado manualmente!\n( \`${link.split("").join(" ")}\` )` })
+        client.notify(guild.spam_channel || guild.logger_channel, { content: client.tls.phrase(user, "mode.link_suspeito.adicionado_manualmente", [44, 10], link.split("").join(" ")) })
 
         return client.reply(interaction, {
-            content: client.tls.phrase(user, "mode.link_suspeito.aviso_adicao", [44, 10], guild.spam_channel || guild.logger_channel),
+            content: client.tls.phrase(user, "mode.link_suspeito.aviso_adicao", [44, 10], guild.spam_channel || guild.logger_channel || interaction.channel.id),
             embeds: [],
             components: [],
             ephemeral: true
@@ -55,9 +61,9 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
         let links
 
         if (interaction.guild.id === process.env.guild_id && process.env.owner_id.includes(interaction.user.id)) // Lista todos os links maliciosos salvos no Alonsal
-            links = await listAllSuspiciouLinks()
+            links = await listAllSuspiciousLinks(client)
         else
-            links = await getAllGuildSuspiciousLinks(interaction.guild.id)
+            links = await getAllGuildSuspiciousLinks(client, interaction.guild.id)
 
         if (links.length < 1) // Sem links suspeitos registrados no servidor
             return interaction.reply({

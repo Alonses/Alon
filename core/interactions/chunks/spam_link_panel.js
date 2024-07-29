@@ -6,7 +6,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
     const timestamp = dados.split(".")[1]
     const pagina = parseInt(dados.split(".")[2])
-    const link = await getCachedSuspiciousLink(timestamp)
+    const link = await getCachedSuspiciousLink(client, timestamp)
 
     if (!link) // Link não encontrado
         return client.reply(interaction, {

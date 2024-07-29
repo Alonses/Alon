@@ -14,7 +14,7 @@ const schema = new mongoose.Schema({
 const model = mongoose.model("Spam_Link", schema)
 
 // Verificando se os links suspeitos estão registrados
-async function verifySuspiciousLink(link) {
+async function verifySuspiciousLink(client, link) {
 
     if (typeof link === "object")
         for (let i = 0; i < link.length; i++) {
@@ -22,15 +22,15 @@ async function verifySuspiciousLink(link) {
             link[i] = link[i].split(")")[0]
 
             if (!links_oficiais.includes(link[i].split("/")[0]))
-                if (await getSuspiciousLink(link[i])) return true
+                if (await getSuspiciousLink(client, link[i])) return true
         }
     else if (!links_oficiais.includes(link.split("/")[0]))
-        if (await getSuspiciousLink(link.split(")")[0])) return true
+        if (await getSuspiciousLink(client, link.split(")")[0])) return true
 
     return false
 }
 
-async function getSuspiciousLink(link) {
+async function getSuspiciousLink(client, link) {
 
     if (link.includes(")"))
         link = link.split(")")[0]
@@ -38,23 +38,19 @@ async function getSuspiciousLink(link) {
     if (link.includes("||"))
         link = link.split("||")[0]
 
-    return model.findOne({
-        link: link.trim()
-    })
+    return client.prisma.spamLinks.findFirst({where: {link: link.trim()}});
 }
 
-async function getCachedSuspiciousLink(timestamp) {
-    return model.findOne({
-        timestamp: timestamp
-    })
+async function getCachedSuspiciousLink(client, timestamp) {
+    return client.prisma.spamLinks.findFirst({where: { timestamp: timestamp }});
 }
 
-async function registerSuspiciousLink(link, guild_id, timestamp) {
+async function registerSuspiciousLink(client, link, guild_id, timestamp) {
 
     let registrados = []
     link = link.replaceAll(" ", "")
 
-    if (!await verifySuspiciousLink(link)) {
+    if (!await verifySuspiciousLink(client, link)) {
 
         if (link.includes(")"))
             link = link.split(")")[0]
@@ -62,11 +58,13 @@ async function registerSuspiciousLink(link, guild_id, timestamp) {
         if (link.includes("("))
             link = link.split("(")[1]
 
-        await model.create({
-            link: link,
-            sid: guild_id,
-            timestamp: timestamp,
-            valid: true
+        await client.prisma.spamLinks.create({
+            data: {
+                link: link,
+                guild_id: guild_id,
+                timestamp: timestamp,
+                valid: true
+            }
         })
 
         registrados.push(link.split("").join(" "))
@@ -76,54 +74,49 @@ async function registerSuspiciousLink(link, guild_id, timestamp) {
 }
 
 // Registrando um link suspeito provisório
-async function registerCachedSuspiciousLink(link, guild_id, timestamp) {
-    await model.create({
-        link: link,
-        sid: guild_id,
-        timestamp: timestamp
+async function registerCachedSuspiciousLink(client, link, guild_id, timestamp) {
+    return client.prisma.spamLinks.create({
+        data: {
+            link: link,
+            guild_id: guild_id,
+            timestamp: timestamp
+        }
     })
 }
 
-async function getAllGuildSuspiciousLinks(guild_id) {
-    return await model.find({
-        sid: guild_id
-    }).sort({
-        timestamp: -1
-    })
+async function getAllGuildSuspiciousLinks(client, guild_id) {
+    return client.prisma.spamLinks.findMany({
+        where: {
+            guild_id: guild_id
+        },
+        orderBy: {
+            timestamp: "desc"
+        }
+    });
 }
 
-async function listAllSuspiciouLinks() {
-    return await model.find({}).sort({
-        timestamp: -1
-    })
+async function listAllSuspiciousLinks(client) {
+    return client.prisma.spamLinks.findMany({orderBy: {timestamp: "desc"}});
 }
 
-async function dropSuspiciousLink(link) {
-
-    await model.findOneAndDelete({
-        link: link
-    })
-}
-
-async function updateGuildSuspectLink(sid) {
+async function updateGuildSuspectLink(client, sid) {
 
     // Movendo os links para o servidor do Alonsal
-    const links = await model.find({
-        sid: sid
-    })
-
-    links.forEach(async link => {
-        link.sid = process.env.guild_id
-        await reporte.save()
+    await client.prisma.spamLinks.updateMany({
+        where: {
+            guild_id: sid
+        },
+        data: {
+            guild_id: process.env.guild_id
+        }
     })
 }
 
 module.exports.Spam_Link = model
 module.exports = {
     getSuspiciousLink,
-    dropSuspiciousLink,
     verifySuspiciousLink,
-    listAllSuspiciouLinks,
+    listAllSuspiciousLinks,
     registerSuspiciousLink,
     registerCachedSuspiciousLink,
     getCachedSuspiciousLink,

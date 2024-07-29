@@ -67,7 +67,7 @@ client.discord.on("messageCreate", async message => {
 		const link = `${message.content} `.match(client.cached.regex)
 
 		if (link)
-			if (await verifySuspiciousLink(link)) {
+			if (await verifySuspiciousLink(client, link)) {
 				const suspect_link = true
 				return nerfa_spam({ client, message, guild, suspect_link })
 			}

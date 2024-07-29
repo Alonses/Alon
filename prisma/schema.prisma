@@ -180,3 +180,11 @@ model GuildWarn {
   timed_role_status  Boolean @default(false)
   timed_role_timeout Float   @default(12)
 }
+
+model SpamLinks {
+  id        Int     @id @default(autoincrement())
+  guild_id  String
+  link      String
+  timestamp Int
+  valid     Boolean @default(false)
+}
