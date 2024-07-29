@@ -9,7 +9,7 @@ module.exports = async function ({ client, interaction, user, member_guild, user
 
     const id_alvo = user_warn.uid
     const guild = await client.getGuild(interaction.guild.id)
-    const guild_warns = await listAllGuildWarns(interaction.guild.id)
+    const guild_warns = await listAllGuildWarns(client, interaction.guild.id)
 
     const active_user_warns = await listAllUserWarns(id_alvo, interaction.guild.id)
     const indice_warn = active_user_warns.length > guild_warns.length ? guild_warns.length - 1 : active_user_warns.length - 1

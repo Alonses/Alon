@@ -23,7 +23,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
     let operacao = parseInt(dados.split(".")[1]), reback = "panel_guild_warns.2", pagina_guia = 0
 
-    const advertencias = await listAllGuildWarns(interaction.guild.id)
+    const advertencias = await listAllGuildWarns(client, interaction.guild.id)
     let guild = await client.getGuild(interaction.guild.id)
 
     if (operacao > 8) pagina_guia = 2
@@ -71,7 +71,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
         }], indice_matriz = 5
 
         if (advertencias.length < 1) {
-            await getGuildWarn(interaction.guild.id, 0)
+            await getGuildWarn(client, interaction.guild.id, 0)
 
             botoes.push({
                 id: "warn_configure_button", name: "1°", type: 1, emoji: client.emoji(39), data: `9|0`

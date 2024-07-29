@@ -14,7 +14,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const user_notes = await listAllUserPreWarns(id_alvo, interaction.guild.id)
 
     const guild = await client.getGuild(interaction.guild.id)
-    const guild_warns = await listAllGuildWarns(interaction.guild.id)
+    const guild_warns = await listAllGuildWarns(client, interaction.guild.id)
 
     let indice_matriz = client.verifyMatrixIndex(guild_warns) // Indice marcador do momento de expulsão/banimento do membro pelas advertências
 

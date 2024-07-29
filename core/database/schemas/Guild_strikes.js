@@ -23,11 +23,11 @@ async function getGuildStrike(client, id, rank) {
         rank: rank
     }
 
-    const strike = await client.prisma.guildRoleAssigner.findFirst({ where: key });
+    const strike = await client.prisma.guildStrike.findFirst({ where: key });
 
     if (!strike) {
-        await client.prisma.guildRoleAssigner.create({ data: key });
-        return client.prisma.guildRoleAssigner.findFirst({ where: key });
+        await client.prisma.guildStrike.create({ data: key });
+        return client.prisma.guildStrike.findFirst({ where: key });
     }
 
     return strike;

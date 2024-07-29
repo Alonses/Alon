@@ -10,7 +10,7 @@ const { default_emoji } = require('../../../files/json/text/emojis.json')
 module.exports = async ({ client, user, interaction, guild, user_warns, guild_member }) => {
 
     const descricao_warn = interaction.options.getString("reason")
-    const guild_warns = await listAllGuildWarns(interaction.guild.id)
+    const guild_warns = await listAllGuildWarns(client, interaction.guild.id)
 
     let texto_rodape = "⠀", user_warn, id_warn = "warn_create"
 

@@ -2,7 +2,7 @@ const { EmbedBuilder, PermissionsBitField } = require("discord.js")
 
 const { emoji_button } = require("../../functions/emoji_button")
 
-const { getGuildWarn } = require("../../database/schemas/Guild_warns")
+const { getGuildWarn, updateGuildWarn} = require("../../database/schemas/Guild_warns")
 
 const { loggerMap } = require("../../formatters/patterns/guild")
 const { spamTimeoutMap, defaultRoleTimes } = require("../../formatters/patterns/timeout")
@@ -12,12 +12,10 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
     const id_warn = parseInt(dados.split(".")[2])
     const guild = await client.getGuild(interaction.guild.id)
-    const warn = await getGuildWarn(interaction.guild.id, id_warn)
+    const warn = await getGuildWarn(client, interaction.guild.id, id_warn)
 
-    if (!warn.strikes) { // Concede os strikes minimos para cada advertência conforme a configuração do servidor
-        warn.strikes = guild.warn_hierarchy_strikes
-        warn.save()
-    }
+    if (!warn.strikes) // Concede os strikes minimos para cada advertência conforme a configuração do servidor
+        await updateGuildWarn(client, warn.id, { strikes: guild.warn_hierarchy_strikes })
 
     const embed = new EmbedBuilder()
         .setTitle(client.tls.phrase(user, "mode.warn.edicao_warn_titulo", null, warn.rank + 1))
@@ -36,7 +34,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
             },
             {
                 name: `${client.defaultEmoji("time")} **${client.tls.phrase(user, "menu.botoes.cargo_temporario")}**`,
-                value: `**${warn.timed_role.status ? `\`${client.tls.phrase(user, "status.ativo")}\` \`${client.defaultEmoji("time")} ${client.tls.phrase(user, `menu.times.${defaultRoleTimes[warn.timed_role.timeout]}`)}\`` : `\`${client.tls.phrase(user, "status.desativado")}\` \`${client.defaultEmoji("time")} ${client.tls.phrase(user, `menu.times.${defaultRoleTimes[warn.timed_role.timeout]}`)}\``}**`,
+                value: `**${warn.timed_role_status ? `\`${client.tls.phrase(user, "status.ativo")}\` \`${client.defaultEmoji("time")} ${client.tls.phrase(user, `menu.times.${defaultRoleTimes[warn.timed_role_timeout]}`)}\`` : `\`${client.tls.phrase(user, "status.desativado")}\` \`${client.defaultEmoji("time")} ${client.tls.phrase(user, `menu.times.${defaultRoleTimes[warn.timed_role_timeout]}`)}\``}**`,
                 inline: true
             }
         )
@@ -94,17 +92,15 @@ module.exports = async ({ client, user, interaction, dados }) => {
             iconURL: interaction.user.avatarURL({ dynamic: true })
         })
 
-        if (warn.role) { // Removendo o cargo definido anteriormente
-            warn.role = null
-            warn.save()
-        }
+        if (warn.role) // Removendo o cargo definido anteriormente
+            await updateGuildWarn(client, warn.id, { role: null })
     }
 
     const botoes = [
         { id: "warn_configure_button", name: client.tls.phrase(user, "menu.botoes.penalidade"), type: 1, emoji: loggerMap[warn.action] || loggerMap["none"], data: `1.${id_warn}` },
         { id: "warn_configure_button", name: client.tls.phrase(user, "menu.botoes.tempo_mute"), type: 1, emoji: client.defaultEmoji("time"), data: `3.${id_warn}` },
         { id: "warn_configure_button", name: client.tls.phrase(user, "mode.anuncio.cargo"), type: 1, emoji: client.defaultEmoji("role"), data: `2.${id_warn}`, disabled: b_cargos },
-        { id: "warn_configure_button", name: client.tls.phrase(user, "menu.botoes.cargo_temporario"), type: client.execute("functions", "emoji_button.type_button", warn.timed_role.status), emoji: client.execute("functions", "emoji_button.emoji_button", warn.timed_role.status), data: `20.${id_warn}`, disabled: !warn.role },
+        { id: "warn_configure_button", name: client.tls.phrase(user, "menu.botoes.cargo_temporario"), type: client.execute("functions", "emoji_button.type_button", warn.timed_role_status), emoji: client.execute("functions", "emoji_button.emoji_button", warn.timed_role_status), data: `20.${id_warn}`, disabled: !warn.role },
         { id: "warn_configure_button", name: client.tls.phrase(user, "menu.botoes.expiracao_cargo"), type: 1, emoji: client.defaultEmoji("time"), data: `21|${id_warn}` }
     ]
 

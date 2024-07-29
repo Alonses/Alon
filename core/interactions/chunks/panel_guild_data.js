@@ -9,7 +9,7 @@ const { defaultEraser } = require('../../formatters/patterns/timeout')
 module.exports = async ({ client, user, interaction, operador, pagina_guia }) => {
 
     const rank = await listRankGuild(interaction.guild.id)
-    const warns = await listAllGuildWarns(interaction.guild.id)
+    const warns = await listAllGuildWarns(client, interaction.guild.id)
     const reportes = await checkUserGuildReported(interaction.guild.id)
 
     const guild = await client.getGuild(interaction.guild.id), pagina = pagina_guia || 0

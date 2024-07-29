@@ -651,7 +651,7 @@ function internal_functions(client) {
     client.verifyUserWarnRoles = async (id_user, id_guild) => {
 
         const guild = await client.guilds(id_guild)
-        const guild_warns = await listAllGuildWarns(id_guild)
+        const guild_warns = await listAllGuildWarns(client, id_guild)
         const user_warns = await listAllUserWarns(id_user, id_guild)
 
         let i = 0

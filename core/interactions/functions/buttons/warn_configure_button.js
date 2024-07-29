@@ -1,4 +1,5 @@
-const { getGuildWarn } = require('../../../database/schemas/Guild_warns')
+const { getGuildWarn, updateGuildWarn} = require('../../../database/schemas/Guild_warns')
+const {updateGuild} = require("../../../database/schemas/Guild");
 
 const { spamTimeoutMap, defaultWarnStrikes, defaultRoleTimes } = require('../../../formatters/patterns/timeout')
 const { guildActions, guildPermissions } = require('../../../formatters/patterns/guild')
@@ -19,7 +20,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     // Redirecionando para nova advertência
     if (operacao === 9) return require('../../chunks/warn_configure')({ client, user, interaction, dados })
 
-    const warn = await getGuildWarn(interaction.guild.id, id_warn) // Cria uma nova advertência caso o ID passado não exista
+    const warn = await getGuildWarn(client, interaction.guild.id, id_warn) // Cria uma nova advertência caso o ID passado não exista
     let guild = await client.getGuild(interaction.guild.id)
 
     // Tratamento dos cliques
@@ -158,16 +159,13 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
         })
 
     } else if (operacao === 20) {
-
         // Inverte o status de ativação dos cargos temporários na advertência selecionada
-        warn.timed_role.status = !warn.timed_role.status
-        await warn.save()
-
+        await updateGuildWarn(client, warn.id, { timed_role_status: !warn.timed_role_status })
     } else if (operacao === 21) {
 
         // Submenu para escolher o tempo de duração do cargo temporário da advertência
         const valores = []
-        Object.keys(defaultRoleTimes).forEach(key => { if (parseInt(key) >= 5 && parseInt(key) !== warn.timed_role.timeout) valores.push(`${key}.${defaultRoleTimes[key]}`) })
+        Object.keys(defaultRoleTimes).forEach(key => { if (parseInt(key) >= 5 && parseInt(key) !== warn.timed_role_timeout) valores.push(`${key}.${defaultRoleTimes[key]}`) })
 
         // Definindo o tempo que o cargo ficará com o membro que receber a advertência
         const data = {

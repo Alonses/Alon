@@ -164,7 +164,19 @@ model GuildStrike {
   rank               Int     @default(0)
   action             String?
   role               String?
-  timeout            Float
+  timeout            Float   @default(2)
+  timed_role_status  Boolean @default(false)
+  timed_role_timeout Float   @default(12)
+}
+
+model GuildWarn {
+  id                 Int     @id @default(autoincrement())
+  guild_id           String
+  rank               Int     @default(0)
+  action             String?
+  role               String?
+  timeout            Float   @default(2)
+  strikes            Int     @default(0)
   timed_role_status  Boolean @default(false)
   timed_role_timeout Float   @default(12)
 }

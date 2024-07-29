@@ -6,7 +6,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const escolha = parseInt(dados.split(".")[1])
     const id_alvo = parseInt(dados.split(".")[2])
 
-    const warns_guild = await listAllGuildWarns(interaction.guild.id)
+    const warns_guild = await listAllGuildWarns(client, interaction.guild.id)
 
     // Tratamento dos cliques
     // 0 -> Cancela
@@ -16,7 +16,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     if (escolha === 1) {
 
         // Removendo a advertência
-        dropGuildWarn(interaction.guild.id, id_alvo)
+        await dropGuildWarn(client, interaction.guild.id, id_alvo)
 
         // Menos que o limite necessário para o recurso ser ativo
         if ((warns_guild.length - 1) < 2)

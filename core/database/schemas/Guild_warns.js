@@ -18,40 +18,49 @@ const schema = new mongoose.Schema({
 const model = mongoose.model("Warn_guild", schema)
 
 // Procurando por uma advertência
-async function getGuildWarn(sid, rank) {
+async function getGuildWarn(client, id, rank) {
 
-    if (!await model.exists({ sid: sid, rank: rank }))
-        await model.create({
-            sid: sid,
-            rank: rank
-        })
-
-    return model.findOne({
-        sid: sid,
+    const key = {
+        guild_id: id,
         rank: rank
-    })
+    }
+
+    const warn = await client.prisma.guildWarn.findFirst({ where: key });
+
+    if (!warn) {
+        await client.prisma.guildWarn.create({ data: key });
+        return client.prisma.guildWarn.findFirst({ where: key });
+    }
+
+    return warn;
 }
 
 // Listando todas as advertências do servidor
-async function listAllGuildWarns(sid) {
-
-    return model.find({
-        sid: sid
-    })
+async function listAllGuildWarns(client, id) {
+    return client.prisma.guildWarn.findMany({where: {guild_id: id}});
 }
 
 // Apaga a advertência customizada
-async function dropGuildWarn(sid, rank) {
-    await model.findOneAndDelete({
-        sid: sid,
-        rank: rank
+async function dropGuildWarn(client, id, rank) {
+    await client.prisma.guildWarn.delete({
+        where: {
+            guild_id: id,
+            rank: rank
+        }
     })
 }
 
 // Apaga todas as advertências criadas no servidor
-async function dropAllGuildWarns(sid) {
-    await model.deleteMany({
-        sid: sid
+async function dropAllGuildWarns(client, id) {
+    await client.prisma.guildWarn.deleteMany({ where: { guild_id: id } })
+}
+
+async function updateGuildWarn(client, id, data) {
+    await client.prisma.guildWarn.update({
+        where: {
+            id: id
+        },
+        data: data
     })
 }
 
@@ -60,5 +69,6 @@ module.exports = {
     getGuildWarn,
     listAllGuildWarns,
     dropGuildWarn,
-    dropAllGuildWarns
+    dropAllGuildWarns,
+    updateGuildWarn
 }

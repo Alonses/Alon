@@ -1,4 +1,4 @@
-const { getGuildWarn } = require('../../../database/schemas/Guild_warns')
+const { getGuildWarn, updateGuildWarn} = require('../../../database/schemas/Guild_warns')
 
 module.exports = async ({ client, user, interaction, dados }) => {
 
@@ -6,15 +6,16 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const id_warn = parseInt(dados.split("/")[1])
 
     // Atualizando o cargo da advertência
-    const warn = await getGuildWarn(interaction.guild.id, id_warn)
-    warn.role = cargo == "none" ? null : cargo
+    const warn = await getGuildWarn(client, interaction.guild.id, id_warn)
+    let data = cargo === "none" ? {
+        role: null,
+        timed_role_status: false
+    } : {role: cargo}
 
-    // Desativando o cargo temporário caso seja removido o cargo da advertência
-    if (!warn.role) warn.timed_role.status = false
 
-    await warn.save()
+    await updateGuildWarn(client, warn.id, data)
 
     // Redirecionando o evento
     dados = `x.y.${id_warn}`
-    require('../../chunks/warn_configure')({ client, user, interaction, dados })
+    require('../../chunks/warn_configure')({client, user, interaction, dados})
 }

@@ -36,7 +36,7 @@ async function verifica_eraser(client) {
                 await dropAllRankGuild(servidor.sid)
 
                 // Excluindo todas as advertências criadas no servidor
-                await dropAllGuildWarns(servidor.sid)
+                await dropAllGuildWarns(client, servidor.sid)
 
                 // Excluindo todos os tickets criados no servidor
                 await dropAllGuildTickets(servidor.sid)
@@ -46,9 +46,6 @@ async function verifica_eraser(client) {
 
                 // Excluindo todos os strikes criados no servidor
                 await dropAllGuildStrikes(client, servidor.sid)
-
-                // Excluindo todas as advertências criadas no servidor
-                await dropAllGuildWarns(servidor.sid)
 
                 // Excluindo todos os servidores salvos em cache que referênciam o servidor excluído
                 await dropAllUserGuilds(servidor.sid)

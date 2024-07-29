@@ -12,7 +12,7 @@ module.exports = async ({ client, user, interaction, pagina_guia }) => {
 
     // Permissões do bot no servidor
     const membro_sv = await client.getMemberGuild(interaction, client.id())
-    const advertencias = await listAllGuildWarns(interaction.guild.id)
+    const advertencias = await listAllGuildWarns(client, interaction.guild.id)
 
     const embed = new EmbedBuilder()
         .setTitle(`> ${client.tls.phrase(user, "mode.hierarquia.status_ativacao")} :crown: :octagonal_sign:`)

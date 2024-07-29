@@ -7,7 +7,7 @@ const { listAllUserPreWarns } = require('../../../core/database/schemas/User_pre
 module.exports = async ({ client, user, interaction }) => {
 
     // Verificando a quantidade de advertências customizadas no servidor
-    const warns_guild = await listAllGuildWarns(interaction.guild.id)
+    const warns_guild = await listAllGuildWarns(client, interaction.guild.id)
 
     if (warns_guild.length < 2) // Warns não configuradas no servidor
         return client.tls.reply(interaction, user, "mode.warn.nao_configurado", true, 60)

@@ -24,7 +24,7 @@ module.exports = async ({ client, user, interaction, guild, active_user_warns, g
         return client.notify(guild.warn.channel, { content: client.tls.phrase(guild, "events.mute.sem_permissao_mute_2", [7, 0], user_warn.uid) })
     }
 
-    const guild_warns = await listAllGuildWarns(interaction.guild.id)
+    const guild_warns = await listAllGuildWarns(client, interaction.guild.id)
 
     // Tempo de mute padrão do servidor para advertências
     const timeout = spamTimeoutMap[guild_warns[active_user_warns.length - 1].timeout] * 1000

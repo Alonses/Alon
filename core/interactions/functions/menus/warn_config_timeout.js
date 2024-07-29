@@ -1,4 +1,4 @@
-const { getGuildWarn } = require('../../../database/schemas/Guild_warns')
+const { getGuildWarn, updateGuildWarn} = require('../../../database/schemas/Guild_warns')
 
 module.exports = async ({ client, user, interaction, dados }) => {
 
@@ -6,10 +6,8 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const id_warn = parseInt(dados.split(".")[1])
 
     // Atualizando o tempo de mute da advertência
-    const warn = await getGuildWarn(interaction.guild.id, id_warn)
-    warn.timeout = tempo_mute
-
-    await warn.save()
+    const warn = await getGuildWarn(client, interaction.guild.id, id_warn)
+    await updateGuildWarn(client, warn.id, { timeout: tempo_mute })
 
     // Redirecionando o evento
     dados = `x.y.${id_warn}`
