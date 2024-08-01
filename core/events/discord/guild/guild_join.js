@@ -9,7 +9,11 @@ module.exports = async ({ client, guild }) => {
 
     if (client.id() !== process.env.client_1 || !process.env.channel_server) return
 
-    await updateGuild(client, guild.id, { erase_valid: false })
+    const erase_id = await client.getGuild(guild.id).erase_id
+    await client.prisma.guildOptionsErase.update({
+        where: { id: erase_id },
+        data: { erase_valid: false }
+    })
 
     const canais = guild.channels.cache.filter((c) => c.type !== "GUILD_CATEGORY").size
     const server_info = `\n\n:busts_in_silhouette: **Members** ( \`${guild.memberCount - 1}\` )\n:placard: **Channels** ( \`${canais}\` )`

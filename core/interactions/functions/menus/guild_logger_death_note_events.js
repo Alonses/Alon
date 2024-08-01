@@ -1,15 +1,17 @@
-const {updateGuild} = require("../../../database/schemas/Guild");
 module.exports = async ({ client, user, interaction, dados }) => {
 
-    const guild = await client.getGuild(interaction.guild.id)
+    const guild = await client.getGuild(interaction.guild.id, { death_note: true })
     const update = {}
     // Invertendo os eventos
     Object.keys(interaction.values).forEach(indice => {
-        const evento = "death_note_" + interaction.values[indice].split("|")[1]
-        update[evento] = !guild[evento]
+        const evento = interaction.values[indice].split("|")[1]
+        update[evento] = !guild.death_note[evento]
     })
 
-    await updateGuild(client, guild.id, update)
+    await client.prisma.guildOptionsDeathNote.update({
+        where: { id: guild.death_note_id },
+        data: update
+    })
 
     // Redirecionando o evento
     const pagina_guia = 2

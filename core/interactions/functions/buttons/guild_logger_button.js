@@ -1,29 +1,31 @@
 const { ChannelType } = require('discord.js')
-const {updateGuild} = require("../../../database/schemas/Guild");
 
 // 1 -> Ativar ou desativar o log de eventos
 // 5 -> Ativar ou desativar o registro de punições em canal separado
 // 7 -> Ativar ou desativar as notificações
 
 const operations = {
-    1: { action: "conf.logger", page: 0 },
-    5: { action: "death.note", page: 2 },
-    7: { action: "death.note.notify", page: 2 }
+    1: { action: "logger.enabled", page: 0 },
+    5: { action: "death_note.note", page: 2 },
+    7: { action: "death_note.notify", page: 2 }
 }
 
 module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
     let operacao = parseInt(dados.split(".")[1]), reback = "panel_guild_logger", pagina_guia = 0
-    let guild = await client.getGuild(interaction.guild.id)
+    let guild = await client.getGuild(interaction.guild.id, {
+        death_note: true,
+        logger: true
+    })
 
     // Sem canal de avisos definido, solicitando um canal
-    if (!guild.logger_channel) {
+    if (!guild.logger.channel) {
         reback = "panel_guild.0"
         operacao = 3
     }
 
     // Sem canal de aviso para o Death note escolhido
-    if (operacao === 5 && !guild.death_note_channel)
+    if (operacao === 5 && !guild.death_note.channel)
         operacao = 8
 
     // Tratamento dos cliques
@@ -45,22 +47,22 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     else if (operacao === 2 || operacao === 6) {
 
         const eventos = []
-        let lista_eventos = Object.keys(guild).filter(prop => prop.startsWith("logger")), alvo = "guild_logger#events", digito = 0
+        let lista_eventos = Object.keys(guild.logger), alvo = "guild_logger#events", digito = 0
 
         if (operacao === 6) {
-            lista_eventos = Object.keys(guild).filter(prop => prop.startsWith("death_note"))
+            lista_eventos = Object.keys(guild.death_note)
             alvo = "guild_logger_death_note#events"
             digito = 2
         }
 
-        lista_eventos.forEach(evento => {
-            if (evento !== "logger_channel" && operacao === 2)
-                eventos.push({ type: evento.replace("logger_", ""), status: guild[evento] })
-
-            if (evento.includes("member_") && operacao === 6) {
-                eventos.push({type: evento.replace("death_note_", ""), status: guild[evento]})
+        for (const event of lista_eventos) {
+            if (event === "id" || event === "enabled") continue
+            if (operacao === 2 && event !== "channel")
+                eventos.push({ type: event, status: guild.logger[event] })
+            else if (operacao === 6 && event.includes("member_")) {
+                eventos.push({type: event, status: guild.death_note[event]})
             }
-        })
+        }
 
         // Definindo os eventos que o log irá relatar no servidor
         const data = {
@@ -82,10 +84,10 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
     } else if (operacao === 3 || operacao === 8) {
 
-        let canal = guild.logger_channel, alvo = "guild_logger#channel", digito = 1
+        let canal = guild.logger.channel, alvo = "guild_logger#channel", digito = 1
 
         if (operacao === 8) {
-            canal = guild.death_note_channel
+            canal = guild.death_note.channel
             alvo = "guild_logger_death_note#channel"
             digito = 2
         }
@@ -140,7 +142,16 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     if (operacao === 10) pagina_guia = 2
 
     // Salvando os dados atualizados
-    if (operations[operacao]) await updateGuild(client, guild.id, guild)
+    if (operations[operacao]) {
+        await client.prisma.guildOptionsLogger.update({
+            where: { id: guild.logger_id },
+            data: guild.logger
+        })
+        await client.prisma.guildOptionsDeathNote.update({
+            where: { id: guild.death_note_id },
+            data: guild.death_note
+        })
+    }
 
     // Redirecionando a função para o painel do log de eventos
     require('../../chunks/panel_guild_logger')({ client, user, interaction, operacao, pagina_guia })

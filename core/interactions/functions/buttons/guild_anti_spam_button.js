@@ -24,12 +24,15 @@ const operations = {
 module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
     let operacao = parseInt(dados.split(".")[1]), reback = "panel_guild_anti_spam", pagina_guia = 0
-    let guild = await client.getGuild(interaction.guild.id)
+    let guild = await client.getGuild(interaction.guild.id, {
+        logger: true,
+        spam: true
+    })
 
     if (operacao > 3) pagina_guia = 2
 
     // Sem canal de avisos definido, solicitando um canal
-    if (!guild.spam_channel && !guild.logger_channel) {
+    if (!guild.spam.channel && !guild.logger.channel) {
         reback = "panel_guild.0"
         operacao = 6
     }
@@ -124,11 +127,11 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             values: []
         }
 
-        if (guild.spam_channel)
+        if (guild.spam.channel)
             data.values.push({ name: client.tls.phrase(user, "manu.guild_data.remover_canal"), id: "none" })
 
         // Listando os canais do servidor
-        data.values = data.values.concat(await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.spam_channel))
+        data.values = data.values.concat(await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.spam.channel))
 
         // Subtrai uma página do total ( em casos de exclusão de itens e pagina em cache )
         if (data.values.length < pagina * 24) pagina--

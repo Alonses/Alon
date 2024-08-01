@@ -8,7 +8,7 @@ const { spamTimeoutMap } = require('../formatters/patterns/timeout')
 module.exports = async function ({ client, interaction, user, member_guild, user_warn, hierarquia }) {
 
     const id_alvo = user_warn.uid
-    const guild = await client.getGuild(interaction.guild.id)
+    const guild = await client.getGuild(interaction.guild.id, { warn: true })
     const guild_warns = await listAllGuildWarns(client, interaction.guild.id)
 
     const active_user_warns = await listAllUserWarns(id_alvo, interaction.guild.id)
@@ -73,7 +73,7 @@ module.exports = async function ({ client, interaction, user, member_guild, user
         inline: true
     })
 
-    let canal_envio = guild.warn_channel, texto_embed = guild.warn_notify ? "@here" : ""
+    let canal_envio = guild.warn.channel, texto_embed = guild.warn.notify ? "@here" : ""
 
     // Altera o destino para o canal de avisos temporários
     if (guild.warn_timed_channel) interaction.channel.id = guild.warn_timed_channel
@@ -82,8 +82,8 @@ module.exports = async function ({ client, interaction, user, member_guild, user
     client.timed_message(interaction, { content: client.tls.phrase(guild, "mode.warn.anuncio_temporario", null, [id_alvo, `${active_user_warns.length} / ${indice_matriz}`, client.verifyAction(guild_warns[indice_warn], guild), client.timestamp() + 60]) }, 60)
 
     // Servidor com anúncio de advertências público configurado
-    if (guild.warn_announce_status && guild.warn_announce_channel) {
-        canal_envio = guild.warn_announce_channel
+    if (guild.warn.announce_status && guild.warn.announce_channel) {
+        canal_envio = guild.warn.announce_channel
         texto_embed = `<@${id_alvo}>`
 
         embed_guild.setDescription(`\`\`\`fix\n📠 | ${client.tls.phrase(guild, "mode.warn.descricao_fornecida")}\n\n${user_warn.relatory}\`\`\``)

@@ -1,0 +1,186 @@
+model Guild {
+  id          String  @id
+  lang        String  @default("pt-br")
+  second_lang String?
+  inviter     String?
+
+  nuke_invites Boolean @default(false)
+
+  games_channel String?
+  games_role    String?
+  games_enabled Boolean @default(false)
+
+  tickets_category String?
+  tickets_enabled  Boolean @default(false)
+
+  speaker_regional_limit Boolean @default(false)
+  speaker_channels       String?
+
+  timed_roles_timeout Float   @default(5)
+  timed_roles_channel String?
+  timed_roles_enabled Boolean @default(false)
+
+  warn    GuildOptionsWarn @relation(fields: [warn_id], references: [id])
+  warn_id Int              @unique
+
+  erase    GuildOptionsErase @relation(fields: [erase_id], references: [id])
+  erase_id Int               @unique
+
+  reports    GuildOptionsReports @relation(fields: [reports_id], references: [id])
+  reports_id Int                 @unique
+
+  logger    GuildOptionsLogger @relation(fields: [logger_id], references: [id])
+  logger_id Int                @unique
+
+  death_note    GuildOptionsDeathNote @relation(fields: [death_note_id], references: [id])
+  death_note_id Int                   @unique
+
+  spam    GuildOptionsSpam @relation(fields: [spam_id], references: [id])
+  spam_id Int              @unique
+
+  network    GuildOptionsNetwork @relation(fields: [network_id], references: [id])
+  network_id Int                 @unique
+}
+
+model GuildOptionsWarn {
+  id                 Int     @id @default(autoincrement())
+  enabled            Boolean @default(false)
+  notify             Boolean @default(true)
+  notify_exclusion   Boolean @default(true)
+  timed              Boolean @default(false)
+  channel            String?
+  timeout            Float   @default(2)
+  reset              Float   @default(7)
+  erase_ban_messages Float   @default(0)
+  timed_channel      String?
+  announce_status    Boolean @default(false)
+  announce_channel   String?
+  hierarchy_status   Boolean @default(false)
+  hierarchy_strikes  Int     @default(3)
+  hierarchy_timed    Boolean @default(false)
+  hierarchy_reset    Float   @default(4)
+  hierarchy_channel  String?
+  guild              Guild?
+}
+
+model GuildOptionsErase {
+  id        Int     @id @default(autoincrement())
+  valid     Boolean @default(false)
+  timeout   Float   @default(5)
+  timestamp String?
+  guild     Guild?
+}
+
+model GuildOptionsReports {
+  id                 Int     @id @default(autoincrement())
+  channel            String?
+  enabled            Boolean @default(false)
+  auto_ban           Boolean @default(false)
+  notify             Boolean @default(false)
+  role               String?
+  erase_ban_messages Float   @default(0)
+  guild              Guild?
+}
+
+model GuildOptionsLogger {
+  id                  Int     @id @default(autoincrement())
+  channel             String?
+  enabled             Boolean @default(false)
+  message_edit        Boolean @default(true)
+  message_delete      Boolean @default(true)
+  member_nick         Boolean @default(false)
+  member_image        Boolean @default(true)
+  member_role         Boolean @default(true)
+  member_join         Boolean @default(true)
+  member_left         Boolean @default(true)
+  channel_created     Boolean @default(false)
+  channel_delete      Boolean @default(false)
+  member_punishment   Boolean @default(true)
+  member_kick         Boolean @default(true)
+  member_ban_add      Boolean @default(true)
+  member_ban_remove   Boolean @default(true)
+  member_voice_status Boolean @default(false)
+  invite_created      Boolean @default(false)
+  invite_deleted      Boolean @default(false)
+  guild               Guild?
+}
+
+model GuildOptionsDeathNote {
+  id                Int     @id @default(autoincrement())
+  note              Boolean @default(false)
+  notify            Boolean @default(true)
+  channel           String?
+  member_punishment Boolean @default(true)
+  member_kick       Boolean @default(true)
+  member_ban_add    Boolean @default(true)
+  member_ban_remove Boolean @default(true)
+  guild             Guild?
+}
+
+model GuildOptionsSpam {
+  id               Int     @id @default(autoincrement())
+  enabled          Boolean @default(false)
+  notify           Boolean @default(true)
+  strikes          Boolean @default(true)
+  timeout          Float   @default(2)
+  manage_mods      Boolean @default(false)
+  trigger_amount   Float   @default(5)
+  suspicious_links Boolean @default(false)
+  channel          String?
+  scanner_links    Boolean @default(false)
+  guild            Guild?
+}
+
+model GuildOptionsNetwork {
+  id                 Int     @id @default(autoincrement())
+  link               String?
+  channel            String?
+  enabled            Boolean @default(false)
+  member_punishment  Boolean @default(true)
+  member_ban_add     Boolean @default(true)
+  member_kick        Boolean @default(true)
+  erase_ban_messages Float   @default(0)
+  scanner_type       Boolean @default(true)
+  guild              Guild?
+}
+
+model GuildRoleAssigner {
+  id          Int     @id @default(autoincrement())
+  guild_id    String
+  interaction String?
+  attribute   String?
+  ignore      String?
+  type        String  @default("global")
+  status      Boolean @default(false)
+}
+
+model GuildStrike {
+  id                 Int     @id @default(autoincrement())
+  guild_id           String
+  rank               Int     @default(0)
+  action             String?
+  role               String?
+  timeout            Float   @default(2)
+  timed_role_status  Boolean @default(false)
+  timed_role_timeout Float   @default(12)
+}
+
+model GuildWarn {
+  id                 Int     @id @default(autoincrement())
+  guild_id           String
+  rank               Int     @default(0)
+  action             String?
+  role               String?
+  timeout            Float   @default(2)
+  strikes            Int     @default(0)
+  timed_role_status  Boolean @default(false)
+  timed_role_timeout Float   @default(12)
+}
+
+model SpamLinks {
+  id        Int     @id @default(autoincrement())
+  guild_id  String
+  link      String
+  timestamp Int
+  valid     Boolean @default(false)
+}

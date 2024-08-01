@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["prismaSchemaFolder"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Bot {
+  id String @id
+
+  persis_version          String  @default("1.0")
+  persis_commands         Int     @default(0)
+  persis_ranking          Float   @default(5)
+  persis_alondioma        String?
+  persis_last_interaction Int?
+  persis_spam             Int     @default(0)
+  persis_bufunfas         Float   @default(0)
+
+  cmd_ativacoes Int @default(0)
+  cmd_botoes    Int @default(0)
+  cmd_menus     Int @default(0)
+  cmd_erros     Int @default(0)
+
+  exp_concedido Float @default(0)
+  msgs_lidas    Int   @default(0)
+  msgs_validas  Int   @default(0)
+
+  bfu_gerado Int @default(0)
+  bfu_movido Int @default(0)
+  bfu_reback Int @default(0)
+}
+
+model Charada {
+  qid      Int    @id @default(autoincrement())
+  question String
+  answer   String
+}
+
+model Game {
+  name        String  @id
+  description String?
+  thumbnail   String?
+  type        String  @default("game")
+  link        String?
+  price       Float   @default(0)
+  expire      Int?
+}

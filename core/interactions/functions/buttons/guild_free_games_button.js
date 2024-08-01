@@ -29,7 +29,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
     // Ativa ou desativa o módulo de jogos gratuitos do servidor
     if (operacao === 1)
-        await updateGuild(client, guild.id, { conf_games: !guild.conf_games })
+        await updateGuild(client, guild.id, { games_enabled: !guild.games_enabled })
     else if (operacao === 2) {
         // Enviando um anúncio com os titulos de graça no momento
         const canal_alvo = client.discord.channels.cache.get(guild.games_channel)

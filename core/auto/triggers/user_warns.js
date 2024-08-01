@@ -10,15 +10,15 @@ async function atualiza_warns(client) {
     const dados = await getTimedGuilds(client)
     const warns = []
 
-    dados.forEach(async guild => {
-        const guild_warns = await checkUserGuildWarned(guild.sid)
+    for (const guild of dados) {
+        const guild_warns = await checkUserGuildWarned(guild.id)
 
         // Listando todas as advertências do servidor
         guild_warns.forEach(warn => { warns.push(warn) })
 
         // Salvando as advertências no cache do bot
         writeFileSync("./files/data/user_timed_warns.txt", JSON.stringify(warns))
-    })
+    }
 }
 
 async function verifica_warns(client) {
@@ -34,13 +34,13 @@ async function verifica_warns(client) {
         for (let i = 0; i < data.length; i++) {
 
             const warn = data[i]
-            const guild = guilds_map[warn.sid] ? guilds_map[warn.sid] : await client.getGuild(warn.sid)
+            const guild = guilds_map[warn.sid] ? guilds_map[warn.sid] : await client.getGuild(warn.sid, { warn: true })
 
             if (!guilds_map[warn.sid]) // Salvando a guild em cache
                 guilds_map[warn.sid] = guild
 
             // Verificando se a advertência ultrapassou o tempo de exclusão
-            if (client.timestamp() > (warn.timestamp + spamTimeoutMap[guild.warn_reset])) {
+            if (client.timestamp() > (warn.timestamp + spamTimeoutMap[guild.warn.reset])) {
 
                 // Excluindo o registro da advertência caso tenha zerado e verificando os cargos do usuário
                 await removeUserWarn(warn.uid, warn.sid, warn.timestamp)

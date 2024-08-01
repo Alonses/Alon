@@ -1,6 +1,8 @@
 const { PermissionsBitField, ChannelType } = require('discord.js')
 
-module.exports = async ({ client, user, interaction, guild }) => {
+module.exports = async ({ client, user, interaction }) => {
+
+    const death_note = await client.getGuild(interaction.guild.id, { death_note: true }).death_note
 
     let canal_alvo
 
@@ -13,22 +15,25 @@ module.exports = async ({ client, user, interaction, guild }) => {
 
         // Atribuindo o canal passado para o logger
         canal_alvo = interaction.options.getChannel("value")
-        guild.death_note.channel = canal_alvo.id
+        death_note.channel = canal_alvo.id
     }
 
     // Sem canal informado no comando e nenhum canal salvo no cache do bot
-    if (!canal_alvo && !guild.death_note.channel)
+    if (!canal_alvo && !death_note.channel)
         return client.tls.reply(interaction, user, "mode.logger.mencao_canal", true, 1)
     else {
-        if (!guild.death_note.channel) // Sem canal salvo em cache
+        if (!death_note.channel) // Sem canal salvo em cache
             return client.tls.reply(interaction, user, "mode.logger.mencao_canal", true, 1)
 
         if (typeof canal_alvo !== "object") // Restaurando o canal do cache
-            canal_alvo = await client.channels().get(guild.death_note.channel)
+            canal_alvo = await client.channels().get(death_note.channel)
 
         if (!canal_alvo) { // Canal salvo em cache foi apagado
-            guild.death_note.note = false
-            await guild.save()
+            death_note.note = false
+            await client.prisma.guildOptionsDeathNote.update({
+                where: { id: death_note.id },
+                data: death_note
+            })
 
             return client.tls.reply(interaction, user, "mode.logger.canal_excluido", true, 1)
         }
@@ -39,22 +44,22 @@ module.exports = async ({ client, user, interaction, guild }) => {
     }
 
     // Ativa ou desativa o logger no servidor
-    if (!guild.death_note.note) guild.death_note.note = true
+    if (!death_note.note) death_note.note = true
     else {
         // Inverte o status de funcionamento apenas se executar o comando sem informar um canal
-        if (!interaction.options.getChannel("value"))
-            guild.death_note.note = !guild.death_note.note
-        else
-            guild.death_note.note = true
+        death_note.note = interaction.options.getChannel("value") ? true : !death_note.note
     }
 
     // Se usado sem mencionar um canal, desliga o logger
-    if (!canal_alvo) guild.death_note.note = false
+    if (!canal_alvo) death_note.note = false
 
     // Verificando as permissões do bot
     if (!await client.permissions(interaction, client.id(), [PermissionsBitField.Flags.ViewAuditLog])) {
-        guild.death_note.note = false
-        await guild.save()
+        death_note.note = false
+        await client.prisma.guildOptionsDeathNote.update({
+            where: { id: death_note.id },
+            data: death_note
+        })
 
         return client.reply(interaction, {
             content: client.tls.phrase(user, "manu.painel.salvo_sem_permissao", [10, 7]),
@@ -62,10 +67,13 @@ module.exports = async ({ client, user, interaction, guild }) => {
         })
     }
 
-    await guild.save()
+    await client.prisma.guildOptionsDeathNote.update({
+        where: { id: death_note.id },
+        data: death_note
+    })
 
-    if (guild.death_note.note)
-        client.tls.reply(interaction, user, "mode.death_note.ativado", true, client.defaultEmoji("guard"), `<#${guild.death_note.channel}>`)
+    if (death_note.note)
+        client.tls.reply(interaction, user, "mode.death_note.ativado", true, client.defaultEmoji("guard"), `<#${death_note.channel}>`)
     else
         client.tls.reply(interaction, user, "mode.death_note.desativado", true, 11)
 }

@@ -1,7 +1,7 @@
 const { PermissionsBitField, ChannelType } = require('discord.js')
 
-module.exports = async ({ client, user, interaction, guild }) => {
-
+module.exports = async ({ client, user, interaction }) => {
+    const warn = await client.getGuild(interaction.guild.id, { warn: true }).warn
     let canal_alvo
 
     // Canal de texto para enviar os relatórios de warns
@@ -13,22 +13,25 @@ module.exports = async ({ client, user, interaction, guild }) => {
 
         // Atribuindo o canal passado para o warn
         canal_alvo = interaction.options.getChannel("value")
-        guild.warn.channel = canal_alvo.id
+        warn.channel = canal_alvo.id
     }
 
     // Sem canal informado no comando e nenhum canal salvo no cache do bot
-    if (!canal_alvo && !guild.warn.channel)
+    if (!canal_alvo && !warn.channel)
         return client.tls.reply(interaction, user, "mode.logger.mencao_canal", true, 1)
     else {
-        if (!guild.warn.channel) // Sem canal salvo em cache
+        if (!warn.channel) // Sem canal salvo em cache
             return client.tls.reply(interaction, user, "mode.logger.mencao_canal", true, 1)
 
         if (typeof canal_alvo !== "object") // Restaurando o canal do cache
-            canal_alvo = await client.channels().get(guild.warn.channel)
+            canal_alvo = await client.channels().get(warn.channel)
 
         if (!canal_alvo) { // Canal salvo em cache foi apagado
-            guild.conf.warn = false
-            await guild.save()
+            warn.enabled = false
+            await client.prisma.guildOptionsWarn.update({
+                where: { id: warn.id },
+                data: warn
+            })
 
             return client.tls.reply(interaction, user, "mode.logger.canal_excluido", true, 1)
         }
@@ -39,18 +42,18 @@ module.exports = async ({ client, user, interaction, guild }) => {
     }
 
     // Inverte o status de funcionamento apenas se executar o comando sem informar um canal
-    if (!interaction.options.getChannel("value"))
-        guild.conf.warn = !guild.conf.warn
-    else
-        guild.conf.warn = true
+    warn.enabled = interaction.options.getChannel("value") ? true : !warn.enabled
 
     // Se usado sem mencionar categoria, desliga o sistema de warns
     if (!canal_alvo)
-        guild.conf.warn = false
+        warn.enabled = false
 
-    await guild.save()
+    await client.prisma.guildOptionsWarn.update({
+        where: { id: warn.id },
+        data: warn
+    })
 
-    if (guild.conf.warn)
+    if (warn.enabled)
         client.tls.reply(interaction, user, "mode.warn.recurso_ativo", true, 10)
     else
         client.tls.reply(interaction, user, "mode.warn.recurso_desligado", true, client.emoji(0))

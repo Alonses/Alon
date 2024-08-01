@@ -43,14 +43,19 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             }
         })
 
-        const guild = await client.getGuild(interaction.guild.id)
+        const guild = await client.getGuild(interaction.guild.id, {
+            logger: true,
+            spam: true
+        })
+
+        const logger_channel = guild.spam.channel || guild.logger.channel
 
         // Notificando sobre a adição de um novo link suspeito ao banco do Alonsal e ao servidor original
         client.notify(process.env.channel_feeds, { content: `:link: :inbox_tray: | Um novo link suspeito foi adicionado manualmente!\n( \`${link.split("").join(" ")}\` )` })
-        client.notify(guild.spam_channel || guild.logger_channel, { content: client.tls.phrase(user, "mode.link_suspeito.adicionado_manualmente", [44, 10], link.split("").join(" ")) })
+        client.notify(logger_channel, { content: client.tls.phrase(user, "mode.link_suspeito.adicionado_manualmente", [44, 10], link.split("").join(" ")) })
 
         return client.reply(interaction, {
-            content: client.tls.phrase(user, "mode.link_suspeito.aviso_adicao", [44, 10], guild.spam_channel || guild.logger_channel || interaction.channel.id),
+            content: client.tls.phrase(user, "mode.link_suspeito.aviso_adicao", [44, 10], logger_channel || interaction.channel.id),
             embeds: [],
             components: [],
             ephemeral: true

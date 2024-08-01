@@ -8,10 +8,10 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
     let pagina_guia = pagina || 0
     let operacao = parseInt(dados.split(".")[1]), reback = "panel_guild_network"
-    const guild = await client.getGuild(interaction.guild.id)
+    const guild = await client.getGuild(interaction.guild.id, { network: true })
 
     // Sem servidores para o link definidos, criando um grupo
-    if (!guild.network_link) {
+    if (!guild.network.link) {
         reback = "panel_guild.1"
         operacao = 3
     }
@@ -36,13 +36,13 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
         // Verificando as permissões necessárias conforme os casos
         let niveis_permissao = [PermissionsBitField.Flags.ViewAuditLog]
 
-        if (guild.network_member_ban_add) // Banimentos automaticos
+        if (guild.network.member_ban_add) // Banimentos automaticos
             niveis_permissao.push(PermissionsBitField.Flags.BanMembers)
 
-        if (guild.network_member_kick) // Expulsões automaticas
+        if (guild.network.member_kick) // Expulsões automaticas
             niveis_permissao.push(PermissionsBitField.Flags.KickMembers)
 
-        if (guild.network_member_punishment) // Castigos automaticos
+        if (guild.network.member_punishment) // Castigos automaticos
             niveis_permissao.push(PermissionsBitField.Flags.ModerateMembers)
 
         // Verificando se o bot possui permissões requeridas conforme os recursos ativos
@@ -132,7 +132,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             .setDescription(client.tls.phrase(user, "manu.guild_data.descricao_quebra_link", 2))
             .setFields({
                 name: `:link: **${client.tls.phrase(user, "manu.guild_data.outros_servidores")}:**`,
-                value: guild.network_link ? await client.getNetWorkGuildNames(user, guild.network_link, interaction) : client.tls.phrase(user, "manu.guild_data.sem_servidores"),
+                value: guild.network.link ? await client.getNetWorkGuildNames(user, guild.network.link, interaction) : client.tls.phrase(user, "manu.guild_data.sem_servidores"),
                 inline: true
             })
             .setFooter({
@@ -162,11 +162,11 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             values: []
         }
 
-        if (guild.network_channel)
+        if (guild.network.channel)
             data.values.push({ name: client.tls.phrase(user, "manu.guild_data.remover_canal"), id: "none" })
 
         // Listando os canais do servidor
-        data.values = data.values.concat(await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.network_channel))
+        data.values = data.values.concat(await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.network.channel))
 
         // Subtrai uma página do total ( em casos de exclusão de itens e pagina em cache )
         if (data.values.length < pagina * 24) pagina--
@@ -211,21 +211,33 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     } else if (operacao === 10) {
 
         // Alterando o estilo de filtragem por ações moderativas geradas por bots ou apenas moderadores humanos
-        await updateGuild(client, guild.id, { network_scanner_type: !guild.network_scanner_type })
+        await client.prisma.guildOptionsNetwork.update({
+            where: { id: guild.network_id },
+            data: { scanner_type: guild.network.scanner_type }
+        })
 
-        const network_guilds = await getNetworkedGuilds(client, guild.network_link)
+        const network_guilds = await getNetworkedGuilds(client, guild.network.link)
 
         // Sincronizando os servidores com a nova configuração de filtragem
         for (let i = 0; i < network_guilds.length; i++) {
             if (network_guilds[i].id !== guild.id)
-                await updateGuild(client, network_guilds[i].id, { network_scanner_type: guild.network_scanner_type })
+            {
+                const network_guild = await client.getGuild(network_guilds[i].id);
+                await client.prisma.guildOptionsNetwork.update({
+                    where: { id: network_guild.network_id },
+                    data: { scanner_type: guild.network.scanner_type }
+                })
+            }
         }
 
     } else if (operacao === 11) {
         // Confirmando a remoção do servidor do link do network
-        await updateGuild(client, guild.id, {
-            conf_network: false,
-            network_link: true
+        await client.prisma.guildOptionsNetwork.update({
+            where: { id: guild.network_id },
+            data: {
+                enabled: false,
+                link: true
+            }
         })
     }
 

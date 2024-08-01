@@ -16,7 +16,7 @@ module.exports = async ({ client, alvo, id_canal, link }) => {
     // Coletando os dados em cache do servidor do reporte
     const cached_guild = await client.guilds(alvo.sid)
 
-    canais_reporte.forEach(async guild => {
+    for (const guild of canais_reporte) {
         const canal_alvo = client.discord.channels.cache.get(guild.reports.channel)
 
         if (!guild.lang)
@@ -75,5 +75,5 @@ module.exports = async ({ client, alvo, id_canal, link }) => {
                         canal_alvo.send({ content: guild.reports.role ? `<@&${guild.reports.role}>` : "⠀", embeds: [embed] })
                     }
                 }
-    })
+    }
 }

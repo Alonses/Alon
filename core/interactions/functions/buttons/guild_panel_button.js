@@ -24,7 +24,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
             return interaction.update({ content: client.tls.phrase(user, "mode.invites.sem_permissao", 7), ephemeral: true })
 
         // Ativa ou desativa os convites rastreados
-        await updateGuild(client, guild.id, { conf_nuke_invites: !guild.conf_nuke_invites })
+        await updateGuild(client, guild.id, { nuke_invites: !guild.nuke_invites })
     }
 
     const pagina_guia = 2

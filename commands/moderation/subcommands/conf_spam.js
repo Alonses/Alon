@@ -1,7 +1,11 @@
 const { PermissionsBitField, ChannelType } = require('discord.js')
+const {updateGuild} = require("../../../core/database/schemas/Guild");
 
-module.exports = async ({ client, user, interaction, guild }) => {
-
+module.exports = async ({ client, user, interaction }) => {
+    const guild = await client.getGuild(interaction.guild.id, {
+        logger: true,
+        spam: true
+    })
     let canal_alvo
 
     // Canal alvo para o bot enviar os relatórios de spam
@@ -27,8 +31,11 @@ module.exports = async ({ client, user, interaction, guild }) => {
             canal_alvo = await client.channels().get(guild.logger.channel)
 
         if (!canal_alvo) { // Canal salvo em cache foi apagado
-            guild.conf.logger = false
-            await guild.save()
+            guild.logger.enabled = false
+            await client.prisma.guildOptionsLogger.update({
+                where: { id: guild.logger_id },
+                data: guild.logger
+            })
 
             return client.tls.reply(interaction, user, "mode.logger.canal_excluido", true, 1)
         }
@@ -39,17 +46,17 @@ module.exports = async ({ client, user, interaction, guild }) => {
     }
 
     // Inverte o status de funcionamento apenas se executar o comando sem informar um canal
-    if (!interaction.options.getChannel("value"))
-        guild.conf.spam = !guild.conf.spam
-    else
-        guild.conf.spam = true
+    guild.spam.enabled = interaction.options.getChannel("value") ? true : !guild.spam.enabled
 
     // Se usado sem mencionar categoria, desliga o sistema antispam
-    if (!canal_alvo) guild.conf.spam = false
+    if (!canal_alvo) guild.spam.enabled = false
 
-    await guild.save()
+    await client.prisma.guildOptionsSpam.update({
+        where: { id: guild.spam_id },
+        data: guild.spam
+    })
 
-    if (guild.conf.spam)
+    if (guild.spam.enabled)
         client.tls.reply(interaction, user, "mode.spam.ativado", true, client.defaultEmoji("guard"), [`<#${guild.logger.channel}>`, client.emoji("epic_embed_fail2")])
     else
         client.tls.reply(interaction, user, "mode.spam.desativado", true, client.defaultEmoji("guard"))

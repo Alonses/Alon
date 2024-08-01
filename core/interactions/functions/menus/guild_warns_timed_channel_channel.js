@@ -1,6 +1,9 @@
-const {updateGuild} = require("../../../database/schemas/Guild");
 module.exports = async ({ client, user, interaction, dados }) => {
-    await updateGuild(client, interaction.guild.id, { warn_timed_channel: dados === "none" ? null : dados })
+    const { warn_id } = await client.getGuild(interaction.guild.id)
+    await client.prisma.guildOptionsWarn.update({
+        where: { id: warn_id },
+        data: { timed_channel: dados === "none" ? null : dados }
+    })
 
     // Redirecionando o evento
     const pagina_guia = 2

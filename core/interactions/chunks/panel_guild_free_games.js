@@ -15,7 +15,7 @@ module.exports = async ({ client, user, interaction }) => {
         .setDescription(client.tls.phrase(user, "mode.anuncio.descricao"))
         .setFields(
             {
-                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf_games)} **${client.tls.phrase(user, "mode.report.status")}**`,
+                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.games_enabled)} **${client.tls.phrase(user, "mode.report.status")}**`,
                 value: "⠀",
                 inline: true
             },

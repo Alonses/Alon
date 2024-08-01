@@ -24,12 +24,12 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     let operacao = parseInt(dados.split(".")[1]), reback = "panel_guild_warns.2", pagina_guia = 0
 
     const advertencias = await listAllGuildWarns(client, interaction.guild.id)
-    let guild = await client.getGuild(interaction.guild.id)
+    let guild = await client.getGuild(interaction.guild.id, { warn: true } )
 
     if (operacao > 8) pagina_guia = 2
 
     // Sem canal de avisos definido, solicitando um canal
-    if (!guild.warn_channel) {
+    if (!guild.warn.channel) {
         reback = "panel_guild.0"
         operacao = 5
     }
@@ -61,8 +61,10 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             })
 
         // Ativa ou desativa as advertências do servidor
-        await updateGuild(client, guild.id, { conf_warn: !guild.conf_warn })
-
+        await client.prisma.guildOptionsWarn.update({
+            where: { id: guild.warn_id },
+            data: { enabled: !guild.warn.enabled }
+        })
     } else if (operacao === 3) {
 
         // Submenu para navegar pelas advertências do servidor
@@ -115,17 +117,17 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     } else if (operacao === 5 || operacao === 12 || operacao === 17) {
 
         // Definindo o canal de avisos dos warns, canal de avisos públicos ou de avisos temporários
-        let canal = guild.warn_channel, alvo = "guild_warns#channel", digito = 2
+        let canal = guild.warn.channel, alvo = "guild_warns#channel", digito = 2
 
         if (operacao === 12) {
-            canal = guild.warn_announce_channel
+            canal = guild.warn.announce_channel
             alvo = "guild_warns_announce#channel"
             reback = "panel_guild_warns"
             digito = 1
         }
 
         if (operacao === 17) {
-            canal = guild.warn_timed_channel
+            canal = guild.warn.timed_channel
             alvo = "guild_warns_timed_channel#channel"
             reback = "panel_guild_warns"
             digito = 2
@@ -168,7 +170,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
         // Escolhendo o tempo de exclusão das mensagens para membros banidos por advertências
         const valores = []
-        Object.keys(banMessageEraser).forEach(key => { if (parseInt(key) !== guild.warn_erase_ban_messages) valores.push(key) })
+        Object.keys(banMessageEraser).forEach(key => { if (parseInt(key) !== guild.warn.erase_ban_messages) valores.push(key) })
 
         const data = {
             title: { tls: "menu.menus.escolher_expiracao" },
@@ -190,7 +192,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
         // Definindo o tempo de expiração das advertências no servidor
         const valores = []
-        Object.keys(spamTimeoutMap).forEach(key => { if (parseInt(key) !== guild.warn_reset) valores.push(`${key}.${spamTimeoutMap[key]}`) })
+        Object.keys(spamTimeoutMap).forEach(key => { if (parseInt(key) !== guild.warn.reset) valores.push(`${key}.${spamTimeoutMap[key]}`) })
 
         const data = {
             title: { tls: "mode.warn.definir_tempo" },

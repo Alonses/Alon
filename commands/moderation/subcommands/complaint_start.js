@@ -16,13 +16,13 @@ module.exports = async ({ client, user, interaction, channel, solicitante, canal
 
     const everyone = interaction.guild.roles.cache.find(r => r.name === '@everyone')
     const bot = await client.getMemberGuild(interaction, client.id()) // Liberando ao canal para o bot
-    const guild = await client.getGuild(interaction.guild.id)
+    const guild = await client.getGuild(interaction.guild.id, { tickets: true })
 
     // Criando o canal e atribuindo ele aos usuários especificos/ categoria escolhida
     interaction.guild.channels.create({
         name: interaction.user.username,
         type: ChannelType.GuildText,
-        parent: guild.tickets_category,
+        parent: guild.tickets.category,
         permissionOverwrites: [
             {
                 id: everyone.id,

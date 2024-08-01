@@ -5,7 +5,10 @@ const { registerUserGuild } = require('../../../database/schemas/User_guilds')
 
 module.exports = async (client, dados) => {
 
-    const guild = await client.getGuild(dados.guild.id)
+    const guild = await client.getGuild(dados.guild.id, {
+        logger: true,
+        reports: true
+    })
     const user = await client.getUser(dados.user.id)
 
     if (user.conf?.cached_guilds) // Salvando o novo servidor ao usuário
@@ -17,7 +20,7 @@ module.exports = async (client, dados) => {
         require('../../../auto/triggers/user_assign_role')({ client, guild, interaction, acionador })
     }
 
-    if (guild?.reports_notify) { // Notificando o servidor sobre a entrada de um usuário que possui reportes
+    if (guild?.reports.notify) { // Notificando o servidor sobre a entrada de um usuário que possui reportes
         let historico = []
 
         const reports = await getUserReports(dados.user.id)
@@ -37,7 +40,7 @@ module.exports = async (client, dados) => {
     }
 
     // Verificando se a guild habilitou o logger
-    if (!guild.logger_member_join || !guild.conf_logger) return
+    if (!guild.logger.member_join || !guild.logger.enabled) return
 
     const embed = new EmbedBuilder()
         .setTitle(client.tls.phrase(guild, "mode.logger.novo_membro"))
@@ -54,5 +57,5 @@ module.exports = async (client, dados) => {
     const url_avatar = dados.user.avatarURL({ dynamic: true, size: 2048 })
     if (url_avatar) embed.setThumbnail(url_avatar)
 
-    client.notify(guild.logger_channel, { embeds: [embed] })
+    client.notify(guild.logger.channel, { embeds: [embed] })
 }

@@ -106,12 +106,12 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
     async execute({ client, user, interaction }) {
 
-        const guild = await client.getGuild(interaction.guild.id)
+        const guild = await client.getGuild(interaction.guild.id, { warn: true })
 
-        if (!guild.conf_warn || !guild.warn_channel) // Verificando se o comando está configurado
+        if (!guild.warn.enabled || !guild.warn.channel) // Verificando se o comando está configurado
             return client.tls.reply(interaction, user, "mode.warn.nao_configurado_2", true, 7)
 
         // Redirecionando o evento
-        require(`./subcommands/warn_${interaction.options.getSubcommand()}`)({ client, user, interaction })
+        require(`./subcommands/warn_${interaction.options.getSubcommand()}`)({ client, user, interaction, guild })
     }
 }

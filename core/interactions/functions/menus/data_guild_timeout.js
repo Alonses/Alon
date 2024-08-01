@@ -1,6 +1,9 @@
-const {updateGuild} = require("../../../database/schemas/Guild");
 module.exports = async ({ client, user, interaction, dados }) => {
-    await updateGuild(client, interaction.guild.id, { erase_timeout: dados })
+    const { erase_id } = await client.getGuild(interaction.guild.id)
+    await client.prisma.guildOptionsErase.update({
+        where: { id: erase_id },
+        data: { timeout: dados }
+    })
 
     // Redirecionando o evento
     const pagina_guia = 1

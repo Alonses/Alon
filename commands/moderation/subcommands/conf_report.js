@@ -1,7 +1,8 @@
 const { PermissionsBitField, ChannelType } = require('discord.js')
+const {updateGuild} = require("../../../core/database/schemas/Guild");
 
-module.exports = async ({ client, user, interaction, guild }) => {
-
+module.exports = async ({ client, user, interaction }) => {
+    const reports = await client.getGuild(interaction.guild.id, { reports: true }).reports
     let canal_alvo
 
     // Canal alvo para o bot enviar os relatórios de reportes
@@ -13,22 +14,25 @@ module.exports = async ({ client, user, interaction, guild }) => {
 
         // Atribuindo o canal passado para o reportador
         canal_alvo = interaction.options.getChannel("value")
-        guild.reports.channel = canal_alvo.id
+        reports.channel = canal_alvo.id
     }
 
     // Sem canal informado no comando e nenhum canal salvo no cache do bot
-    if (!canal_alvo && !guild.reports.channel)
+    if (!canal_alvo && !reports.channel)
         return client.tls.reply(interaction, user, "mode.logger.mencao_canal", true, 1)
     else {
-        if (!guild.reports.channel) // Sem canal salvo em cache
+        if (!reports.channel) // Sem canal salvo em cache
             return client.tls.reply(interaction, user, "mode.logger.mencao_canal", true, 1)
 
         if (typeof canal_alvo !== "object") // Restaurando o canal do cache
-            canal_alvo = await client.channels().get(guild.reports.channel)
+            canal_alvo = await client.channels().get(reports.channel)
 
         if (!canal_alvo) { // Canal salvo em cache foi apagado
-            guild.conf.reports = false
-            await guild.save()
+            reports.enabled = false
+            await client.prisma.guildOptionsReports.update({
+                where: { id: reports.id },
+                data: reports
+            })
 
             return client.tls.reply(interaction, user, "mode.logger.canal_excluido", true, 1)
         }
@@ -39,18 +43,18 @@ module.exports = async ({ client, user, interaction, guild }) => {
     }
 
     // Inverte o status de funcionamento apenas se executar o comando sem informar um canal
-    if (!interaction.options.getChannel("value"))
-        guild.conf.reports = !guild.conf.reports
-    else
-        guild.conf.reports = true
+    reports.enabled = interaction.options.getChannel("value") ? true : !reports.enabled
 
     // Se usado sem mencionar o canal, desliga os reportes no servidor
-    if (!canal_alvo) guild.conf.reports = false
+    if (!canal_alvo) reports.enabled = false
 
-    await guild.save()
+    await client.prisma.guildOptionsReports.update({
+        where: { id: reports.id },
+        data: reports
+    })
 
-    if (guild.conf.reports)
-        client.tls.reply(interaction, user, "mode.report.ativo", true, 15, `<#${guild.reports.channel}>`)
+    if (reports.enabled)
+        client.tls.reply(interaction, user, "mode.report.ativo", true, 15, `<#${reports.channel}>`)
     else
         client.tls.reply(interaction, user, "mode.report.desativo", true, 16)
 }

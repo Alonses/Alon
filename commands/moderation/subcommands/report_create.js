@@ -38,10 +38,13 @@ module.exports = async ({ client, user, interaction }) => {
     alvo.relatory = interaction.options.getString("reason")
     alvo.timestamp = client.timestamp()
 
-    const guild = await client.getGuild(interaction.guild.id)
+    const guild = await client.getGuild(interaction.guild.id, {
+        network: true,
+        reports: true
+    })
     let auto_ban = ""
 
-    if (guild?.reports_auto_ban)
+    if (guild?.reports.auto_ban)
         auto_ban = `\n\n\`\`\`${client.tls.phrase(user, "mode.report.auto_ban_descricao", 34)}\`\`\``
 
     // Enviando o embed para validação
@@ -77,7 +80,7 @@ module.exports = async ({ client, user, interaction }) => {
     // Criando os botões para as funções de reporte
     let botoes = [{ id: "report_user", name: client.tls.phrase(user, "menu.botoes.confirmar_anunciando"), type: 2, emoji: '📣', data: `1|${alvo.uid}` }]
 
-    if (guild.network_link) // Habilitando opção de enviar o aviso apenas aos servidores do network
+    if (guild.network.link) // Habilitando opção de enviar o aviso apenas aos servidores do network
         botoes.push({ id: "report_user", name: client.tls.phrase(user, "menu.botoes.anunciar_ao_network"), type: 0, emoji: client.emoji(36), data: `3|${alvo.uid}` })
 
     botoes.push(

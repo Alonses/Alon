@@ -16,10 +16,10 @@ const operations = {
 module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
     let operacao = parseInt(dados.split(".")[1]), reback = "panel_guild_external_reports", pagina_guia = 0
-    let guild = await client.getGuild(interaction.guild.id)
+    let guild = await client.getGuild(interaction.guild.id, { reports: true })
 
     // Sem canal de avisos definido, solicitando um canal
-    if (!guild.reports_channel) {
+    if (!guild.reports.channel) {
         reback = "panel_guild.1"
         operacao = 4
     }
@@ -46,7 +46,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             alvo: "guild_reports#channel",
             reback: "browse_button.guild_reports_button",
             operation: operacao,
-            values: await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.reports_channel)
+            values: await client.getGuildChannels(interaction, user, ChannelType.GuildText, guild.reports.channel)
         }
 
         // Subtrai uma página do total ( em casos de exclusão de itens e pagina em cache )
@@ -79,10 +79,10 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             values: []
         }
 
-        if (guild.reports_role)
+        if (guild.reports.role)
             data.values.push({ name: client.tls.phrase(user, "manu.guild_data.remover_cargo"), id: "none" })
 
-        data.values = data.values.concat(await client.getGuildRoles(interaction, guild.reports_role, true))
+        data.values = data.values.concat(await client.getGuildRoles(interaction, guild.reports.role, true))
 
         // Subtrai uma página do total ( em casos de exclusão de itens e pagina em cache )
         if (data.values.length < pagina * 24) pagina--
@@ -106,7 +106,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
         // Escolhendo o tempo de exclusão das mensagens para membros banidos pelo AutoBan
         const valores = []
-        Object.keys(banMessageEraser).forEach(key => { if (parseInt(key) !== guild.reports_erase_ban_messages) valores.push(key) })
+        Object.keys(banMessageEraser).forEach(key => { if (parseInt(key) !== guild.reports.erase_ban_messages) valores.push(key) })
 
         const data = {
             title: { tls: "menu.menus.escolher_expiracao" },

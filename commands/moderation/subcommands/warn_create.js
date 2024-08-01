@@ -4,15 +4,13 @@ const { listAllGuildWarns } = require('../../../core/database/schemas/Guild_warn
 const { guildPermissions } = require('../../../core/formatters/patterns/guild')
 const { listAllUserPreWarns } = require('../../../core/database/schemas/User_pre_warns')
 
-module.exports = async ({ client, user, interaction }) => {
+module.exports = async ({ client, user, interaction, guild }) => {
 
     // Verificando a quantidade de advertências customizadas no servidor
     const warns_guild = await listAllGuildWarns(client, interaction.guild.id)
 
     if (warns_guild.length < 2) // Warns não configuradas no servidor
         return client.tls.reply(interaction, user, "mode.warn.nao_configurado", true, 60)
-
-    const guild = await client.getGuild(interaction.guild.id)
 
     const guild_member = await client.getMemberGuild(interaction.guild.id, interaction.options.getUser("user").id)
     const bot_member = await client.getMemberGuild(interaction.guild.id, client.id())
@@ -41,7 +39,7 @@ module.exports = async ({ client, user, interaction }) => {
         return client.tls.reply(interaction, user, "mode.report.usuario_bot", true, client.emoji(0))
 
     // Usado apenas em servidores com advertências hierarquias desativadas
-    if (!guild.warn_hierarchy_status) {
+    if (!guild.warn.hierarchy_status) {
 
         // Verificando se a hierarquia do membro que ativou o warn é maior que o do alvo
         if (interaction.member.roles.highest.position < guild_member.roles.highest.position)

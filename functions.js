@@ -158,7 +158,7 @@ function internal_functions(client) {
     client.updateBot = (data) => updateBot(client, data)
 
 
-    client.getGuild = (id_guild) => getGuild(client, id_guild)
+    client.getGuild = (id_guild, includes) => getGuild(client, id_guild, includes)
 
     client.getGuildChannels = async (interaction, user, tipo, id_configurado) => { // Lista todos os canais de um tipo especifico no servidor
 
@@ -351,8 +351,8 @@ function internal_functions(client) {
 
         let servers_cache = await getNetworkedGuilds(client, link)
         for (let i = 0; i < servers_cache.length; i++) {
-            if (servers_cache[i].sid !== interaction.guild.id) {
-                const nome_servidor = (await client.guilds(servers_cache[i].sid))?.name || client.tls.phrase(user, "menu.invalid.servidor_desconhecido")
+            if (servers_cache[i].id !== interaction.guild.id) {
+                const nome_servidor = (await client.guilds(servers_cache[i].id))?.name || client.tls.phrase(user, "menu.invalid.servidor_desconhecido")
                 servers_link.push(`\`${nome_servidor}\``)
             }
         }
@@ -526,9 +526,13 @@ function internal_functions(client) {
 
     client.switcher = ({ guild, operations, operacao }) => {
         // Inverte o valor de botões liga/desliga
-        const local = (operations[operacao].action).replaceAll('.', '_')
+        const local = (operations[operacao].action).split('.')
+        local.reduce((acc, key, index) => {
+            if (index === local.length - 1)
+                acc[key] = !acc[key]
 
-        guild[local] = !guild[local];
+            return acc[key]
+        }, guild)
 
         const pagina_guia = operations[operacao].page
 

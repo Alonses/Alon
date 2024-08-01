@@ -1,22 +1,27 @@
 const { PermissionsBitField } = require('discord.js')
-const {updateGuild} = require("../../../database/schemas/Guild");
 
 module.exports = async (client, dados) => {
 
-    const guild = await client.getGuild(dados[0].guild.id)
+    const guild = await client.getGuild(dados[0].guild.id, {
+        network: true,
+        logger: true
+    })
     const user_alvo = dados[0].user
 
-    if (guild.network_member_punishment && guild.conf_network) // Network de servidores
+    if (guild.network.member_punishment && guild.network.enabled) // Network de servidores
         client.network(guild, "mute", user_alvo.id)
 
     // Verificando se a guild habilitou o logger
-    if (!guild.conf_logger) return
+    if (!guild.logger.enabled) return
 
     // Permissão para ver o registro de auditoria, desabilitando o logger
     if (!await client.permissions(dados[0], client.id(), PermissionsBitField.Flags.ViewAuditLog)) {
-        await updateGuild(client, guild.id, { logger_member_role: false })
+        await client.prisma.guildOptionsLogger.update({
+            where: { id: guild.logger_id },
+            data: { member_role: false }
+        })
 
-        return client.notify(guild.logger_channel, { content: client.tls.phrase(guild, "mode.logger.permissao", 7) })
+        return client.notify(guild.logger.channel, { content: client.tls.phrase(guild, "mode.logger.permissao", 7) })
     }
 
     // Verificando qual atributo foi atualizado
@@ -26,7 +31,7 @@ module.exports = async (client, dados) => {
     const registroAudita = fetchedLogs.entries.first()
 
     // Apelido alterado
-    if (registroAudita?.changes[0]?.key === "nick" && guild.logger_member_nick)
+    if (registroAudita?.changes[0]?.key === "nick" && guild.logger.member_nick)
         return require('./member_nick')({ client, guild, registroAudita, dados })
 
     // Membro foi mutado
@@ -39,7 +44,7 @@ module.exports = async (client, dados) => {
         // Verificando se há cargos temporários no servidor vinculados ao membro
         require('./member_timed_role')({ client, guild, dados })
 
-        if (guild.logger_member_role) // Log de eventos
+        if (guild.logger.member_role) // Log de eventos
             return require('./member_role')({ client, guild, registroAudita, dados })
     }
 

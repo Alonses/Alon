@@ -1,18 +1,20 @@
 const { EmbedBuilder, AuditLogEvent, PermissionsBitField } = require('discord.js')
-const {updateGuild} = require("../../../database/schemas/Guild");
 
 module.exports = async ({ client, invite }) => {
 
-    const guild = await client.getGuild(invite.guild.id)
+    const guild = await client.getGuild(invite.guild.id, { logger: true })
 
     // Verificando se a guild habilitou o logger
-    if (!guild.logger_invite_deleted || !guild.conf_logger) return
+    if (!guild.logger.invite_deleted || !guild.logger.enabled) return
 
     // Permissão para ver o registro de auditoria, desabilitando o logger
     if (!await client.permissions(invite, client.id(), PermissionsBitField.Flags.ViewAuditLog)) {
-        await updateGuild(client, guild.id, { logger_invite_deleted: false })
+        await client.prisma.guildOptionsLogger.update({
+            where: { id: guild.logger_id },
+            data: { invite_deleted: false }
+        })
 
-        return client.notify(guild.logger_channel, { content: client.tls.phrase(guild, "mode.logger.permissao", 7) })
+        return client.notify(guild.logger.channel, { content: client.tls.phrase(guild, "mode.logger.permissao", 7) })
     }
 
     // Coletando dados sobre o evento
@@ -41,5 +43,5 @@ module.exports = async ({ client, invite }) => {
         )
         .setTimestamp()
 
-    client.notify(guild.logger_channel, { embeds: [embed] })
+    client.notify(guild.logger.channel, { embeds: [embed] })
 }

@@ -10,38 +10,44 @@ module.exports = async ({ client, user, interaction, pagina_guia }) => {
 
     const pagina = pagina_guia || 0
     const emoji_pessoa = client.defaultEmoji("person")
-    const guild = await client.getGuild(interaction.guild.id)
-    let botoes = [], retorno_aviso = "", ant_network = guild.conf_network
+    const guild = await client.getGuild(interaction.guild.id, {
+        logger: true,
+        network: true
+    })
+    let botoes = [], retorno_aviso = ""
 
     // Permissões do bot no servidor
-    const servidores_link = guild.network_link ? (await getNetworkedGuilds(client, guild.network_link)).length : 0
+    const servidores_link = guild.network.link ? (await getNetworkedGuilds(client, guild.network.link)).length : 0
     const membro_sv = await client.getMemberGuild(interaction, client.id())
 
     let update = {}
 
     // Verificando as permissões necessárias conforme os casos
     if (!membro_sv.permissions.has(PermissionsBitField.Flags.ViewAuditLog))
-        update.conf_network = false
+        update.enabled = false
 
-    if (guild.network_member_ban_add) // Banimentos automaticos
+    if (guild.network.member_ban_add) // Banimentos automaticos
         if (!membro_sv.permissions.has(PermissionsBitField.Flags.BanMembers))
-            update.conf_network = false
+            update.enabled = false
 
-    if (guild.network_member_kick) // Expulsões automaticas
+    if (guild.network.member_kick) // Expulsões automaticas
         if (!membro_sv.permissions.has(PermissionsBitField.Flags.KickMembers))
-            update.conf_network = false
+            update.enabled = false
 
-    if (guild.network_member_punishment) // Castigos automaticos
+    if (guild.network.member_punishment) // Castigos automaticos
         if (!membro_sv.permissions.has(PermissionsBitField.Flags.ModerateMembers))
-            update.conf_network = false
+            update.enabled = false
 
     if (servidores_link === 1) {
-        update.conf_network = false
+        update.enabled = false
         retorno_aviso = client.tls.phrase(user, "mode.network.falta_servidores", 36)
     }
 
     // Salva os dados atualizados
-    if (update !== {}) await updateGuild(client, guild.id, update)
+    if (update !== {}) await client.prisma.guildOptionsNetwork.update({
+        where: { id: guild.network_id },
+        data: update
+    })
 
     const eventos = {
         total: 0,
@@ -63,7 +69,7 @@ module.exports = async ({ client, user, interaction, pagina_guia }) => {
         .setDescription(client.tls.phrase(user, "mode.network.descricao"))
         .setFields(
             {
-                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.conf_network)} **${client.tls.phrase(user, "mode.report.status")}**`,
+                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.network.enabled)} **${client.tls.phrase(user, "mode.report.status")}**`,
                 value: `${client.emoji(32)} **${client.tls.phrase(user, "mode.network.servidores_link")}: ${servidores_link}**`,
                 inline: true
             },
@@ -74,17 +80,17 @@ module.exports = async ({ client, user, interaction, pagina_guia }) => {
             },
             {
                 name: `${client.defaultEmoji("channel")} **${client.tls.phrase(user, "mode.report.canal_de_avisos")}**`,
-                value: `${guild.network_channel ? `${client.emoji("icon_id")} \`${guild.network_channel}\`\n( <#${guild.network_channel}> )` : `\`❌ ${client.tls.phrase(user, "mode.network.sem_canal")}\``}${guild.logger_channel ? `\n${client.emoji(49)} ( <#${guild.logger_channel}> )` : ""}`,
+                value: `${guild.network.channel ? `${client.emoji("icon_id")} \`${guild.network.channel}\`\n( <#${guild.network.channel}> )` : `\`❌ ${client.tls.phrase(user, "mode.network.sem_canal")}\``}${guild.logger.channel ? `\n${client.emoji(49)} ( <#${guild.logger.channel}> )` : ""}`,
                 inline: true
             },
             {
                 name: `:wastebasket: **${client.tls.phrase(user, "mode.network.excluir_banidos")}**`,
-                value: `\`${client.tls.phrase(user, `menu.network.${banMessageEraser[guild.network_erase_ban_messages]}`)}\` ( :twisted_rightwards_arrows: :globe_with_meridians: )`,
+                value: `\`${client.tls.phrase(user, `menu.network.${banMessageEraser[guild.network.erase_ban_messages]}`)}\` ( :twisted_rightwards_arrows: :globe_with_meridians: )`,
                 inline: false
             },
             {
                 name: `${client.defaultEmoji("guard")} **${client.tls.phrase(user, "mode.network.filtro_acoes")}**`,
-                value: `\`${guild.network_scanner_type ? `${emoji_pessoa} ${client.tls.phrase(user, "mode.network.filtro_apenas_humanos")}` : `${client.emoji(5)} ${client.tls.phrase(user, "mode.network.filtro_todas_fontes")}`}\` ( :twisted_rightwards_arrows: :globe_with_meridians: )`,
+                value: `\`${guild.network.scanner_type ? `${emoji_pessoa} ${client.tls.phrase(user, "mode.network.filtro_apenas_humanos")}` : `${client.emoji(5)} ${client.tls.phrase(user, "mode.network.filtro_todas_fontes")}`}\` ( :twisted_rightwards_arrows: :globe_with_meridians: )`,
                 inline: false
             }
         )

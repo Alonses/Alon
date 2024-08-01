@@ -5,10 +5,10 @@ module.exports = async ({ client, oldState, newState }) => {
     // Verificando se o autor da mensagem editada é o bot
     if (oldState.member.user.bot || newState.member.user.bot) return
 
-    const guild = await client.getGuild(oldState.guild.id)
+    const guild = await client.getGuild(oldState.guild.id, { logger: true })
 
     // Verificando se a guild habilitou o logger
-    if (!guild.logger_member_voice_status || !guild.conf_logger) return
+    if (!guild.logger.member_voice_status || !guild.logger.enabled) return
 
     let frase
 
@@ -25,5 +25,5 @@ module.exports = async ({ client, oldState, newState }) => {
             text: `${client.tls.phrase(guild, "mode.logger.id_membro")} ${oldState.id}`
         })
 
-    client.notify(guild.logger_channel, { embeds: [embed] })
+    client.notify(guild.logger.channel, { embeds: [embed] })
 }

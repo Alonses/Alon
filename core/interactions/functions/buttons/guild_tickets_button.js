@@ -26,8 +26,8 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             })
 
         // Ativa ou desativa a função de denúncias in-server
-        guild.conf.tickets = !guild.conf.tickets
-        await updateGuild(client, guild.id, { conf_tickets: !guild.conf_tickets })
+        guild.tickets_enabled = !guild.tickets_enabled
+        await updateGuild(client, guild.id, { tickets_enabled: !guild.tickets_enabled })
     } else if (operacao === 2) {
 
         // Definindo a categoria do sistema de denúncias in-server

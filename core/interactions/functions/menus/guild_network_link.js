@@ -1,12 +1,14 @@
-const {updateGuild} = require("../../../database/schemas/Guild");
 const { randomString } = require("../../functions/random_string")
 
 module.exports = async ({ client, user, interaction, dados }) => {
 
-    const guild = await client.getGuild(interaction.guild.id)
+    const guild = await client.getGuild(interaction.guild.id, { network: true })
 
-    if (!guild.network_link) // Criando um link de network para o servidor
-        await updateGuild(client, guild.id, { network_link: await createNetworkLink(client)})
+    if (!guild.network.link) // Criando um link de network para o servidor
+        await client.prisma.guildOptionsNetwork.update({
+            where: { id: guild.network_id },
+            data: { link: await createNetworkLink(client) }
+        })
 
     // Atualizando o link dos servidores
     for (let i = 0; i < interaction.values.length; i++) {
@@ -15,15 +17,18 @@ module.exports = async ({ client, user, interaction, dados }) => {
         const update = {}
 
         // Desvinculando o servidor
-        if (internal_guild.network_link === guild.network_link) {
-            update.conf_network = false
-            update.network_link = null
+        if (internal_guild.network.link === guild.network.link) {
+            update.enabled = false
+            update.link = null
         } else { // Vinculando o servidor
-            update.conf_network = true
-            update.network_link = guild.network_link
+            update.enabled = true
+            update.link = guild.network.link
         }
 
-        await updateGuild(client, internal_guild.id, update)
+        await client.prisma.guildOptionsNetwork.update({
+            where: { id: internal_guild.network_id },
+            data: update
+        })
     }
 
     // Redirecionando o evento

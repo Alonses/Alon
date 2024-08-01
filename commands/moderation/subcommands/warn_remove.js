@@ -4,5 +4,5 @@ module.exports = async ({ client, user, interaction }) => {
         client.cached.warns.set(interaction.user.id, { relatory: interaction.options.getString("reason"), keep: false })
 
     // Redirecionando o evento
-    require('../../../core/interactions/chunks/panel_guild_browse_warns')({ client, user, interaction })
+    await require('../../../core/interactions/chunks/panel_guild_browse_warns')({client, user, interaction})
 }

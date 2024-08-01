@@ -1,0 +1,80 @@
+model User {
+  id     String  @id
+  lang   String?
+  hoster Boolean @default(false)
+  nick   String?
+
+  erase    UserOptionsErase @relation(fields: [erase_id], references: [id])
+  erase_id Int              @unique
+
+  social    UserOptionsSocial @relation(fields: [social_id], references: [id])
+  social_id Int               @unique
+
+  profile    UserOptionsProfile @relation(fields: [profile_id], references: [id])
+  profile_id Int                @unique
+
+  misc    UserOptionsMisc @relation(fields: [misc_id], references: [id])
+  misc_id Int             @unique
+
+  conf    UserOptionsConf @relation(fields: [conf_id], references: [id])
+  conf_id Int             @unique
+}
+
+model UserOptionsErase {
+  id            Int     @id @default(autoincrement())
+  erase_on      Int?
+  valid         Boolean @default(false)
+  forced        Boolean @default(false)
+  timeout       Int     @default(2)
+  guild_timeout Int     @default(2)
+  user          User?
+}
+
+model UserOptionsSocial {
+  id           Int     @id @default(autoincrement())
+  steam        String?
+  lastfm       String?
+  pula_predios String?
+  userId       String
+  user         User?
+}
+
+model UserOptionsProfile {
+  id          Int     @id @default(autoincrement())
+  avatar      String?
+  about       String?
+  join        Boolean @default(true)
+  creation    Boolean @default(true)
+  bank        Boolean @default(true)
+  lastfm      Boolean @default(false)
+  steam       Boolean @default(false)
+  thumbnail   String?
+  cache_about String?
+  user        User?
+}
+
+model UserOptionsMisc {
+  id          Int     @id @default(autoincrement())
+  color       String  @default("#29BB8E")
+  daily       String?
+  money       Int     @default(0)
+  embed       String  @default("#29BB8E")
+  locale      String?
+  weather     Boolean @default(true)
+  fixed_badge Int?
+  second_lang String?
+  user        User?
+}
+
+model UserOptionsConf {
+  id            Int     @id @default(autoincrement())
+  banned        Boolean @default(false)
+  ghost_mode    Boolean @default(false)
+  notify        Boolean @default(false)
+  ranking       Boolean @default(true)
+  global_tasks  Boolean @default(true)
+  public_badges Boolean @default(true)
+  resumed       Boolean @default(false)
+  cached_guilds Boolean @default(false)
+  user          User?
+}

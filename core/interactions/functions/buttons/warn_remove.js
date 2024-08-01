@@ -20,7 +20,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
         // Menos que o limite necessário para o recurso ser ativo
         if ((warns_guild.length - 1) < 2)
-            await updateGuild(client, interaction.guild.id, { conf_warn: false })
+            await updateGuild(client, interaction.guild.id, { warn: { enabled: false }})
 
         dados = "0.3"
         return require('./guild_warns_button')({ client, user, interaction, dados })

@@ -11,7 +11,7 @@ module.exports = async ({ client, user, interaction }) => {
 
     // Desabilitando os tickets caso o bot não possa gerenciar os canais e cargos do servidor
     if (!bot_member.permissions.has([PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.ManageRoles]))
-        await updateGuild(client, guild.id, { conf_timed_roles: false })
+        await updateGuild(client, guild.id, { timed_roles_enabled: false })
 
     const embed = new EmbedBuilder()
         .setTitle(`${client.tls.phrase(user, "mode.timed_roles.titulo_painel")} :passport_control: ${client.defaultEmoji("time")}`)

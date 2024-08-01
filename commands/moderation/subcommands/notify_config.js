@@ -36,7 +36,7 @@ module.exports = async ({ client, user, interaction }) => {
     if (!dados.lang)
         dados.lang = guild.lang
 
-    const canal_alvo = client.discord.channels.cache.get(guild.games.channel)
+    const canal_alvo = client.discord.channels.cache.get(guild.games_channel)
 
     // Verificando permissões para enviar mensagens no canal
     if (!await client.permissions(null, client.id(), [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages], canal_alvo))

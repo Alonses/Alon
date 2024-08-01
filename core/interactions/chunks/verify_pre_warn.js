@@ -13,14 +13,14 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const user_warns = await listAllUserWarns(id_alvo, interaction.guild.id)
     const user_notes = await listAllUserPreWarns(id_alvo, interaction.guild.id)
 
-    const guild = await client.getGuild(interaction.guild.id)
+    const guild = await client.getGuild(interaction.guild.id, { warn: true })
     const guild_warns = await listAllGuildWarns(client, interaction.guild.id)
 
     let indice_matriz = client.verifyMatrixIndex(guild_warns) // Indice marcador do momento de expulsão/banimento do membro pelas advertências
 
     // Verificando se existem advertências para as próximas punições do usuário
     let indice_warn = user_warns.length > guild_warns.length ? guild_warns.length - 1 : user_warns.length
-    const notas_requeridas = guild_warns[indice_warn - 1].strikes || guild.warn_hierarchy_strikes
+    const notas_requeridas = guild_warns[indice_warn - 1].strikes || guild.warn.hierarchy_strikes
 
     const embed = new EmbedBuilder()
         .setTitle(`${client.tls.phrase(user, "mode.hierarquia.verificando_anotacao_titulo")} ${client.defaultEmoji("pen")}`)

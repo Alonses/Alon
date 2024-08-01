@@ -10,10 +10,10 @@ module.exports = async (client, message) => {
     // Mensagem com o mesmo conteúdo (links de gifs e imagens)
     if (message[0].content === message[1].content) return
 
-    const guild = await client.getGuild(message[0].guildId)
+    const guild = await client.getGuild(message[0].guildId, { logger: true })
 
     // Verificando se a guild habilitou o logger
-    if (!guild.logger_message_edit || !guild.conf_logger) return
+    if (!guild.logger.message_edit || !guild.logger.enabled) return
 
     // const alteracoes = comparar_edicoes(formata_text(message[0].content), formata_text(message[1].content))
     const alteracoes = {
@@ -64,5 +64,5 @@ module.exports = async (client, message) => {
 
     embed.setDescription(texto)
 
-    client.notify(guild.logger_channel, { embeds: [embed] })
+    client.notify(guild.logger.channel, { embeds: [embed] })
 }

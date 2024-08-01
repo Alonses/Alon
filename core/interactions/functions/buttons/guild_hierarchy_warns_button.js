@@ -14,10 +14,10 @@ const operations = {
 module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
     let operacao = parseInt(dados.split(".")[1]), reback = "panel_guild_warns.0", pagina_guia = 0
-    let guild = await client.getGuild(interaction.guild.id)
+    let guild = await client.getGuild(interaction.guild.id, { warn: true })
 
     // Sem canal de avisos definido, solicitando um canal
-    if (!guild.warn_hierarchy_channel) {
+    if (!guild.warn.hierarchy_channel) {
         // reback = "panel_guild_warns.0"
         operacao = 5
     }
@@ -33,7 +33,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
         // Escolher o número de avisos prévios
         const valores = []
-        defaultWarnStrikes.forEach(key => { if (parseInt(key) !== guild.warn_hierarchy_strikes) valores.push(key) })
+        defaultWarnStrikes.forEach(key => { if (parseInt(key) !== guild.warn.hierarchy_strikes) valores.push(key) })
 
         const data = {
             title: { tls: "menu.menus.escolher_numero" },
@@ -55,7 +55,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     } else if (operacao === 5) {
 
         // Definindo o canal de avisos das advertências hierárquicas
-        let canal = guild.warn_hierarchy_channel
+        let canal = guild.warn.hierarchy_channel
 
         const data = {
             title: { tls: "menu.menus.escolher_canal" },

@@ -24,7 +24,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
     await updateGuild(client, guild.id, {
         lang: idioma,
-        conf_games: true
+        games_enabled: true
     })
 
     client.notify(process.env.channel_feeds, { content: `:video_game: :mega: | O Servidor ( \`${interaction.guild.name}\` | \`${interaction.guild.id}\` ) agora recebe atts de jogos grátis` })

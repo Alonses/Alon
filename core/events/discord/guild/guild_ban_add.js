@@ -1,21 +1,27 @@
 const { EmbedBuilder, AuditLogEvent, PermissionsBitField } = require('discord.js')
-const {updateGuild} = require("../../../database/schemas/Guild");
 
 module.exports = async ({ client, ban }) => {
 
-    const guild = await client.getGuild(ban.guild.id)
+    const guild = await client.getGuild(ban.guild.id, {
+        death_note: true,
+        logger: true,
+        network: true
+    })
 
-    if (guild.network_member_ban_add && guild.conf_network) // Network de servidores
+    if (guild.network.member_ban_add && guild.network.enabled) // Network de servidores
         client.network(guild, "ban_add", ban.user.id)
 
     // Verificando se a guild habilitou o logger
-    if (!guild.logger_member_ban_add || !guild.conf_logger) return
+    if (!guild.logger.member_ban_add || !guild.logger.enabled) return
 
     // Permissão para ver o registro de auditoria, desabilitando o logger
     if (!await client.permissions(ban, client.id(), PermissionsBitField.Flags.ViewAuditLog)) {
-        await updateGuild(client, guild.id, { logger_member_ban_add: false })
+        await client.prisma.guildOptionsLogger.update({
+            where: { id: guild.logger_id },
+            data: { member_ban_add: false }
+        })
 
-        return client.notify(guild.logger_channel, { content: client.tls.phrase(guild, "mode.logger.permissao", 7) })
+        return client.notify(guild.logger.channel, { content: client.tls.phrase(guild, "mode.logger.permissao", 7) })
     }
 
     // Coletando dados sobre o evento
@@ -25,11 +31,11 @@ module.exports = async ({ client, ban }) => {
     })
 
     const registroAudita = fetchedLogs.entries.first()
-    let razao = `\n💂‍♂️ ${client.tls.phrase(guild, "mode.logger.sem_motivo")}`, network_descricao = "", canal_aviso = guild.logger_channel
+    let razao = `\n💂‍♂️ ${client.tls.phrase(guild, "mode.logger.sem_motivo")}`, network_descricao = "", canal_aviso = guild.logger.channel
 
     // Alterando o canal alvo conforme o filtro de eventos do death note
-    if (guild.death_note && guild.death_note_member_ban_add && guild.death_note_channel)
-        canal_aviso = guild.death_note_channel
+    if (guild.death_note.note && guild.death_note.member_ban_add && guild.death_note.channel)
+        canal_aviso = guild.death_note.channel
 
     if (registroAudita.reason) { // Banimento com motivo explicado
         razao = `\n💂‍♂️ ${client.tls.phrase(guild, "mode.logger.motivo_ban")}: ${registroAudita.reason}`
@@ -39,8 +45,8 @@ module.exports = async ({ client, ban }) => {
             network_descricao = `📡 ${registroAudita.reason.split(" | ")[1]}`
             razao = ""
 
-            if (guild.network_channel) // Ação realizada pelo network
-                canal_aviso = guild.network_channel
+            if (guild.network.channel) // Ação realizada pelo network
+                canal_aviso = guild.network.channel
         }
     }
 
@@ -70,7 +76,7 @@ module.exports = async ({ client, ban }) => {
     }
 
     // Notificações do Death note
-    if (guild.death_note.channel === canal_aviso && guild.death_note_notify)
+    if (guild.death_note.channel === canal_aviso && guild.death_note.notify)
         obj.content = "@here"
 
     client.notify(canal_aviso, obj)

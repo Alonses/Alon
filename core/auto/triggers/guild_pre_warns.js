@@ -10,15 +10,15 @@ async function atualiza_pre_warns(client) {
     const dados = await getTimedPreGuilds(client)
     const warns = []
 
-    dados.forEach(async guild => {
-        const guild_warns = await checkUserGuildPreWarned(guild.sid)
+    for (const guild of dados) {
+        const guild_warns = await checkUserGuildPreWarned(guild.id)
 
         // Listando todas as anotações de advertências do servidor
         guild_warns.forEach(warn => { warns.push(warn) })
 
         // Salvando as anotações de advertências no cache do bot
         writeFileSync("./files/data/user_timed_pre_warns.txt", JSON.stringify(warns))
-    })
+    }
 }
 
 async function verifica_pre_warns(client) {
@@ -34,13 +34,13 @@ async function verifica_pre_warns(client) {
         for (let i = 0; i < data.length; i++) {
 
             const warn = data[i]
-            const guild = guilds_map[warn.sid] ? guilds_map[warn.sid] : await client.getGuild(warn.sid)
+            const guild = guilds_map[warn.sid] ? guilds_map[warn.sid] : await client.getGuild(warn.sid, { warn: true })
 
             if (!guilds_map[warn.sid]) // Salvando a guild em cache
                 guilds_map[warn.sid] = guild
 
             // Verificando se a anotação de advertência ultrapassou o tempo de exclusão
-            if (client.timestamp() > (warn.timestamp + defaultEraser[guild.warn_hierarchy_reset])) {
+            if (client.timestamp() > (warn.timestamp + defaultEraser[guild.warn.hierarchy_reset])) {
 
                 // Excluindo o registro da anotação de advertência caso tenha zerado e verificando os cargos do usuário
                 await removeUserPreWarn(warn.uid, warn.sid, warn.timestamp)

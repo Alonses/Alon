@@ -31,7 +31,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     }
 
     // Advertência confirmada
-    const guild = await client.getGuild(interaction.guild.id)
+    const guild = await client.getGuild(interaction.guild.id, { warn: true })
     const user_note = user_notes[user_notes.length - 1]
 
     // Validando a advertência
@@ -39,7 +39,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     await user_note.save()
 
     // Atualizando a lista de anotações criadas
-    if (guild.warn_hierarchy_timed) atualiza_pre_warns(client)
+    if (guild.warn.hierarchy_timed) atualiza_pre_warns(client)
 
     const notas_recebidas = await listAllUserPreWarns(id_alvo, interaction.guild.id)
 
@@ -50,11 +50,11 @@ module.exports = async ({ client, user, interaction, dados }) => {
     let indice_warn = user_warns.length > guild_warns.length ? user_warns.length - 1 : user_warns.length
     if (indice_warn < 1) indice_warn = 0
 
-    const notas_requeridas = guild_warns[indice_warn].strikes !== 0 ? guild_warns[indice_warn].strikes : guild.warn_hierarchy_strikes
+    const notas_requeridas = guild_warns[indice_warn].strikes !== 0 ? guild_warns[indice_warn].strikes : guild.warn.hierarchy_strikes
 
     // Embed de aviso para o servidor onde foi aplicada a advertência
     const embed_guild = new EmbedBuilder()
-        .setTitle(`${!guild.warn_hierarchy_status ? client.tls.phrase(guild, "mode.warn.titulo_advertencia") : client.tls.phrase(guild, "mode.anotacoes.titulo_nova_anotacao")} :inbox_tray:`)
+        .setTitle(`${!guild.warn.hierarchy_status ? client.tls.phrase(guild, "mode.warn.titulo_advertencia") : client.tls.phrase(guild, "mode.anotacoes.titulo_nova_anotacao")} :inbox_tray:`)
         .setColor(0xED4245)
         .setDescription(`${client.tls.phrase(guild, "mode.warn.usuario_nova_advertencia")}!\n\`\`\`fix\n📠 | ${client.tls.phrase(guild, "mode.warn.descricao_fornecida")}\n\n${user_note.relatory}\`\`\``)
         .addFields(
@@ -77,11 +77,11 @@ module.exports = async ({ client, user, interaction, dados }) => {
         .setTimestamp()
 
     // Anotação de advertência com prazo de expiração
-    if (guild.warn_hierarchy_timed)
+    if (guild.warn.hierarchy_timed)
         embed_guild
             .addFields({
                 name: `${client.defaultEmoji("time")} **${client.tls.phrase(guild, "menu.botoes.expiracao")}**`,
-                value: `**${client.tls.phrase(guild, "mode.warn.remocao_em")} \`${client.tls.phrase(guild, `menu.times.${defaultEraser[guild.warn_hierarchy_reset]}`)}\`**\n( <t:${client.timestamp() + defaultEraser[guild.warn_hierarchy_reset]}:f> )`,
+                value: `**${client.tls.phrase(guild, "mode.warn.remocao_em")} \`${client.tls.phrase(guild, `menu.times.${defaultEraser[guild.warn.hierarchy_reset]}`)}\`**\n( <t:${client.timestamp() + defaultEraser[guild.warn.hierarchy_reset]}:f> )`,
                 inline: false
             })
             .setFooter({
@@ -90,11 +90,11 @@ module.exports = async ({ client, user, interaction, dados }) => {
             })
 
     // Altera o destino para o canal de avisos temporários
-    if (guild.warn_timed_channel) interaction.channel.id = guild.warn_timed_channel
+    if (guild.warn.timed_channel) interaction.channel.id = guild.warn.timed_channel
 
     // Envia uma mensagem temporária no canal onde foi gerada a anotação de advertência
     client.timed_message(interaction, { content: client.tls.phrase(guild, "mode.anotacoes.ping_anotacao", [id_alvo, notas_recebidas.length, notas_recebidas, client.timestamp() + 60]) }, 60)
-    client.notify(guild.warn_hierarchy_channel, { embeds: [embed_guild] })
+    client.notify(guild.warn.hierarchy_channel, { embeds: [embed_guild] })
 
     client.reply(interaction, {
         content: client.tls.phrase(user, "mode.warn.advertencia_registrada", 63),
@@ -126,7 +126,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
                 },
                 {
                     name: `${client.defaultEmoji("time")} **${client.tls.phrase(guild, "menu.botoes.expiracao")}**`,
-                    value: `**${client.tls.phrase(guild, "mode.warn.remocao_em")} \`${client.tls.phrase(guild, `menu.times.${spamTimeoutMap[guild.warn_reset]}`)}\`**`,
+                    value: `**${client.tls.phrase(guild, "mode.warn.remocao_em")} \`${client.tls.phrase(guild, `menu.times.${spamTimeoutMap[guild.warn.reset]}`)}\`**`,
                     inline: true
                 },
                 {
@@ -143,6 +143,6 @@ module.exports = async ({ client, user, interaction, dados }) => {
         ]
 
         // Enviando o card para os moderadores poderem autorizar a aplicação da advertência
-        client.notify(guild.warn_hierarchy_channel, { embeds: [embed], components: [client.create_buttons(rows, interaction)] })
+        client.notify(guild.warn.hierarchy_channel, { embeds: [embed], components: [client.create_buttons(rows, interaction)] })
     }
 }
