@@ -99,6 +99,8 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
 
     const guild = await client.getGuild(interaction.guild.id, {
         logger: true,
+        network: true,
+        reports: true,
         spam: true,
         warn: true
     })
@@ -131,7 +133,7 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
             }
         )
 
-    if (pagina == 1)
+    else if (pagina === 1)
         embed.addFields(
             {
                 name: `${client.execute("functions", "emoji_button.emoji_button", guild?.network.enabled)} **Network**`,
@@ -149,8 +151,7 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
                 inline: true
             }
         )
-
-    if (pagina == 2)
+    else if (pagina === 2)
         embed.addFields(
             {
                 name: `${client.defaultEmoji("time")} **${client.tls.phrase(user, "manu.painel.cargos_temporarios")}**`,
@@ -158,7 +159,7 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
                 inline: true
             },
             {
-                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.tickets.enabled)} **${client.tls.phrase(user, "manu.painel.denuncias_server")}**`,
+                name: `${client.execute("functions", "emoji_button.emoji_button", guild?.tickets_enabled)} **${client.tls.phrase(user, "manu.painel.denuncias_server")}**`,
                 value: `\`\`\`${client.tls.phrase(user, "manu.painel.desc_denuncias")}\`\`\``,
                 inline: true
             },
@@ -180,7 +181,7 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
 
     // Segunda página de botões de configuração do Alonsal
     // Network, Reportes externos e Anúncio de games
-    if (pagina === 1)
+    else if (pagina === 1)
         botoes = botoes.concat([
             { id: "guild_network_button", name: "Network", type: 1, emoji: client.emoji(41), data: '0', disabled: c_buttons[8] },
             { id: "guild_reports_button", name: client.tls.phrase(user, "manu.painel.reports_externos"), type: 1, emoji: client.emoji(41), data: '0', disabled: c_buttons[4] },
@@ -189,7 +190,7 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
 
     // Terceira página de botões de configuração do Alonsal
     // Cargos temporários, Denúncias in-server e Convites rastreados
-    if (pagina === 2)
+    else if (pagina === 2)
         botoes = botoes.concat([
             { id: "guild_timed_roles_button", name: client.tls.phrase(user, "manu.painel.cargos_temporarios"), type: 1, emoji: client.emoji(41), data: '0', disabled: c_buttons[12] },
             { id: "guild_tickets_button", name: client.tls.phrase(user, "manu.painel.denuncias_server"), type: 1, emoji: client.emoji(41), data: '0', disabled: c_buttons[3] },

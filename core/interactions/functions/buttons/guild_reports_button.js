@@ -8,7 +8,7 @@ const {updateGuild} = require("../../../database/schemas/Guild");
 // 3 -> Ativar ou desativar o aviso de novos usuários reportados
 
 const operations = {
-    1: { action: "conf.reports", page: 0 },
+    1: { action: "reports.enabled", page: 0 },
     2: { action: "reports.auto_ban", page: 1 },
     3: { action: "reports.notify", page: 2 }
 }
@@ -126,7 +126,10 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     }
 
     // Salvando os dados atualizados
-    if (operations[operacao]) await updateGuild(client, guild.id, guild)
+    if (operations[operacao]) await client.prisma.guildOptionsReports.update({
+        where: { id: guild.reports_id },
+        data: guild.reports
+    })
 
     if (operacao === 20) pagina_guia = 1
     else if (operacao === 21) pagina_guia = 2
