@@ -4,6 +4,7 @@ const { verifyDynamicBadge } = require('../../../database/schemas/User_badges')
 
 const { badges } = require('../../../formatters/patterns/user')
 const {updateGuild} = require("../../../database/schemas/Guild");
+const {updateUser} = require("../../../database/schemas/User");
 
 module.exports = async ({ client, guild }) => {
 
@@ -47,12 +48,11 @@ module.exports = async ({ client, guild }) => {
                         .setImage("https://i.imgur.com/N8AFVTH.png")
                         .setDescription(`${client.tls.phrase(inviter, "inic.ping.boas_vindas")}\n\n${client.defaultEmoji("earth")} | ${client.tls.phrase(inviter, "inic.ping.idioma_dica_server")}`)
 
-                    client.sendDM(inviter, { embeds: [embed], components: [row] }, true)
+                    client.sendDM(inviter.id, { embeds: [embed], components: [row] }, true)
                 }
 
                 // Atualizando os dados do usuário para não avisar mais o mesmo em DM
-                inviter.hoster = true
-                await inviter.save()
+                await updateUser(client, inviter.id, { hoster: true })
             }
 
             // Checking which user invited the bot the most

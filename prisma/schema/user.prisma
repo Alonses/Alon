@@ -35,7 +35,6 @@ model UserOptionsSocial {
   steam        String?
   lastfm       String?
   pula_predios String?
-  userId       String
   user         User?
 }
 

@@ -35,7 +35,7 @@ module.exports = async (client, dados) => {
         return require('./member_nick')({ client, guild, registroAudita, dados })
 
     // Membro foi mutado
-    if (registroAudita?.changes[0]?.key === "communication_disabled_until" && guild.logger_member_punishment)
+    if (registroAudita?.changes[0]?.key === "communication_disabled_until" && guild.logger.member_punishment)
         return require('./member_mute')({ client, guild, registroAudita, dados })
 
     // Membro teve os cargos atualizados
@@ -48,9 +48,9 @@ module.exports = async (client, dados) => {
             return require('./member_role')({ client, guild, registroAudita, dados })
     }
 
-    const user = await client.getUser(user_alvo.id)
+    const user = await client.getUser(user_alvo.id, { profile: true })
 
     // Membro atualizou a foto de perfil
-    if (user.profile.avatar !== dados[1].user.avatarURL({ dynamic: true }) && guild.logger_member_image)
+    if (user.profile.avatar !== dados[1].user.avatarURL({ dynamic: true }) && guild.logger.member_image)
         return require('./member_avatar')({ client, guild, user, dados })
 }

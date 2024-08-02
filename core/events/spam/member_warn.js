@@ -57,5 +57,5 @@ module.exports = async ({ client, guild, strike_aplicado, indice_matriz, user_me
         msg_user += `\n${client.defaultEmoji("detective")} | ${client.tls.phrase(user, "mode.spam.aviso_links")}`
 
     embed_user.setDescription(msg_user)
-    client.sendDM(user, { embeds: [embed_user] }, true)
+    client.sendDM(user.id, { embeds: [embed_user] }, true)
 }

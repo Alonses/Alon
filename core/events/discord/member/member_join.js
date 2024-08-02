@@ -9,10 +9,10 @@ module.exports = async (client, dados) => {
         logger: true,
         reports: true
     })
-    const user = await client.getUser(dados.user.id)
+    const user = await client.getUser(dados.user.id, { conf: true })
 
     if (user.conf?.cached_guilds) // Salvando o novo servidor ao usuário
-        await registerUserGuild(user.uid, dados.guild.id)
+        await registerUserGuild(user.id, dados.guild.id)
 
     if (client.cached.join_guilds.has(dados.guild.id)) { // Servidores com cargos na entrada
 

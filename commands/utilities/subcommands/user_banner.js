@@ -6,7 +6,7 @@ const { EmbedBuilder } = require('discord.js')
 module.exports = async ({ client, user, interaction }) => {
 
     let user_alvo = interaction.options.getUser("user") || interaction.user
-    const user_c = await client.getUser(user_alvo.id)
+    const user_c = await client.getUser(user_alvo.id, { misc: true })
 
     let response = fetch(`https://discord.com/api/v8/users/${user_alvo.id}`, {
         method: 'GET',

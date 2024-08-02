@@ -28,7 +28,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
         // Atribuindo e notificando
         if (operacao === 1) {
-            client.sendDM(alvo, { content: client.tls.phrase(alvo, "dive.badges.new_badge", client.emoji("emojis_dancantes"), [badge.name, badge.emoji]) })
+            client.sendDM(alvo.id, { content: client.tls.phrase(alvo, "dive.badges.new_badge", client.emoji("emojis_dancantes"), [badge.name, badge.emoji]) })
 
             interaction.update({
                 content: `${client.emoji("emojis_dancantes")} | Badge \`${badge.name}\` ${badge.emoji} atribuída ao usuário ${user_interno}!`,

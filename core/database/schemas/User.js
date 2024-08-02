@@ -54,71 +54,70 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("User", schema)
 
-async function checkUser(uid) {
-
-    // Verifica se há registros do usuário informado no banco
-    if (await model.exists({ uid: uid }))
-        return model.findOne({
-            uid: uid
-        })
-
-    return false
+async function checkUser(client, uid) {
+    return !!await getUser(client, uid)
 }
 
-async function getUser(uid) {
-    if (!await model.exists({ uid: uid }))
-        await model.create({
-            uid: uid
-        })
-
-    return model.findOne({
-        uid: uid
+async function getUser(client, uid, includes = { }) {
+   return await client.prisma.user.upsert({
+       where: { id: uid },
+       update: { },
+       create: {
+           id: uid,
+           erase: { create: { } },
+           social: { create: { } },
+           profile: { create: { } },
+           misc: { create: { } },
+           conf: { create: { } }
+        },
+       include: includes
     })
 }
 
-async function getRankMoney() {
-    return model.find({
-        "misc.money": { $gt: 0.01 }
-    }).sort({
-        "misc.money": -1
-    }).limit(25)
+async function getRankMoney(client) {
+    return await client.prisma.user.findMany({
+        take: 25,
+        where: { misc: {  money: { gt: 0 } } },
+        orderBy: { misc: { money: "desc" } }
+    })
 }
 
 // Buscando os usuários que estão inativos para realizar a exclusão dos dados
-async function getOutdatedUsers(timestamp) {
-
-    return await model.find({
-        "erase.erase_on": { $lte: timestamp }
+async function getOutdatedUsers(client, timestamp) {
+    return await client.prisma.user.findMany({
+        where: { erase: { erase_on: { lte: timestamp } } }
     })
 }
 
 // Define um tempo de expiração para todos os usuários sem tempo definido
-async function getUnknowUsers(client) {
+async function getUnknownUsers(client) {
 
-    const users = await model.find({ "erase.erase_on": null })
+    const users = await client.prisma.user.findMany({ where: { erase: { erase_on: null } } })
 
     for (let i = 0; i < users.length; i++) {
-
-        const usuario = users[i]
-        usuario.erase.erase_on = client.timestamp() + 2419200
-
-        await usuario.save()
+        const user = users[i]
+        await client.prisma.userOptionsErase.update({
+            where: { id: user.erase_id },
+            data: { erase_on: client.timestamp() + 2419200 }
+        })
     }
 }
 
 // Exclui o usuário por completo
-async function dropUser(uid) {
-    await model.findOneAndDelete({
-        uid: uid
+async function dropUser(client, uid) {
+    await client.prisma.user.deleteOne({ where: { id: uid } })
+}
+
+async function updateUser(client, uid, update) {
+    await client.prisma.user.update({
+        where: { id: uid },
+        data: update
     })
 }
 
 // Lista todos os usuários com badges fixadas
-async function getUserWithFixedBadges() {
-
-    return await model.find({
-        "misc.fixed_badge": { $ne: null }
-    })
+async function getUserWithFixedBadges(client) {
+    return await client.prisma.user.findMany({ where: { misc: { fixed_badge: { not: null } } } })
 }
 
 module.exports.User = model
@@ -126,8 +125,9 @@ module.exports = {
     getUser,
     checkUser,
     dropUser,
+    updateUser,
     getRankMoney,
-    getUnknowUsers,
+    getUnknownUsers,
     getOutdatedUsers,
     getUserWithFixedBadges
 }

@@ -125,7 +125,7 @@ const model = mongoose.model("Guild", schema)
 async function getGuild(client, gid, includes = { }) {
     return await client.prisma.guild.upsert({
         where: { id: gid },
-        update: {},
+        update: { },
         create: {
             id: gid,
             warn: { create: { } },

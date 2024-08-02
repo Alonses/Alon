@@ -51,7 +51,7 @@ client.discord.on("messageCreate", async message => {
 	// Prevents the bot from interacting with other members when in develop mode or updating commands
 	if ((!process.env.owner_id.includes(message.author.id) && client.x.modo_develop) || client.x.force_update) return
 
-	const user = await checkUser(message.author.id)
+	const user = await checkUser(client, message.author.id)
 	const guild = await client.getGuild(message.guild.id)
 
 	// Responding to the user who just ping the bot
@@ -62,7 +62,7 @@ client.discord.on("messageCreate", async message => {
 				components: [client.create_buttons([{ name: client.tls.phrase(user, "inic.inicio.convidar"), type: 4, emoji: client.emoji("mc_coracao"), value: `https://discord.com/oauth2/authorize?client_id=${client.id()}&scope=bot&permissions=2550136990` }], message)]
 			}).catch(console.error)
 
-	if (guild.spam_suspicious_links) { // Checking the text for a malicious link
+	if (guild.spam.suspicious_links) { // Checking the text for a malicious link
 
 		const link = `${message.content} `.match(client.cached.regex)
 
@@ -73,7 +73,7 @@ client.discord.on("messageCreate", async message => {
 			}
 	}
 
-	if (guild.conf_spam) // Server anti-spam system
+	if (guild.conf.spam) // Server anti-spam system
 		await require("./core/events/spam")({ client, message, guild })
 
 	if (user) { // It only runs if the member is saved in the database
@@ -107,13 +107,16 @@ client.discord.on("interactionCreate", async interaction => {
 	// Prevents the bot from responding to interactions while updating commands
 	if (client.x.force_update) return
 
-	const user = await client.getUser(interaction.user.id)
+	const user = await client.getUser(interaction.user.id, {
+		conf: true,
+		erase: true
+	})
 
 	// Prevents the bot from interacting with other members when in develop mode
 	if (!process.env.owner_id.includes(interaction.user.id) && client.x.modo_develop)
 		return client.tls.reply(interaction, user, "inic.inicio.testes", true, 60)
 
-	if (user.conf?.banned || false) return // Ignoring users
+	if (user?.conf.banned) return // Ignoring users
 
 	// Checking if it is a command used on a server
 	if (!interaction.guild) return client.tls.reply(interaction, user, "inic.error.comando_dm")

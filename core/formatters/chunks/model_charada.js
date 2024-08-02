@@ -10,5 +10,5 @@ module.exports = async (client, user, interaction) => {
             content: texto,
             ephemeral: client.decider(user?.conf.ghost_mode, 0)
         })
-    else client.sendDM(user, { content: texto }, true)
+    else client.sendDM(user.id, { content: texto }, true)
 }

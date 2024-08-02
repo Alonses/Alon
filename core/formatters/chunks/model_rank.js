@@ -164,7 +164,7 @@ async function retorna_card_alvo({ client, user, interaction, usuario_alvo, user
     if (usuario_alvo.length === 0)
         usuario_alvo.push(0)
 
-    const user_a = await client.getUser(user_alvo_data.id)
+    const user_a = await client.getUser(user_alvo_data.id, { misc: true })
     let fixed_badge = busca_badges(client, badgeTypes.FIXED, user_a) || ""
 
     if (fixed_badge) fixed_badge = fixed_badge.emoji

@@ -17,13 +17,13 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
         return require(`../../../commands/miscellanea/subcommands/bank_statement`)({ client, user, interaction })
 
     if (!last_update) { // Utiliza os dados do cache
-        client.cached.rank.bank = await getRankMoney()
+        client.cached.rank.bank = await getRankMoney(client)
         last_update = client.timestamp()
     }
 
     // Atualiza os dados do cache para o ranking do banco
     if (last_update && client.timestamp() > last_update + 10000) {
-        client.cached.rank.bank = await getRankMoney()
+        client.cached.rank.bank = await getRankMoney(client)
         last_update = client.timestamp()
     }
 

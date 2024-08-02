@@ -58,7 +58,10 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
     // Badges do usuário
     if (operador === 2) {
 
-        const internal_user = await client.getUser(id_alvo)
+        const internal_user = await client.getUser(id_alvo, {
+            conf: true,
+            misc: true
+        })
 
         // Informando ao usuário do comando que essa guia está desativada para ele
         if (!autor_original && !internal_user?.conf.public_badges)
@@ -126,7 +129,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
 
     // Desabilitando a guia de badges caso o usuário tenha escondido
     if (!autor_original) {
-        const internal_user = await client.getUser(id_alvo)
+        const internal_user = await client.getUser(id_alvo, { conf: true })
 
         if (!internal_user?.conf.public_badges)
             b_disabled[2] = true

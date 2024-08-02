@@ -3,7 +3,7 @@ const { EmbedBuilder } = require('discord.js')
 module.exports = async ({ client, user, interaction }) => {
 
     let user_alvo = interaction.options.getUser("user") || interaction.user
-    const user_c = await client.getUser(user_alvo.id)
+    const user_c = await client.getUser(user_alvo.id, { misc: true })
 
     const url_avatar = user_alvo.avatarURL({ dynamic: true, size: 2048 })
 

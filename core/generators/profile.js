@@ -1,6 +1,6 @@
 const { EmbedBuilder, PermissionsBitField } = require('discord.js')
 
-async function create_profile({ client, interaction, user, id_alvo, operador }) {
+async function create_profile(client, interaction, user, id_alvo, operador) {
 
     let user_alvo = await client.getMemberGuild(interaction, id_alvo), operacao = 0
     const membro_sv = user_alvo
@@ -14,13 +14,16 @@ async function create_profile({ client, interaction, user, id_alvo, operador }) 
     user_alvo = user_alvo.user
 
     if (typeof operador !== "undefined") operacao = operador
-    const user_data = await client.getUser(id_alvo)
+    const user_data = await client.getUser(id_alvo, {
+        misc: true,
+        profile: true
+    })
 
     let apelido = membro_sv.nickname || user_alvo.username, tipo_user = "🤖", nota_rodape = ""
     let nome_usuario = `\`${user_alvo.username.replace(/ /g, "")}#${user_alvo.discriminator}\``
 
     // Usuário sem discriminador
-    if (user_alvo.discriminator == 0)
+    if (user_alvo.discriminator === 0)
         nome_usuario = `\`@${user_alvo.username.replace(/ /g, "")}\``
 
     let emoji_hypesquad = "⠀", discord_premium = "⠀"
@@ -51,10 +54,10 @@ async function create_profile({ client, interaction, user, id_alvo, operador }) 
     if (!tipo_user.includes("🛡️") && !user_data.bot)
         tipo_user = client.defaultEmoji("person")
 
-    if (user_data.uid === client.id())
+    if (user_data.id === client.id())
         nota_rodape = client.tls.phrase(user, "util.user.alonsal")
 
-    if (process.env.ids_enceirados.includes(user_data.uid)) {
+    if (process.env.ids_enceirados?.includes(user_data.id)) {
         if (nota_rodape !== "") nota_rodape += ", "
 
         nota_rodape += client.tls.phrase(user, "util.user.enceirado")
@@ -66,12 +69,12 @@ async function create_profile({ client, interaction, user, id_alvo, operador }) 
         .addFields(
             {
                 name: `${client.emoji("icon_mention")} ${nome_usuario}`,
-                value: `( <@${user_data.uid}> )`,
+                value: `( <@${user_data.id}> )`,
                 inline: true
             },
             {
                 name: `${client.emoji("icon_id")} **${client.tls.phrase(user, "mode.report.identificador")}**`,
-                value: `\`${user_data.uid}\``,
+                value: `\`${user_data.id}\``,
                 inline: true
             }
         )

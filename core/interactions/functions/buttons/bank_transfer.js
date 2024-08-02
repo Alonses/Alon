@@ -15,13 +15,17 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const alvo = await client.getUser(id_alvo)
     const bufunfas = parseFloat(dados.split("[")[1])
 
-    user.misc.money -= bufunfas
-    alvo.misc.money += bufunfas
+    await client.prisma.userOptionsMisc.update({
+        where: { id: user.misc_id },
+        data: { money: { increment: -bufunfas } }
+    })
 
-    await user.save()
-    await alvo.save()
+    await client.prisma.userOptionsMisc.update({
+        where: { id: alvo.misc_id },
+        data: { money: { increment: bufunfas } }
+    })
 
-    const user_i = await client.getCachedUser(alvo.uid)
+    const user_i = await client.getCachedUser(alvo.id)
 
     // Registrando as movimentações de bufunfas para os usuários
     await client.registryStatement(user.uid, `misc.b_historico.deposito_enviado|${user_i.username}`, false, bufunfas)
@@ -36,5 +40,5 @@ module.exports = async ({ client, user, interaction, dados }) => {
     })
 
     // Notificando o usuário que recebeu as Bufunfas
-    client.sendDM(alvo, { content: client.tls.phrase(alvo, "misc.pay.notifica", client.emoji("emojis_dancantes"), [user.uid, client.locale(bufunfas)]) })
+    client.sendDM(alvo.id, { content: client.tls.phrase(alvo, "misc.pay.notifica", client.emoji("emojis_dancantes"), [user.uid, client.locale(bufunfas)]) })
 }

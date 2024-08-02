@@ -16,14 +16,14 @@ module.exports = async ({ client, user, interaction, id_cache }) => {
 
     // Coletando os dados de histórico do usuário
     const reports = await getUserReports(id_alvo)
-    const user_c = await client.getUser(id_alvo)
+    const user_c = await client.getUser(id_alvo, { misc: true })
 
     let apelido = user_alvo.nickname !== null ? user_alvo.nickname : user_alvo.user.username
     let avisos = 0, descricao = `\`\`\`✅ | ${client.tls.phrase(user, "mode.report.sem_report")}\`\`\``
 
     let user_name = `\`${user_alvo.user.username.replace(/ /g, "")}#${user_alvo.user.discriminator}\`\n( ${user_alvo} )`
 
-    if (user_alvo.user.discriminator == 0)
+    if (user_alvo.user.discriminator === 0)
         user_name = `\`${user_alvo.user.username.replace(/ /g, "")}\`\n( ${user_alvo} )`
 
     // Avatar do usuário
@@ -48,6 +48,8 @@ module.exports = async ({ client, user, interaction, id_cache }) => {
     if (warns.length > 0)
         descricao += `\`\`\`${client.tls.phrase(user, "mode.report.com_registro", 58)}\`\`\``
 
+    const timestamp = user_alvo.joinedTimestamp / 1000
+
     const infos_user = new EmbedBuilder()
         .setTitle(`> ${apelido}`)
         .setColor(client.embed_color(user_c.misc.color))
@@ -65,7 +67,7 @@ module.exports = async ({ client, user, interaction, id_cache }) => {
             },
             {
                 name: `${client.defaultEmoji("calendar")} **${client.tls.phrase(user, "util.user.entrada")}**`,
-                value: `<t:${parseInt(user_alvo.joinedTimestamp / 1000)}:F>\n( <t:${Math.floor(user_alvo.joinedTimestamp / 1000)}:R> )`,
+                value: `<t:${parseInt(timestamp)}:F>\n( <t:${Math.floor(timestamp)}:R> )`,
                 inline: false
             }
         )

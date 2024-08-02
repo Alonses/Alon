@@ -130,10 +130,8 @@ async function nerfa_spam({ client, message, guild, suspect_link }) {
     }
 
     // Requests coming from suspicious links
-    if (!cached_messages[`${message.author.id}.${guild.sid}`] || cached_messages[`${message.author.id}.${guild.sid}`].length < 1) {
-        cached_messages[`${message.author.id}.${guild.sid}`] = []
-        cached_messages[`${message.author.id}.${guild.sid}`].push(message)
-    }
+    if (!cached_messages[`${message.author.id}.${guild.sid}`] || cached_messages[`${message.author.id}.${guild.sid}`].length < 1)
+        cached_messages[`${message.author.id}.${guild.sid}`] = [ message ]
 
     if (!strike_aplicado?.action && !guild.spam.strikes) { // No defined operation
         strike_aplicado.action = "member_mute"
@@ -169,7 +167,7 @@ async function nerfa_spam({ client, message, guild, suspect_link }) {
     }, 4000)
 
     // Registering neutralized spam in history
-    await client.updateBot({ persis_span: { increment: 1 }})
+    await client.updateBot({ persis_spam: { increment: 1 }})
 
     if (guild.spam.suspicious_links && user_messages.length > 0 && !suspect_link) { // Checking if the server has the suspicious links registry active
 

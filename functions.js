@@ -5,7 +5,7 @@ const { readdirSync } = require('fs')
 const { alea_hex } = require('./core/functions/hex_color')
 
 const { getBot, updateBot } = require('./core/database/schemas/Bot')
-const { getUser } = require('./core/database/schemas/User')
+const { getUser, updateUser} = require('./core/database/schemas/User')
 
 const { create_menus } = require('./core/generators/menus')
 const { create_profile } = require('./core/generators/profile')
@@ -79,11 +79,10 @@ function internal_functions(client) {
 
     client.create_buttons = (data, interaction) => { return create_buttons(data, interaction) }
 
-    client.create_menus = ({ client, interaction, user, data, pagina, multi_select, guild }) => {
-        return create_menus({ client, interaction, user, data, pagina, multi_select, guild })
-    }
+    client.create_menus = ({ client, interaction, user, data, pagina, multi_select, guild }) =>
+        create_menus({ client, interaction, user, data, pagina, multi_select, guild })
 
-    client.create_profile = ({ interaction, user, id_alvo }) => { return create_profile(client, interaction, user, id_alvo) }
+    client.create_profile = ({ interaction, user, id_alvo }) => create_profile(client, interaction, user, id_alvo)
 
     // Verifica se um valor foi passado, caso contrário retorna o valor padrão esperado
     client.decider = (entrada, padrao) => { return !entrada ? padrao : entrada }
@@ -209,9 +208,9 @@ function internal_functions(client) {
         return roles.sort((a, b) => (client.normalizeString(a.name) > client.normalizeString(b.name)) ? 1 : ((client.normalizeString(b.name) > client.normalizeString(a.name)) ? -1 : 0))
     }
 
-    client.getUser = (id_user) => { return getUser(id_user) }
+    client.getUser = (id_user, includes) => getUser(client, id_user, includes)
 
-    client.getUserBadges = (id_user) => { return getUserBadges(id_user) }
+    client.getUserBadges = (id_user) => getUserBadges(client, id_user)
 
     // Retorna o membro do servidor
     client.getMemberGuild = async (interaction, id_alvo) => {
@@ -488,18 +487,18 @@ function internal_functions(client) {
     }
 
     // Envia uma notificação em DM para o usuário
-    client.sendDM = async (user, dados, force) => {
-
+    client.sendDM = async (user_id, dados, force) => {
+        const user = await client.getUser(user_id, { conf: true })
         let notifications = false
 
         // Previne que o bot envie DM's para si mesmo
-        if (user.uid === client.id()) return
+        if (user_id === client.id()) return
         if (force) user.conf.notify = 1
 
         // Notificando o usuário alvo caso ele receba notificações em DM do bot
         if (client.decider(user?.conf?.notify, 1)) {
 
-            const user_interno = await client.discord.users.fetch(user.uid)
+            const user_interno = await client.discord.users.fetch(user.id)
                 .catch(() => { return null })
 
             if (user_interno)
@@ -508,10 +507,11 @@ function internal_functions(client) {
         }
 
         // Usuário com DM bloqueada
-        if (notifications) {
-            user.conf.notify = false
-            user.save()
-        }
+        if (notifications)
+            await client.prisma.userOptionsConf.update({
+                where: { id: user.conf_id },
+                data: { notify: false }
+            })
     }
 
     // Aleatoriza o texto de entrada
@@ -637,13 +637,13 @@ function internal_functions(client) {
 
         const guild = await client.getGuild(id_guild)
         user.lang = guild.lang || "pt-br"
-        await user.save()
+        await updateUser(client, user.id, { lang: user.lang })
     }
 
     // Valida se o usuário possui ranking ativo
     client.verifyUserRanking = async (id_user) => {
 
-        let user = await client.getUser(id_user)
+        let user = await client.getUser(id_user, { conf: true })
         let user_ranking = true
 
         if (typeof user.conf.ranking !== "undefined") user_ranking = user.conf.ranking
@@ -660,7 +660,7 @@ function internal_functions(client) {
 
         let i = 0
 
-        guild_warns.forEach(async guild_warn => {
+        for (const guild_warn of guild_warns) {
 
             if (guild_warn.role) {
 
@@ -668,7 +668,7 @@ function internal_functions(client) {
                 const membro_sv = await client.getMemberGuild(id_guild, client.id())
                 const membro_guild = await client.getMemberGuild(id_guild, id_user)
 
-                if (!membro_sv || !membro_guild) return // Sem dados
+                if (!membro_sv || !membro_guild) continue; // Sem dados
 
                 // Removendo o cargo ao usuário que recebeu a advertência
                 if (membro_sv.permissions.has(PermissionsBitField.Flags.ManageRoles, PermissionsBitField.Flags.Administrator)) {
@@ -683,7 +683,7 @@ function internal_functions(client) {
             }
 
             i++
-        })
+        }
     }
 
     console.log(`🟢 | Funções internas vinculadas com sucesso.`)

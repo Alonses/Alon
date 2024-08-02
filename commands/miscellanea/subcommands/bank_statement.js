@@ -6,19 +6,19 @@ module.exports = async ({ client, user, interaction, local }) => {
 
     const date1 = new Date()
     let alvo = interaction.options.getUser("user") || interaction.user
-    let user_interno = await client.getUser(alvo.id)
+    let user_interno = await client.getUser(alvo.id, { misc: true })
 
-    if (user_interno.uid === client.id())
+    if (user_interno.id === client.id())
         user_interno.misc.money = 1000000000000
 
     let daily = `${client.tls.phrase(user, "misc.banco.dica_comando")} ${client.emoji("emojis_dancantes")}`
     let titulo_embed = client.tls.phrase(user, "misc.banco.suas_bufunfas")
 
-    if (user_interno.uid !== interaction.user.id)
+    if (user_interno.id !== interaction.user.id)
         daily = "", titulo_embed = client.tls.phrase(user, "misc.banco.bufunfas_outros", null, alvo.username)
 
-    let data_atual = date1.toDateString('pt-BR')
-    if (data_atual == user.misc.daily && user_interno.uid === interaction.user.id) {
+    let data_atual = date1.toDateString("pt-BR")
+    if (data_atual === user.misc.daily && user_interno.uid === interaction.user.id) {
         const tempo_restante = Math.floor((date1.getTime() + (((23 - date1.getHours()) * 3600000) + ((59 - date1.getMinutes()) * 60000) + ((60 - date1.getSeconds()) * 1000))) / 1000)
 
         daily = `${client.tls.phrase(user, "misc.banco.daily")} <t:${tempo_restante}:R>\n( <t:${tempo_restante}:f> )`

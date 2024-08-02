@@ -20,7 +20,7 @@ module.exports = async (client, user, interaction) => {
             // Erro de pesquisa com a API
             if (dados_item.status === 502)
                 if (interaction) return client.tls.editReply(interaction, user, "util.minecraft.error_1", true, client.emoji(0))
-                else return client.sendDM(user, { content: client.tls.phrase(user, "util.minecraft.error_1", client.emoji(0)) }, true)
+                else return client.sendDM(user.id, { content: client.tls.phrase(user, "util.minecraft.error_1", client.emoji(0)) }, true)
 
             if (dados_item.status === 404 && interaction) // Sem item conhecido
                 return client.tls.editReply(interaction, user, "util.minecraft.nao_encontrado", true, client.emoji("emojis_negativos"), interaction.options.getString("item"))
@@ -156,6 +156,6 @@ module.exports = async (client, user, interaction) => {
                     ephemeral: client.decider(user?.conf.ghost_mode, 0)
                 })
             else
-                return client.sendDM(user, { embeds: [embed] }, true)
+                return client.sendDM(user.id, { embeds: [embed] }, true)
         })
 }

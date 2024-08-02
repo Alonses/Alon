@@ -15,8 +15,11 @@ module.exports = async ({ client, user, interaction }) => {
     if (params.url)
         texto_entrada = params.url
 
-    alvo = interaction.options.getUser("user") || interaction.user
-    const user_alvo = await client.getUser(alvo.id)
+    const alvo = interaction.options.getUser("user") || interaction.user
+    const user_alvo = await client.getUser(alvo.id, {
+        misc: true,
+        social: true
+    })
 
     // user_alvo -> usuário marcado pelo comando
     // user -> usuário que disparou o comando

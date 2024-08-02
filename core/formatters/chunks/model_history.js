@@ -20,9 +20,9 @@ module.exports = async (client, user, dados, interaction) => {
                             ephemeral: true
                         })
                     else
-                        return client.sendDM(user, { content: client.tls.phrase(user, "util.history.sem_evento") }, true)
+                        return client.sendDM(user.id, { content: client.tls.phrase(user, "util.history.sem_evento") }, true)
 
-                let lista_eventos = "", data_eventos = ""
+                let lista_eventos = ""
                 const ano_atual = new Date().getFullYear()
 
                 for (let i = 0; i < res.length; i++) {
@@ -35,7 +35,7 @@ module.exports = async (client, user, dados, interaction) => {
 
                 if (dados === "") dados = client.tls.phrase(user, "util.history.hoje")
 
-                data_eventos = ` ${dados}`
+                const data_eventos = ` ${dados}`
 
                 const embed_eventos = new EmbedBuilder()
                     .setTitle(client.tls.phrase(user, "util.history.acontecimentos_1"))
@@ -51,7 +51,7 @@ module.exports = async (client, user, dados, interaction) => {
                         embeds: [embed_eventos],
                         ephemeral: client.decider(user?.conf.ghost_mode, 0)
                     })
-                else return client.sendDM(user, { embeds: [embed_eventos] }, true)
+                else return client.sendDM(user.id, { embeds: [embed_eventos] }, true)
             })
     } else {
 
@@ -66,7 +66,7 @@ module.exports = async (client, user, dados, interaction) => {
                             content: client.tls.phrase(user, "util.history.sem_entradas_valor"),
                             ephemeral: true
                         })
-                    else return client.sendDM(user, { content: client.tls.phrase(user, "util.history.sem_evento") }, true)
+                    else return client.sendDM(user.id, { content: client.tls.phrase(user, "util.history.sem_evento") }, true)
 
                 const row = client.create_buttons([
                     { name: client.tls.phrase(user, "menu.botoes.mais_detalhes"), value: res.fonte, type: 4, emoji: "🌐" }
@@ -99,7 +99,7 @@ module.exports = async (client, user, dados, interaction) => {
                         components: [row],
                         ephemeral: client.decider(user?.conf.ghost_mode, 0)
                     })
-                else client.sendDM(user, { embeds: [acontecimento], components: [row] }, true)
+                else client.sendDM(user.id, { embeds: [acontecimento], components: [row] }, true)
             })
             .catch(() => {
                 if (interaction)
@@ -107,7 +107,7 @@ module.exports = async (client, user, dados, interaction) => {
                         content: client.tls.phrase(user, "util.history.erro_eventos"),
                         ephemeral: true
                     })
-                else client.sendDM(user, { content: client.tls.phrase(user, "util.history.erro_eventos") }, true)
+                else client.sendDM(user.id, { content: client.tls.phrase(user, "util.history.erro_eventos") }, true)
             })
     }
 }

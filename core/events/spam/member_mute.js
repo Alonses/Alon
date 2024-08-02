@@ -81,7 +81,7 @@ module.exports = async ({ client, message, guild, strike_aplicado, indice_matriz
                     inline: true
                 })
 
-            client.sendDM(user, { embeds: [embed_user] }, true)
+            client.sendDM(user.id, { embeds: [embed_user] }, true)
         })
         .catch(console.error)
 }

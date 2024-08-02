@@ -36,7 +36,10 @@ module.exports = {
     async execute({ client, user, interaction }) {
 
         let alvo = interaction.options.getUser("user") || interaction.user
-        const user_pula = await client.getUser(alvo.id)
+        const user_pula = await client.getUser(alvo.id, {
+            social: true,
+            misc: true
+        })
 
         // user_pula -> Dados do usuário alvo
         // user -> Dados do usuário que disparou o comando

@@ -12,13 +12,17 @@ module.exports = {
 
         if (interaction.user.id !== client.x.owners[0] || client.x.owners.includes(interaction.options.getString("usuario"))) return
 
-        const user_alvo = await client.getUser(interaction.options.getString("usuario"))
+        const user_alvo = await client.getUser(interaction.options.getString("usuario"), { conf: true })
 
         // Ativa ou desativa o banimento do membro
-        user_alvo.conf.banned = !user_alvo.conf.banned
-        await user_alvo.save()
+        const userBanned = !user_alvo.conf.banned
 
-        if (user_alvo.conf.banned)
+        await client.prisma.userOptionsConf.update({
+            where: { id: user_alvo.conf_id },
+            data: { banned: userBanned }
+        })
+
+        if (userBanned)
             interaction.reply({
                 content: `${client.emoji("pare_agr")} | O usuário <@${user_alvo.uid}> será ignorado pelo bot a partir de agora!`,
                 ephemeral: true

@@ -20,7 +20,7 @@ async function atualiza_modulos() {
 async function requisita_modulo(client) {
 
     const data1 = new Date()
-    const horario = formata_horas(data1.getHours() == 0 ? '0' : data1.getHours(), data1.getMinutes() === 0 ? '0' : data1.getMinutes()), dia = data1.getDay()
+    const horario = formata_horas(data1.getHours() === 0 ? '0' : data1.getHours(), data1.getMinutes() === 0 ? '0' : data1.getMinutes()), dia = data1.getDay()
 
     readFile('./files/data/user_modules.txt', 'utf8', (err, data) => {
         // Interrompe a operação caso não haja módulos salvos em cache
@@ -65,7 +65,10 @@ executa_modulo = async (client) => {
     if (!trava_modulo) {
         trava_modulo = true
 
-        const user = await client.getUser(lista_modulos[0].uid)
+        const user = await client.getUser(lista_modulos[0].uid, {
+            conf: true,
+            misc: true
+        })
 
         if (lista_modulos[0].type === 0)
             await require('../../formatters/chunks/model_weather.js')(client, user)
@@ -76,7 +79,7 @@ executa_modulo = async (client) => {
         if (lista_modulos[0].type === 2) {
 
             if (lista_modulos[0].data === 0) // Sem definição de tipo de envio
-                await client.sendDM(user, { content: client.tls.phrase(user, "misc.modulo.faltando_tipo") }, true)
+                await client.sendDM(user.id, { content: client.tls.phrase(user, "misc.modulo.faltando_tipo") }, true)
 
             // Definindo qual tipo de anúncio do history será
             let dados = {
@@ -131,7 +134,7 @@ async function cobra_modulo(client) {
     active_modules.forEach(modulo => {
 
         // Considera apenas os módulos que são ativos no dia corrente e desconta do usuário
-        if (modulo.stats.days == 2 || week_days[modulo.stats.days]?.includes(data1.getDay()) || modulo.stats.days - 4 === data1.getDay()) {
+        if (modulo.stats.days === 2 || week_days[modulo.stats.days]?.includes(data1.getDay()) || modulo.stats.days - 4 === data1.getDay()) {
             if (users[modulo.uid]) {
                 users[modulo.uid] += modulo.stats.price
                 modules[modulo.uid]++
@@ -143,26 +146,29 @@ async function cobra_modulo(client) {
     })
 
     const ids = Object.keys(users)
-    ids.forEach(async identificador => {
+    for (const id of ids) {
 
-        const user = await getUser(identificador)
-        user.misc.money -= users[identificador]
-        let total = users[identificador]
+        const user = await getUser(client, id)
+        user.misc.money -= users[id]
+        let total = users[id]
 
-        await user.save()
+        await client.prisma.userOptionsMisc.update({
+            where: { id: user.misc_id },
+            data: { money: user.misc.money }
+        })
 
         // Desliga todos os módulos do usuário caso ele não tenha Bufunfas
-        if (user.misc.money < users[identificador]) {
-            shutdownAllUserModules(identificador)
+        if (user.misc.money < users[id]) {
+            await shutdownAllUserModules(id)
 
             // Avisando o usuário sobre o desligamento dos módulos
-            return client.sendDM(user, { content: client.tls.phrase(user, "misc.modulo.auto_desativado", client.emoji(30)) }, true)
+            client.sendDM(user.id, {content: client.tls.phrase(user, "misc.modulo.auto_desativado", client.emoji(30))}, true);
         }
 
         // Registrando as movimentações de bufunfas para o usuário
-        await client.registryStatement(user.uid, `misc.b_historico.modulos|${modules[identificador]}`, false, users[identificador])
+        await client.registryStatement(id, `misc.b_historico.modulos|${modules[id]}`, false, users[id])
         await client.journal("reback", total)
-    })
+    }
 }
 
 module.exports.atualiza_modulos = atualiza_modulos

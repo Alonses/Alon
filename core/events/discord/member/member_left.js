@@ -5,10 +5,10 @@ const { dropUserGuild } = require('../../../database/schemas/User_guilds.js')
 module.exports = async (client, dados) => {
 
     const guild = await client.getGuild(dados.guild.id, { logger: true })
-    const user = await client.getUser(dados.user.id)
+    const user = await client.getUser(dados.user.id, { conf: true })
 
     // Removendo o servidor salvo em cache do usuário
-    if (user.conf?.cached_guilds) dropUserGuild(user.uid, dados.guild.id)
+    if (user.conf?.cached_guilds) dropUserGuild(user.id, dados.guild.id)
 
     // Verificando se a guild habilitou o logger
     if (!guild.logger.enabled) return

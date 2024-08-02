@@ -67,18 +67,18 @@ module.exports = {
         if (bufunfas < 0.01)
             return client.tls.reply(interaction, user, "misc.pay.error_2", true, [9, 0])
 
-        const alvo = await client.getUser(user_alvo.id)
+        const alvo = await client.getUser(user_alvo.id, { misc: true })
 
-        if (alvo.uid === user.uid)
+        if (alvo.id === user.id)
             return client.tls.reply(interaction, user, "misc.pay.error_3", true, [9, 0])
 
         // Validando se o usuário marcado não é um bot
-        const membro_sv = await client.getMemberGuild(interaction, alvo.uid)
+        const membro_sv = await client.getMemberGuild(interaction, alvo.id)
 
         if (!membro_sv) // Validando se o usuário marcado saiu do servidor
             return client.tls.reply(interaction, user, "mode.report.usuario_nao_encontrado", true, 1)
 
-        if (membro_sv.user.bot && alvo.uid !== client.id())
+        if (membro_sv.user.bot && alvo.id !== client.id())
             return client.tls.reply(interaction, user, "misc.pay.user_bot", true, [9, 0])
 
         if (user.misc.money < bufunfas) // Conferindo a quantidade de Bufunfas do pagador
@@ -95,7 +95,7 @@ module.exports = {
                 },
                 {
                     name: `${client.defaultEmoji("person")} **${client.tls.phrase(user, "misc.pay.destinatario")}**`,
-                    value: `<@${alvo.uid}>`,
+                    value: `<@${alvo.id}>`,
                     inline: true
                 }
             )

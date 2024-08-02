@@ -13,7 +13,7 @@ const { dropUserGlobalRank } = require('../../database/schemas/User_rank_global.
 
 async function atualiza_user_eraser(client) {
 
-    let dados = await getOutdatedUsers(client.timestamp())
+    let dados = await getOutdatedUsers(client, client.timestamp())
 
     // Atualizando o status de exclusão do usuário
     for (let i = 0; i < dados.length; i++) {
@@ -21,8 +21,10 @@ async function atualiza_user_eraser(client) {
         const usuario = dados[i]
 
         if (!usuario.erase.valid) { // Avisando sobre a atualização de status para exclusão dos dados do usuário
-            usuario.erase.valid = true
-            await usuario.save()
+            await client.prisma.userOptionsErase.update({
+                where: { id: usuario.erase_id },
+                data: { valid: true }
+            })
         }
     }
 
@@ -94,7 +96,7 @@ async function verifica_user_eraser(client) {
                 await dropAllUserGuilds(id_user)
 
                 // Exclui o usuário por completo
-                await dropUser(id_user)
+                await dropUser(client, id_user)
             }
         }
 

@@ -24,14 +24,14 @@ module.exports = async (client, user, interaction) => {
                                 files: [file],
                                 ephemeral: client.decider(user?.conf.ghost_mode, 0)
                             })
-                        else client.sendDM(user, { content: `〽️ | ${descricao_curio}`, files: [file] }, true)
+                        else client.sendDM(user.id, { content: `〽️ | ${descricao_curio}`, files: [file] }, true)
                     } else // Gifs
                         if (interaction)
                             interaction.reply({
                                 content: `〽️ | ${descricao_curio}\n${res.data_curio}`,
                                 ephemeral: client.decider(user?.conf.ghost_mode, 0)
                             })
-                        else client.sendDM(user, { content: `〽️ | ${descricao_curio}\n${res.data_curio}` }, true)
+                        else client.sendDM(user.id, { content: `〽️ | ${descricao_curio}\n${res.data_curio}` }, true)
 
                     return
                 }
@@ -41,6 +41,6 @@ module.exports = async (client, user, interaction) => {
                     content: `〽️ | ${descricao_curio}`,
                     ephemeral: client.decider(user?.conf.ghost_mode, 0)
                 })
-            else client.sendDM(user, { content: `〽️ | ${descricao_curio}` }, true)
+            else client.sendDM(user.id, { content: `〽️ | ${descricao_curio}` }, true)
         })
 }

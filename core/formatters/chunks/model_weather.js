@@ -10,7 +10,7 @@ const formata_horas = require('../formata_horas')
 
 module.exports = async (client, user, interaction) => {
 
-    let idioma_definido = user.lang === "al-br" ? "pt-br" : user.lang || "pt-br", pesquisa, pesquisa_bruta, url_completa
+    let idioma_definido = user.lang === "al-br" ? "pt-br" : user.lang || "pt-br", pesquisa, pesquisa_bruta
     let lang_min = idioma_definido.slice(0, 2) === "ru" ? "en" : idioma_definido.slice(0, 2)
 
     const translations = require(`i18n-country-code/locales/${lang_min}.json`)
@@ -24,10 +24,9 @@ module.exports = async (client, user, interaction) => {
         // Usa o local padrão caso não tenha entrada definida
         pesquisa = interaction.options.getString("place") || user.misc.locale
         pesquisa_bruta = `\"${pesquisa.replaceAll("\"", "")}"`
+    }
 
-        url_completa = `${process.env.url_weather}appid=${process.env.key_weather}&q=${pesquisa}&units=metric&lang=${lang_min}`
-    } else
-        url_completa = `${process.env.url_weather}appid=${process.env.key_weather}&q=${user.misc.locale}&units=metric&lang=${lang_min}`
+    const url_completa =  `${process.env.url_weather}appid=${process.env.key_weather}&q=${pesquisa ?? user.misc.locale}&units=metric&lang=${lang_min}`
 
     fetch(url_completa)
         .then(response => response.json())
@@ -51,11 +50,11 @@ module.exports = async (client, user, interaction) => {
                     })
             } else {
                 if (res.cod === '404' || res.cod === '400')
-                    return client.sendDM(user, { content: client.tls.phrase(user, "util.tempo.aviso_2", client.emoji("emojis_negativos"), pesquisa) }, true)
+                    return client.sendDM(user.id, { content: client.tls.phrase(user, "util.tempo.aviso_2", client.emoji("emojis_negativos"), pesquisa) }, true)
                 else if (res.cod === '429') // Erro da API
-                    return client.sendDM(user, { content: client.tls.phrase(user, "util.tempo.aviso_3", client.emoji("emojis_negativos")) }, true)
+                    return client.sendDM(user.id, { content: client.tls.phrase(user, "util.tempo.aviso_3", client.emoji("emojis_negativos")) }, true)
                 else if (res.id === '1873107')
-                    return client.sendDM(user, { content: client.tls.phrase(user, "util.tempo.error_2", client.emoji("emojis_negativos")) }, true)
+                    return client.sendDM(user.id, { content: client.tls.phrase(user, "util.tempo.error_2", client.emoji("emojis_negativos")) }, true)
             }
 
             fetch(`${process.env.url_time}key=${process.env.key_time}&format=json&by=position&lat=${res.coord.lat}&lng=${res.coord.lon}`) // Buscando o horário local
@@ -185,7 +184,8 @@ module.exports = async (client, user, interaction) => {
                         if (res.rain["3h"]) // Dados de chuva para 3 horas
                             cabecalho_fix += `\n${client.tls.phrase(user, "util.tempo.chuva")} 3H: ${res.rain["3h"]}mm`
 
-                        emoji_indica_humidade = " 🔼", emoji_indica_visibilidade = " 🔽"
+                        emoji_indica_humidade     = " 🔼"
+                        emoji_indica_visibilidade = " 🔽"
                         rodape_cabecalho = `${client.emoji("trollface")} _${client.tls.phrase(user, "util.tempo.chuva_troll")}_`
                     }
 
@@ -228,7 +228,7 @@ module.exports = async (client, user, interaction) => {
                         .setColor(client.embed_color(user.misc.color))
 
                     // Máximos de informações para o clima
-                    if (user.misc?.weather || false) {
+                    if (user.misc?.weather) {
                         embed_clima
                             .setThumbnail(`http://openweathermap.org/img/wn/${res.weather[0].icon}@2x.png`)
                             .setDescription(`${horario_local} | **${tempo_atual}**${cabecalho_fix}${rodape_cabecalho}`)
@@ -276,7 +276,6 @@ module.exports = async (client, user, interaction) => {
                             .addFields(
                                 {
                                     name: `:thermometer: **${client.tls.phrase(user, "util.tempo.temperatura")}**`,
-                                    name: `:thermometer: **${client.tls.phrase(user, "util.tempo.temperatura")}**`,
                                     value: `${emoji_indica_temp} **${client.tls.phrase(user, "util.server.atual")}**: \`${res.main.temp}°C\``,
                                     inline: true
                                 },
@@ -319,7 +318,7 @@ module.exports = async (client, user, interaction) => {
                             ephemeral: client.decider(user?.conf.ghost_mode, 0)
                         })
                     else
-                        return client.sendDM(user, { embeds: [embed_clima] }, true)
+                        return client.sendDM(user.id, { embeds: [embed_clima] }, true)
                 })
         }) // Erro com a API de clima
         .catch(() => {
@@ -329,6 +328,6 @@ module.exports = async (client, user, interaction) => {
                     ephemeral: true
                 })
             else
-                return client.sendDM(user, { content: client.tls.phrase(user, "util.tempo.aviso_3", client.emoji("emojis_negativos")) }, true)
+                return client.sendDM(user.id, { content: client.tls.phrase(user, "util.tempo.aviso_3", client.emoji("emojis_negativos")) }, true)
         })
 }

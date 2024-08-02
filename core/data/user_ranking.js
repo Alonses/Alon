@@ -21,22 +21,24 @@ module.exports = async ({ client, message, caso }) => {
         await sincroniza_xp(user)
     }
 
-    const user_data = await client.getUser(user.uid) // Salvando a última interação do usuário
+    const user_data = await client.getUser(user.uid, {
+        erase: true,
+        misc: true
+    }) // Salvando a última interação do usuário
 
-    if (user_data.erase.forced)
-        return // Usuário forçou a exclusão de dados
+    if (user_data.erase.forced) return // Usuário forçou a exclusão de dados
 
     let cached_erase = false
 
     if (user_data.erase.valid) { // Usuário interagiu com o Alonsal novamente
-        client.sendDM(user_data, { content: client.tls.phrase(user_data, "manu.data.aviso_remocao_exclusao", client.defaultEmoji("person")) })
+        client.sendDM(user_data.id, { content: client.tls.phrase(user_data, "manu.data.aviso_remocao_exclusao", client.defaultEmoji("person")) })
 
         user_data.erase.valid = false // Retirando a etiqueta para remoção de dados
         cached_erase = true
     }
 
     if (user.erase.valid) { // Usuário interagiu com o Alonsal novamente
-        client.sendDM(user_data, { content: client.tls.phrase(user_data, "manu.data.aviso_remocao_exclusao_servidor", client.defaultEmoji("person"), await (client.guilds(message.guild.id)).name) })
+        client.sendDM(user_data.id, { content: client.tls.phrase(user_data, "manu.data.aviso_remocao_exclusao_servidor", client.defaultEmoji("person"), await (client.guilds(message.guild.id)).name) })
 
         user.erase.valid = false // Retirando a etiqueta para remoção de dados
         cached_erase = true
@@ -60,7 +62,10 @@ module.exports = async ({ client, message, caso }) => {
 
             validador = true
             await user.save()
-            await user_data.save()
+            await client.prisma.userOptionsErase.update({
+                where: { id: user_data.id },
+                data: user_data.erase
+            })
 
             return
         }
@@ -69,7 +74,10 @@ module.exports = async ({ client, message, caso }) => {
             user.warns++
 
             await user.save()
-            await user_data.save()
+            await client.prisma.userOptionsErase.update({
+                where: { id: user_data.erase_id },
+                data: user_data.erase
+            })
 
             return
         }
@@ -104,12 +112,13 @@ module.exports = async ({ client, message, caso }) => {
 
     // Bônus em Bufunfas por subir de nível
     if (parseInt(user.ixp / 1000) !== parseInt(xp_anterior / 1000)) {
-
-        user_data.misc.money += 250
-        await user_data.save()
+        await client.prisma.userOptionsMisc.update({
+            where: { id: user_data.misc_id },
+            data: { money: { increment: 250 } }
+        })
 
         // Registrando as movimentações de bufunfas para o usuário
-        client.registryStatement(user_data.uid, "misc.b_historico.nivel", true, 250)
+        client.registryStatement(user_data.id, "misc.b_historico.nivel", true, 250)
         client.journal("gerado", 250)
     }
 
