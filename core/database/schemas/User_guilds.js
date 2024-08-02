@@ -10,34 +10,38 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("User_guild", schema)
 
-async function registerUserGuild(uid, sid) {
-    if (!await model.exists({ uid: uid, sid: sid }))
-        await model.create({
-            uid: uid,
-            sid: sid
+async function registerUserGuild(client, uid, sid) {
+    const user = await client.prisma.user.findUnique({ where: { id: uid } })
+
+    if (user && !user.guilds.includes(sid))
+        await client.prisma.user.update({
+            where: { id: uid },
+            data: { guilds: { push: sid } }
         })
 }
 
-async function listAllUserGuilds(uid) {
-    return model.find({
-        uid: uid
-    })
+async function listAllUserGuilds(client, uid) {
+    const user = await client.prisma.user.findUnique({ where: { id: uid } })
+
+    return user.guilds
 }
 
 // Remove o registro de um servidor do usuário
-async function dropUserGuild(uid, sid) {
-    if (await model.exists({ uid: uid, sid: sid }))
-        await model.findOneAndDelete({
-            uid: uid,
-            sid: sid
+async function dropUserGuild(client, uid, sid) {
+    const user = await client.prisma.user.findUnique({ where: { id: uid } })
+
+    if (user && !user.guilds.includes(sid))
+        await client.prisma.user.update({
+            where: { id: uid },
+            data: { guilds: { unset: sid } }
         })
 }
 
 // Remove todos os registros com o servidor informado
-async function dropAllUserGuilds(sid) {
-
-    await model.deleteMany({
-        sid: sid
+async function dropAllUserGuilds(client, sid) {
+    await client.prisma.user.updateMany({
+        where: { guilds: { hasEvery: [sid] } },
+        data: { guilds: { unset: sid } }
     })
 }
 

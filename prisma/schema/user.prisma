@@ -1,8 +1,11 @@
 model User {
-  id     String  @id
+  id     String   @id
   lang   String?
-  hoster Boolean @default(false)
+  hoster Boolean  @default(false)
   nick   String?
+  guilds String[] @default([])
+
+  badge UserBadges[]
 
   erase    UserOptionsErase @relation(fields: [erase_id], references: [id])
   erase_id Int              @unique
@@ -76,4 +79,13 @@ model UserOptionsConf {
   resumed       Boolean @default(false)
   cached_guilds Boolean @default(false)
   user          User?
+}
+
+model UserBadges {
+  id        Int @id @default(autoincrement())
+  badge     Int
+  timestamp Int
+
+  user    User?  @relation(fields: [user_id], references: [id])
+  user_id String
 }

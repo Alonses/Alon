@@ -12,31 +12,33 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("Badge", schema)
 
-async function getUserBadges(uid) {
-    return model.find({
-        uid: uid
+async function getUserBadges(client, uid) {
+    return client.prisma.userBadges.findMany({
+        where: { user_id: uid }
+    });
+}
+
+async function createBadge(client, uid, badge_id, timestamp) {
+    await client.prisma.userBadges.create({
+        data: {
+            badge: badge_id,
+            user_id: uid,
+            timestamp: timestamp
+        }
     })
 }
 
-async function createBadge(uid, badge_id, timestamp) {
-    await model.create({
-        uid: uid,
-        badge: badge_id,
-        timestamp: timestamp
+async function removeBadge(client, uid, badge_id) {
+    await client.prisma.userBadges.deleteMany({
+        where: {
+            user_id: uid,
+            badge: badge_id
+        }
     })
 }
 
-async function removeBadge(uid, badge_id) {
-    await model.findOneAndDelete({
-        uid: uid,
-        badge: badge_id
-    })
-}
-
-async function dropAllUserBadges(uid) {
-    await model.deleteMany({
-        uid: uid
-    })
+async function dropAllUserBadges(client, uid) {
+    await client.prisma.userBadges.deleteMany({ where: { user_id: uid } })
 }
 
 async function verifyDynamicBadge(client, alvo, badge_id) {
@@ -53,7 +55,7 @@ async function verifyDynamicBadge(client, alvo, badge_id) {
     const users = {}
 
     // Badges do primeiro colocado no rank de bufunfas
-    await getUserBadges(top_users[0].id)
+    await getUserBadges(client, top_users[0].id)
         .then(badges => {
             badges.forEach(badge => {
                 if (users[top_users[0].id])
