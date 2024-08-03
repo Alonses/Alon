@@ -7,8 +7,7 @@ const { dropAllUserGroups } = require("../database/schemas/User_tasks_group")
 
 const { dataComboRelation } = require("../formatters/patterns/user")
 
-function update_data(user) {
-
+async function update_data(client, user) {
     if (user.badges)
         delete user.badges
 
@@ -24,7 +23,6 @@ function update_data(user) {
 async function clear_data({ client, user, interaction, operador, caso }) {
 
     // Atualizando os dados do usuário
-    user = await update_data(user)
     let value = caso
 
     // Limpa os dados conforme o nível de escolha do usuário
@@ -41,7 +39,7 @@ async function clear_data({ client, user, interaction, operador, caso }) {
                 user.misc.locale = null
 
                 // Desativando todos os módulos de clima do usuário
-                shutdownAllUserModules(user.uid, 0)
+                await shutdownAllUserModules(user.id, 0)
             }
 
             if (alvos[i] === 2) { // Excluindo as redes sociais vinculadas
@@ -59,25 +57,25 @@ async function clear_data({ client, user, interaction, operador, caso }) {
                 user.misc.fixed_badge = null
 
             if (alvos[i] === 5)  // Excluindo o rank de servidores desconhecidos
-                dropUnknownRankServers(client, user.uid)
+                await dropUnknownRankServers(client, user.id)
 
             if (alvos[i] === 6) // Excluindo o rank do servidor
-                dropUserRankServer(user.uid, interaction.guild.id)
+                await dropUserRankServer(user.id, interaction.guild.id)
 
             if (alvos[i] === 7) // Excluindo o rank global
-                dropAllUserGuildRanks(user.uid)
+                await dropAllUserGuildRanks(user.id)
 
             if (alvos[i] === 8) { // Excluindo todas as tarefas e listas de tarefas
-                dropAllUserTasks(user.uid)
-                dropAllUserGroups(user.uid)
+                await dropAllUserTasks(user.id)
+                await dropAllUserGroups(user.id)
             }
 
             if (alvos[i] === 9) // Excluindo todos os módulos
-                dropAllUserModules(user.uid)
+                await dropAllUserModules(client, user.id)
 
             if (alvos[i] === 10) { // Zerando as bufunfas do usuário e limpando o histórico de movimentações
                 user.misc.money = 0
-                dropAllUserStatements(user.uid)
+                await dropAllUserStatements(user.id)
             }
 
             if (alvos[i] === 11) // Dados extras que podem ser excluídos
@@ -90,7 +88,8 @@ async function clear_data({ client, user, interaction, operador, caso }) {
             break
     }
 
-    await user.save()
+    await update_data(client, user)
+    await client.prisma.user.delete({ where: { id: user.id } })
 
     client.tls.report(interaction, user, "manu.data.dados_excluidos", 1, 10, interaction.customId)
 }

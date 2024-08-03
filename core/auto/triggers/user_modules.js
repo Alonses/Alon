@@ -10,9 +10,9 @@ const formata_horas = require('../../formatters/formata_horas.js')
 const lista_modulos = []
 let trava_modulo = false
 
-async function atualiza_modulos() {
+async function atualiza_modulos(client) {
 
-    const dados = await getActiveModules()
+    const dados = await getActiveModules(client)
 
     writeFileSync("./files/data/user_modules.txt", JSON.stringify(dados))
 }
@@ -128,19 +128,19 @@ executa_modulo = async (client) => {
 async function cobra_modulo(client) {
 
     const users = {}, modules = {}, data1 = new Date()
-    const active_modules = await getActiveModules()
+    const active_modules = await getActiveModules(client)
 
     // Somando todos os módulos ativos em chaves únicas por ID de usuário
     active_modules.forEach(modulo => {
 
         // Considera apenas os módulos que são ativos no dia corrente e desconta do usuário
-        if (modulo.stats.days === 2 || week_days[modulo.stats.days]?.includes(data1.getDay()) || modulo.stats.days - 4 === data1.getDay()) {
-            if (users[modulo.uid]) {
-                users[modulo.uid] += modulo.stats.price
-                modules[modulo.uid]++
+        if (modulo.days === 2 || week_days[modulo.days]?.includes(data1.getDay()) || modulo.days - 4 === data1.getDay()) {
+            if (users[modulo.user_id]) {
+                users[modulo.user_id] += modulo.price
+                modules[modulo.user_id]++
             } else {
-                users[modulo.uid] = modulo.stats.price
-                modules[modulo.uid] = 1
+                users[modulo.user_id] = modulo.price
+                modules[modulo.user_id] = 1
             }
         }
     })

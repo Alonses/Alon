@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js')
 
-const { verifyUserModules, createModule } = require('../../../core/database/schemas/User_modules')
+const { verifyUserModules, createModule, updateModule} = require('../../../core/database/schemas/User_modules')
 const { getModulesPrice } = require('../../../core/database/schemas/User_modules')
 
 const { modulePrices } = require('../../../core/formatters/patterns/user')
@@ -24,25 +24,25 @@ module.exports = async ({ client, user, interaction }) => {
     if (type == 0 && !user.misc.locale)
         return client.tls.reply(interaction, user, "misc.modulo.sem_locale", true, client.emoji(0))
 
-    const corpo_modulo = await createModule(interaction.user.id, type)
+    const corpo_modulo = await createModule(client, interaction.user.id, type)
     const timestamp = client.timestamp()
 
     if (modulePrices[type]) // Módulos com preços diferentes
-        corpo_modulo.stats.price = modulePrices[type]
+        corpo_modulo.price = modulePrices[type]
 
-    corpo_modulo.stats.days = interaction.options.getString("when")
-    corpo_modulo.stats.hour = formata_horas(interaction.options.getInteger("hour") || '0', interaction.options.getInteger("minute") || '0')
-    corpo_modulo.stats.timestamp = timestamp
+    corpo_modulo.days = interaction.options.getString("when")
+    corpo_modulo.hour = formata_horas(interaction.options.getInteger("hour") || '0', interaction.options.getInteger("minute") || '0')
+    corpo_modulo.timestamp = timestamp
 
-    await corpo_modulo.save()
+    await updateModule(client, corpo_modulo.id, corpo_modulo)
 
-    const ativacao_modulo = `${client.tls.phrase(user, `misc.modulo.ativacao_${corpo_modulo.stats.days}`)} ${corpo_modulo.stats.hour}`
-    const montante = await getModulesPrice(interaction.user.id)
+    const ativacao_modulo = `${client.tls.phrase(user, `misc.modulo.ativacao_${corpo_modulo.days}`)} ${corpo_modulo.hour}`
+    const montante = await getModulesPrice(client, interaction.user.id)
 
     const embed = new EmbedBuilder()
         .setTitle(client.tls.phrase(user, "misc.modulo.cabecalho_menu"))
         .setColor(client.embed_color(user.misc.color))
-        .setDescription(client.tls.phrase(user, "misc.modulo.descricao", null, [corpo_modulo.stats.price, montante]))
+        .setDescription(client.tls.phrase(user, "misc.modulo.descricao", null, [corpo_modulo.price, montante]))
         .addFields(
             {
                 name: `${client.defaultEmoji("types")} **${client.tls.phrase(user, "misc.modulo.tipo")}**`,
@@ -56,7 +56,7 @@ module.exports = async ({ client, user, interaction }) => {
             },
             {
                 name: `${client.defaultEmoji("money")} **${client.tls.phrase(user, "misc.modulo.valor")}**`,
-                value: `\`B$ ${corpo_modulo.stats.price}\``,
+                value: `\`B$ ${corpo_modulo.price}\``,
                 inline: true
             }
         )

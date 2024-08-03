@@ -1,5 +1,5 @@
 const { atualiza_modulos } = require('../../../auto/triggers/user_modules')
-const { getModule, dropModule } = require('../../../database/schemas/User_modules')
+const { getModule, dropModule, updateModule} = require('../../../database/schemas/User_modules')
 const { moduleDays } = require('../../../formatters/patterns/user')
 
 module.exports = async ({ client, user, interaction, dados }) => {
@@ -23,7 +23,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
         { id: "return_button", name: client.tls.phrase(user, "menu.botoes.retornar"), type: 0, emoji: client.emoji(19), data: "modulos" }
     ], interaction)
 
-    const modulo = await getModule(interaction.user.id, timestamp)
+    const modulo = await getModule(client, interaction.user.id, timestamp)
 
     if (!modulo) // Verificando se o módulo ainda existe
         return interaction.update({
@@ -43,20 +43,17 @@ module.exports = async ({ client, user, interaction, dados }) => {
                 ephemeral: client.decider(user?.conf.ghost_mode, 0)
             })
 
-        modulo.stats.active = true
+        await updateModule(client, modulo.id, { active: true })
 
-        await modulo.save()
-
-        require('../../chunks/verify_module')({ client, user, interaction, dados })
+        await require('../../chunks/verify_module')({client, user, interaction, dados})
     }
 
     if (operacao === 2) {
 
         // Desativando o módulo
-        modulo.stats.active = false
-        await modulo.save()
+        await updateModule(client, modulo.id, { active: false })
 
-        require('../../chunks/verify_module')({ client, user, interaction, dados })
+        await require('../../chunks/verify_module')({client, user, interaction, dados})
     }
 
     if (operacao === 3) {
@@ -65,7 +62,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
         // Filtrando os dias que não estão selecionados
         Object.keys(moduleDays).forEach(dia => {
-            if (parseInt(dia) !== modulo.stats.days)
+            if (parseInt(dia) !== modulo.days)
                 dias.push(dia)
         })
 
@@ -101,7 +98,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     if (operacao === 5) {
 
         // Excluindo o módulo
-        await dropModule(interaction.user.id, modulo.type, timestamp)
+        await dropModule(client, interaction.user.id, modulo.type, timestamp)
 
         return client.reply(interaction, {
             content: client.tls.phrase(user, "misc.modulo.excluido", 13),
@@ -114,5 +111,5 @@ module.exports = async ({ client, user, interaction, dados }) => {
     if (operacao === 6) // Exclusão de módulo cancelada, redirecionando o evento
         return require('../../chunks/verify_module')({ client, user, interaction, dados })
 
-    atualiza_modulos(client) // Atualizando a lista de módulos salvos localmente
+    await atualiza_modulos(client) // Atualizando a lista de módulos salvos localmente
 }

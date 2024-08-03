@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+const {client_data} = require("../../../setup");
 
 const schema = new mongoose.Schema({
     uid: { type: String, default: null },
@@ -15,91 +16,81 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("Module", schema)
 
-async function getActiveModules() {
-    return model.find({
-        "stats.active": true
+async function getActiveModules(client, uid) {
+    const filter = { active: true }
+    if (uid !== undefined) filter.user_id = uid
+
+    return await client.prisma.findMany({ where: filter })
+}
+
+async function createModule(client, uid, type, timestamp) {
+    return client.prisma.userModules.create({
+        data: {
+            user_id: uid,
+            type: type,
+            timestamp: timestamp
+        }
     })
 }
 
-async function createModule(uid, type, timestamp) {
-    await model.create({
-        uid: uid,
-        type: type,
-        "stats.timestamp": timestamp
-    })
-
-    return model.findOne({
-        uid: uid,
-        "stats.timestamp": timestamp
+async function getModule(client, uid, timestamp) {
+    return client.prisma.userModules.findFirst({
+        where: {
+            user_id: uid,
+            timestamp: timestamp
+        }
     })
 }
 
-async function getModule(uid, timestamp) {
-    return model.findOne({
-        uid: uid,
-        "stats.timestamp": timestamp
+async function dropModule(client, uid, type, timestamp) {
+    await client.prisma.userModules.deleteMany({
+        where: {
+            user_id: uid,
+            timestamp: timestamp,
+            type: type
+        }
     })
 }
 
-async function dropModule(uid, type, timestamp) {
-    await model.findOneAndDelete({
-        uid: uid,
-        type: type,
-        "stats.timestamp": timestamp
-    })
+async function dropAllUserModules(client, uid) {
+    await client.prisma.userModules.deleteMany({ where: { user_id: uid } })
 }
 
-async function dropAllUserModules(uid) {
-    await model.deleteMany({
-        uid: uid
-    })
-}
-
-async function verifyUserModules(uid, type) {
-    return model.find({
-        uid: uid,
-        type: type
+async function verifyUserModules(client, uid, type) {
+    return client.prisma.userModules.findMany({
+        where: {
+            user_id: uid,
+            type: type
+        }
     })
 }
 
 // Lista todos os módulos de determinado usuário
-async function listAllUserModules(uid) {
-    return model.find({
-        uid: uid
-    })
+async function listAllUserModules(client, uid) {
+    return client.prisma.user.findUnique({ where: { id: uid } }).modules
 }
 
-async function shutdownAllUserModules(uid, type) {
-    const user_modules = await listAllUserModules(uid)
+async function shutdownAllUserModules(client, uid, type) {
+    const filter = { user_id: uid }
+    if (type !== undefined) filter.type = type
 
-    if (typeof type === "undefined") // Desliga todos os módulos do usuário
-        user_modules.forEach(async modulo => {
-            modulo.stats.active = false
-            await modulo.save()
-        })
-    else // Desliga todos os módulos de um tipo do usuário
-        user_modules.forEach(async modulo => {
-            if (modulo.type === type) {
-                modulo.stats.active = false
-                await modulo.save()
-            }
-        })
+    await client.prisma.userModules.updateMany({
+        where: filter,
+        data: { active: false }
+    })
 }
 
 // Retorna um preço pelos módulos ativos de determinado usuário
-async function getModulesPrice(uid) {
-    let total = 0
-    let modulos = await model.find({
-        uid: uid,
-        "stats.active": true
+async function getModulesPrice(client, uid) {
+    const modules = await getActiveModules(client, uid)
+    return modules.reduce((total, element) => total + element.price, 0)
+}
+
+async function updateModule(client, id, update) {
+    await client.prisma.userModules.update({
+        where: { id: id },
+        data: update
     })
-
-
-    modulos.forEach(element => {
-        total += element.stats.price
-    })
-
-    return total
 }
 
 module.exports.Badge = model
@@ -112,5 +103,6 @@ module.exports = {
     listAllUserModules,
     dropAllUserModules,
     verifyUserModules,
-    shutdownAllUserModules
+    shutdownAllUserModules,
+    updateModule
 }

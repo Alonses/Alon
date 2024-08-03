@@ -75,7 +75,7 @@ module.exports = async ({ client, user, interaction, caso }) => {
                 },
                 {
                     name: "⠀",
-                    value: `:trophy: **Ranking: **\`${bot.persis_ranking} EXP\`\n${client.emoji("carregando")} **${client.tls.phrase(user, "manu.info.modulos_ativos")}: **\`${(await getActiveModules()).length}\``,
+                    value: `:trophy: **Ranking: **\`${bot.persis_ranking} EXP\`\n${client.emoji("carregando")} **${client.tls.phrase(user, "manu.info.modulos_ativos")}: **\`${(await getActiveModules(client)).length}\``,
                     inline: true
                 },
                 {

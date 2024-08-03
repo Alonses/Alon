@@ -7,6 +7,8 @@ model User {
 
   badge UserBadges[]
 
+  modules UserModules[]
+
   erase    UserOptionsErase @relation(fields: [erase_id], references: [id])
   erase_id Int              @unique
 
@@ -85,6 +87,20 @@ model UserBadges {
   id        Int @id @default(autoincrement())
   badge     Int
   timestamp Int
+
+  user    User?  @relation(fields: [user_id], references: [id])
+  user_id String
+}
+
+model UserModules {
+  id        Int     @id @default(autoincrement())
+  type      Int
+  timestamp Int
+  price     Int     @default(20)
+  data      Int?
+  days      Int?
+  hour      String?
+  active    Boolean @default(false)
 
   user    User?  @relation(fields: [user_id], references: [id])
   user_id String

@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js')
 
-const { getModule, dropModule } = require('../../../database/schemas/User_modules')
+const { getModule, dropModule, updateModule} = require('../../../database/schemas/User_modules')
 const { atualiza_modulos } = require('../../../auto/triggers/user_modules')
 
 module.exports = async ({ client, user, interaction, dados }) => {
@@ -8,7 +8,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const operacao = parseInt(dados.split(".")[1])
     const timestamp = parseInt(dados.split(".")[2])
 
-    const modulo = await getModule(interaction.user.id, timestamp)
+    const modulo = await getModule(client, interaction.user.id, timestamp)
 
     if (!modulo)
         return interaction.update({
@@ -23,7 +23,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     // 1 -> Confirmar
 
     if (!operacao) { // Excluindo o módulo salvo em cache
-        await dropModule(interaction.user.id, modulo.type, timestamp)
+        await dropModule(client, interaction.user.id, modulo.type, timestamp)
 
         client.tls.report(interaction, user, "menu.botoes.operacao_cancelada", true, 11, interaction.customId)
     } else {
@@ -54,8 +54,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
         }
 
         // Ativando o módulo
-        modulo.stats.active = true
-        await modulo.save()
+        await updateModule(client, modulo.id, { active: true })
 
         // Botão de atalho para navegar pelos módulos criados
         let row = client.create_buttons([
@@ -63,12 +62,12 @@ module.exports = async ({ client, user, interaction, dados }) => {
         ], interaction)
 
         interaction.update({
-            content: client.tls.phrase(user, "misc.modulo.modulo_ativado", 6, [client.tls.phrase(user, `misc.modulo.ativacao_min_${modulo.stats.days}`), modulo.stats.hour]),
+            content: client.tls.phrase(user, "misc.modulo.modulo_ativado", 6, [client.tls.phrase(user, `misc.modulo.ativacao_min_${modulo.days}`), modulo.hour]),
             embeds: [],
             components: [row],
             ephemeral: true
         })
     }
 
-    atualiza_modulos(client) // Atualizando a lista de módulos salvos localmente
+    await atualiza_modulos(client) // Atualizando a lista de módulos salvos localmente
 }

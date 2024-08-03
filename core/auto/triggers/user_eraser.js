@@ -84,7 +84,7 @@ async function verifica_user_eraser(client) {
                 await dropUserGlobalRank(id_user)
 
                 // Excluindo todos os módulos do usuário
-                await dropAllUserModules(id_user)
+                await dropAllUserModules(client, id_user)
 
                 // Excluindo o histórico de transações bancárias do usuário
                 await dropAllUserStatements(id_user)
@@ -101,7 +101,7 @@ async function verifica_user_eraser(client) {
         }
 
         // Atualizando as solicitações de exclusão em cache
-        atualiza_user_eraser(client)
+        await atualiza_user_eraser(client)
     })
 
     // Verificando os usuários movidos para exclusão por servidor
@@ -136,7 +136,7 @@ async function verifica_user_eraser(client) {
         }
 
         // Atualizando as solicitações de exclusão em cache
-        atualiza_user_eraser(client)
+        await atualiza_user_eraser(client)
     })
 }
 

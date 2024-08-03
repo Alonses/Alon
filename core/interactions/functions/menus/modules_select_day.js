@@ -1,4 +1,4 @@
-const { getModule } = require("../../../database/schemas/User_modules")
+const { getModule, updateModule} = require("../../../database/schemas/User_modules")
 
 module.exports = async ({ client, user, interaction, dados }) => {
 
@@ -6,10 +6,9 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const dia = parseInt(dados.split(".")[2])
 
     // Alterando o dia do módulo
-    const modulo = await getModule(interaction.user.id, timestamp)
-    modulo.stats.days = dia
+    const modulo = await getModule(client, interaction.user.id, timestamp)
 
-    await modulo.save()
+    await updateModule(client, modulo.id, { days: dia })
 
     // Redirecionando o evento
     require('../../chunks/verify_module')({ client, user, interaction, dados })

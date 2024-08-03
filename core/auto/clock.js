@@ -21,40 +21,40 @@ module.exports = async ({ client }) => {
     const date1 = new Date() // Trava o cronometro em um intervalo de 60 segundos
     const tempo_restante = 10 - date1.getSeconds()
 
-    atualiza_warns(client)
-    atualiza_pre_warns(client)
+    await atualiza_warns(client)
+    await atualiza_pre_warns(client)
 
-    atualiza_roles()
-    atualiza_join_guilds(client)
+    await atualiza_roles()
+    await atualiza_join_guilds(client)
 
-    atualiza_modulos()
-    atualiza_fixed_badges(client)
+    await atualiza_modulos(client)
+    await atualiza_fixed_badges(client)
 
-    atualiza_eraser(client)
-    atualiza_user_eraser(client)
+    await atualiza_eraser(client)
+    await atualiza_user_eraser(client)
 
     console.log("📣 | Disparando o relógio interno")
 
     setTimeout(() => internal_clock(client, tempo_restante), 5000)
 }
 
-internal_clock = (client, tempo_restante) => {
+function internal_clock(client, tempo_restante) {
 
-    setTimeout(() => { // Sincronizando os dados do bot
+    setTimeout(async () => { // Sincronizando os dados do bot
 
-        requisita_modulo(client) // Verificando se há modulos agendados para o horário atual
-        verifica_warns(client) // Sincronizando as advertências temporárias
-        verifica_pre_warns(client) // Sincronizando as anotações de advertências temporárias
-        verifica_roles(client) // Sincronizando os cargos temporários
+        await requisita_modulo(client) // Verificando se há modulos agendados para o horário atual
+        await verifica_warns(client) // Sincronizando as advertências temporárias
+        await verifica_pre_warns(client) // Sincronizando as anotações de advertências temporárias
+        await verifica_roles(client) // Sincronizando os cargos temporários
 
         if (client.timestamp() % 600 < 60) { // 10 Minutos
-            sync_dynamic_badges(client) // Sincronizando as badges que são dinâmicas
-            verifica_eraser(client) // Verificando se há dados de servidores que se expiraram
-            verifica_user_eraser(client) // Verificando se há dados de usuários que se expiraram
+            await sync_dynamic_badges(client) // Sincronizando as badges que são dinâmicas
+            await verifica_eraser(client) // Verificando se há dados de servidores que se expiraram
+            await verifica_user_eraser(client) // Verificando se há dados de usuários que se expiraram
         }
 
         if (client.timestamp() % 1800 < 60) // 30 Minutos
-            verifica_servers() // Sincronizando o ranking global dos usuários que ganharam XP
+            await verifica_servers() // Sincronizando o ranking global dos usuários que ganharam XP
 
         internal_clock(client, 60000)
     }, tempo_restante)
