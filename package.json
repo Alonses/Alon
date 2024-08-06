@@ -12,7 +12,7 @@
   "dependencies": {
     "@discordjs/rest": "^1.5.0",
     "@napi-rs/canvas": "^0.1.44",
-    "@prisma/client": "^5.16.1",
+    "@prisma/client": "^5.18.0",
     "country-iso-2-to-3": "^1.1.0",
     "discord.js": "^14.8.0",
     "dotenv": "^16.0.3",
