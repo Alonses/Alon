@@ -25,7 +25,7 @@ module.exports = {
         }),
     async execute({ client, user, interaction }) {
 
-        const votos = await getVotes()
+        const votos = await getVotes(client)
 
         let maior = {
             qtd: 0,

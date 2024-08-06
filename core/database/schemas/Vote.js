@@ -10,22 +10,18 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("Vote", schema)
 
-async function registryVote(uid) {
-
-
-    if (!await model.exists({ uid: uid }))
-        await model.create({
-            uid: uid
-        })
-
-    return model.findOne({
-        uid: uid
+async function registryVote(client, uid) {
+    return await client.prisma.vote.upsert({
+        where: { id: uid },
+        update: { },
+        create: { id: uid }
     })
 }
 
-async function getVotes() {
+async function getVotes(client) {
 
-    const votes = await model.find({}), total = {}
+    const total = { }
+    const votes = await client.prisma.vote.findMany()
     total.qtd = votes.length
 
     // Soma todos os votos registrados
@@ -40,10 +36,8 @@ async function getVotes() {
     return total
 }
 
-async function verifyUser(uid) {
-    return model.findOne({
-        uid: uid
-    })
+async function verifyUser(client, uid) {
+    return await client.prisma.findUnique({ where: { id: uid } })
 }
 
 

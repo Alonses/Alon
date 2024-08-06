@@ -8,7 +8,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     // Bloqueia novos votos após o encerramento
     if (client.timestamp() >= 1692460800) {
 
-        const verify_user = await verifyUser(interaction.user.id)
+        const verify_user = await verifyUser(client, interaction.user.id)
         let texto = client.tls.phrase(user, "inic.vote.encerrada", client.emoji("mc_approve"))
 
         if (verify_user)
@@ -21,12 +21,15 @@ module.exports = async ({ client, user, interaction, dados }) => {
     }
 
     const vote = dados.split(".")[1]
-    const dados_voto = await registryVote(interaction.user.id)
+    await registryVote(client, interaction.user.id)
 
-    dados_voto.vote = vote
-    dados_voto.timestamp = client.timestamp()
-
-    await dados_voto.save()
+    await client.prisma.vote.update({
+        where: { id: interaction.user.id },
+        data: {
+            vote: vote,
+            timestamp: client.timestamp()
+        }
+    })
 
     const all_badges = [], badges_user = await client.getUserBadges(interaction.user.id)
     let badge_bonus = ""

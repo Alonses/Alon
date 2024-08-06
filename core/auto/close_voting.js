@@ -32,7 +32,7 @@ module.exports = async ({ client, estagio }) => {
             text: client.tls.phrase(user, "inic.vote.rodape_encerrado")
         })
 
-    const votos = await getVotes()
+    const votos = await getVotes(client)
 
     if (estagio == 1)
         embed.setDescription(`${client.replace(`${client.tls.phrase(user, "inic.vote.votacao_encerrada_1")}\n\n${client.tls.phrase(user, "inic.vote.votacao_encerrada_3")}`, [votos.qtd, client.emoji("aln_voter"), client.emoji("emojis_dancantes")])}!\n\n:flag_de: :flag_nl: :flag_se: :flag_tr: :flag_jp: :flag_de: :flag_nl: :flag_se: :flag_tr: :flag_jp: :flag_de: :flag_nl: :flag_se: :flag_tr:\n:flag_nl: :flag_se: :flag_tr: :flag_jp: :flag_de: :flag_nl: :flag_se: :flag_tr: :flag_jp: :flag_de: :flag_nl: :flag_se: :flag_tr: :flag_jp:\n:flag_se: :flag_tr: :flag_jp: :flag_de: :flag_nl: :flag_se: :flag_tr: :flag_jp: :flag_de: :flag_nl: :flag_se: :flag_tr: :flag_jp: :flag_de:`)

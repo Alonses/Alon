@@ -11,7 +11,7 @@ module.exports = {
 
         if (!client.x.owners.includes(interaction.user.id)) return
 
-        const votos = await getVotes()
+        const votos = await getVotes(client)
 
         if (client.timestamp() < 1692460800)
             interaction.reply({
