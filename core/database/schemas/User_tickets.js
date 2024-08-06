@@ -12,39 +12,37 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("Ticket", schema)
 
-async function getTicket(sid, uid) {
-    if (!await model.exists({ sid: sid, uid: uid }))
-        await model.create({
-            sid: sid,
-            uid: uid
-        })
+async function getTicket(client, sid, uid) {
+    const filter = {
+        user_id: uid,
+        server_id: sid
+    }
 
-    return model.findOne({
-        sid: sid,
-        uid: uid
+    return client.prisma.userTickets.upsert({
+        where: filter,
+        update: { },
+        create: filter
     })
 }
 
 // Apaga o ticket de denúncia do servidor
-async function dropTicket(sid, uid) {
-    await model.findOneAndDelete({
-        sid: sid,
-        uid: uid
+async function dropTicket(client, sid, uid) {
+    await client.prisma.userTickets.delete({
+        where: {
+            user_id: uid,
+            server_id: sid
+        }
     })
 }
 
 // Apaga todos os tickets criados no servidor
-async function dropAllGuildTickets(sid) {
-    await model.deleteMany({
-        sid: sid
-    })
+async function dropAllGuildTickets(client, sid) {
+    await client.prisma.userTickets.deleteMany({ where: { server_id: sid } })
 }
 
 // Apaga todos os tickets criados por um usuário
 async function dropAllUserTickets(uid) {
-    await model.deleteMany({
-        uid: uid
-    })
+    await client.prisma.userTickets.deleteMany({ where: { user_id: uid } })
 }
 
 module.exports.Ticket = model

@@ -33,36 +33,36 @@ async function verifica_eraser(client) {
             if (client.timestamp() > servidor.erase.timestamp) {
 
                 // Excluindo todos os rankings registrados no servidor
-                await dropAllRankGuild(servidor.sid)
+                await dropAllRankGuild(servidor.server_id)
 
                 // Excluindo todas as advertências criadas no servidor
-                await dropAllGuildWarns(client, servidor.sid)
+                await dropAllGuildWarns(client, servidor.server_id)
 
                 // Excluindo todos os tickets criados no servidor
-                await dropAllGuildTickets(servidor.sid)
+                await dropAllGuildTickets(client, servidor.server_id)
 
                 // Excluindo a configuração de cargos automáticos do servidor
-                await dropRoleAssigner(client, servidor.sid)
+                await dropRoleAssigner(client, servidor.server_id)
 
                 // Excluindo todos os strikes criados no servidor
-                await dropAllGuildStrikes(client, servidor.sid)
+                await dropAllGuildStrikes(client, servidor.server_id)
 
                 // Excluindo todos os servidores salvos em cache que referênciam o servidor excluído
-                await dropAllUserGuilds(servidor.sid)
+                await dropAllUserGuilds(servidor.server_id)
 
                 // Atualizando o reportes gerados no servidor
-                await updateGuildReport(servidor.sid)
+                await updateGuildReport(servidor.server_id)
 
                 // Atualizando os links suspeitos no servidor
-                await updateGuildSuspectLink(client, servidor.sid)
+                await updateGuildSuspectLink(client, servidor.server_id)
 
                 // Exclui o servidor por completo
-                await dropGuild(client, servidor.sid)
+                await dropGuild(client, servidor.server_id)
             }
         }
 
         // Atualizando as solicitações de exclusão em cache
-        atualiza_eraser(client)
+        await atualiza_eraser(client)
     })
 }
 

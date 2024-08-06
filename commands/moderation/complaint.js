@@ -60,11 +60,11 @@ module.exports = {
         if (!guild.tickets.enabled)
             return client.tls.reply(interaction, user, "mode.denuncia.desativado", true, 3)
 
-        const channel = await getTicket(interaction.guild.id, interaction.user.id)
+        const channel = await getTicket(client, interaction.guild.id, interaction.user.id)
         const solicitante = await client.getMemberGuild(interaction, interaction.user.id)
 
         // Buscando os dados do canal no servidor
-        const canal_servidor = interaction.guild.channels.cache.find(c => c.id === channel.cid)
+        const canal_servidor = interaction.guild.channels.cache.find(c => c.id === channel.channel_id)
 
         // Solicitando a função e executando
         require(`./subcommands/complaint_${interaction.options.getSubcommand()}`)({ client, user, interaction, channel, solicitante, canal_servidor })

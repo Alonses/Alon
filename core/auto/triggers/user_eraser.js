@@ -90,7 +90,7 @@ async function verifica_user_eraser(client) {
                 await dropAllUserStatements(id_user)
 
                 // Excluindo todos os tickets criados por um usuário
-                await dropAllUserTickets(id_user)
+                await dropAllUserTickets(client, id_user)
 
                 // Excluindo todos os servidores salvos em cache do usuário
                 await dropAllUserGuilds(id_user)
@@ -115,7 +115,7 @@ async function verifica_user_eraser(client) {
         for (let i = 0; i < data.length; i++) {
 
             const usuario = data[i]
-            const id_user = usuario.uid, id_guild = usuario.sid
+            const id_user = usuario.user_id, id_guild = usuario.server_id
 
             // Apenas realiza a ação após 1 semana do usuário ser movido para exclusão no servidor
             if (client.timestamp() > (usuario.erase.erase_on + 604800)) {
@@ -128,7 +128,7 @@ async function verifica_user_eraser(client) {
                 await dropUserRankServer(id_user, id_guild)
 
                 // Excluindo o ticket criado pelo usuário no servidor
-                await dropTicket(id_user, id_guild)
+                await dropTicket(client, id_user, id_guild)
 
                 // Excluindo o servidor salvo em cache do usuário
                 await dropUserGuild(id_user, id_guild)
