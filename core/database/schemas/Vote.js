@@ -11,6 +11,8 @@ const schema = new mongoose.Schema({
 const model = mongoose.model("Vote", schema)
 
 async function registryVote(uid) {
+
+
     if (!await model.exists({ uid: uid }))
         await model.create({
             uid: uid
