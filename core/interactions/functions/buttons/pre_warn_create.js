@@ -41,11 +41,11 @@ module.exports = async ({ client, user, interaction, dados }) => {
     // Atualizando a lista de anotações criadas
     if (guild.warn.hierarchy_timed) atualiza_pre_warns(client)
 
-    const notas_recebidas = await listAllUserPreWarns(id_alvo, interaction.guild.id)
+    const notas_recebidas = await listAllUserPreWarns(client, id_alvo, interaction.guild.id)
 
     // Verificando se o membro já ultrapassou o número de anotações necessárias para cada advertência 
     const guild_warns = await listAllGuildWarns(client, interaction.guild.id)
-    const user_warns = await listAllUserWarns(id_alvo, interaction.guild.id)
+    const user_warns = await listAllUserWarns(client, id_alvo, interaction.guild.id)
 
     let indice_warn = user_warns.length > guild_warns.length ? user_warns.length - 1 : user_warns.length
     if (indice_warn < 1) indice_warn = 0

@@ -67,8 +67,16 @@ module.exports = async ({ client, user, interaction, guild }) => {
                 }
             }
     } else // Advertências com hierarquia
-        user_warns = await listAllUserPreWarns(guild_member.id, interaction.guild.id)
+        user_warns = await listAllUserPreWarns(client, guild_member.id, interaction.guild.id)
 
     // Redirecionando o evento
-    require('../../../core/formatters/chunks/model_user_warn')({ client, user, interaction, guild, user_warns, guild_member, bot_member })
+    await require('../../../core/formatters/chunks/model_user_warn')({
+        client,
+        user,
+        interaction,
+        guild,
+        user_warns,
+        guild_member,
+        bot_member
+    })
 }

@@ -275,7 +275,7 @@ function internal_functions(client) {
 
     client.getSingleWarnedGuildUser = async (id_guild, escopo) => {
 
-        const warned_users = await (escopo === "warn" ? checkUserGuildWarned(id_guild) : checkUserGuildPreWarned(id_guild)), usuarios_validos = []
+        const warned_users = await (escopo === "warn" ? checkUserGuildWarned(client, id_guild) : checkUserGuildPreWarned(client, id_guild)), usuarios_validos = []
         let warned_cache = []
 
         for (let i = 0; i < warned_users.length; i++)

@@ -2,7 +2,7 @@ const { EmbedBuilder } = require('discord.js')
 
 const { getUserWarn, listAllUserWarns } = require('../../database/schemas/User_warns')
 const { listAllGuildWarns } = require('../../database/schemas/Guild_warns')
-const { getUserPreWarn, listAllUserPreWarns } = require('../../database/schemas/User_pre_warns')
+const { getUserPreWarn, listAllUserPreWarns, updatePreWarn } = require('../../database/schemas/User_pre_warns')
 
 const { spamTimeoutMap, defaultEraser } = require('../patterns/timeout')
 const { default_emoji } = require('../../../files/json/text/emojis.json')
@@ -18,7 +18,7 @@ module.exports = async ({ client, user, interaction, guild, user_warns, guild_me
         if (user_warns.length < guild_warns.length) user_warn = await getUserWarn(guild_member.id, interaction.guild.id, client.timestamp())
         else user_warn = user_warns[user_warns.length - 1]
     } else {
-        user_warn = await getUserPreWarn(guild_member.id, interaction.guild.id, client.timestamp())
+        user_warn = await getUserPreWarn(client, guild_member.id, interaction.guild.id, client.timestamp())
         id_warn = "pre_warn_create"
     }
 
@@ -33,7 +33,7 @@ module.exports = async ({ client, user, interaction, guild, user_warns, guild_me
     user_warn.assigner_nick = interaction.user.username
     user_warn.timestamp = client.timestamp()
 
-    user_warn.save()
+    await updatePreWarn(client, user_warn)
 
     const embed = new EmbedBuilder()
         .setTitle(`${!guild.warn.hierarchy.status ? client.tls.phrase(user, "mode.warn.criando_advertencia") : client.tls.phrase(user, "mode.anotacoes.nova_anotacao")} :inbox_tray:`)
@@ -73,7 +73,7 @@ module.exports = async ({ client, user, interaction, guild, user_warns, guild_me
     } else {
 
         // Coletando todas as anotações de advertência criadas para o membro no servidor
-        const user_notes = await listAllUserPreWarns(guild_member.id, interaction.guild.id)
+        const user_notes = await listAllUserPreWarns(client, guild_member.id, interaction.guild.id)
         const notas_requeridas = guild_warns[indice_warn].strikes !== 0 ? guild_warns[indice_warn].strikes : guild.warn.hierarchy.strikes
 
         embed.addFields(

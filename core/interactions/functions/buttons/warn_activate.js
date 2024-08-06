@@ -44,8 +44,10 @@ module.exports = async ({ client, user, interaction, dados }) => {
         // Excluindo a advertência registrada em cache
         user_warns[user_warns.length - 1].delete()
 
-        const user_notes = await listAllUserPreWarns(id_alvo, interaction.guild.id)
-        user_notes.forEach(note => note.delete())
+        const user_notes = await listAllUserPreWarns(client, id_alvo, interaction.guild.id)
+        for (const note of user_notes) {
+            await client.prisma.userPreWarns.delete({ where: { id: note.id }});
+        }
 
         return interaction.update({ content: client.tls.phrase(user, "mode.anotacoes.advertencia_cancelada", 13), components: [] })
 
@@ -71,16 +73,16 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
         // Aplicando a advertência
         const user_warn = user_warns[user_warns.length - 1]
-        const user_notes = await listAllUserPreWarns(id_alvo, interaction.guild.id)
+        const user_notes = await listAllUserPreWarns(client, id_alvo, interaction.guild.id)
 
         let registro_notas = []
 
-        user_notes.forEach(nota => {
+        for (const nota of user_notes) {
             registro_notas.push(`${nota.assigner_nick} -> ${nota.relatory}\n${new Date(nota.timestamp * 1000).toLocaleString("pt-BR", { hour12: false })}`)
 
             // Removendo a anotação do membro
-            nota.delete()
-        })
+            await client.prisma.userPreWarns.delete({ where: { id: nota.id } })
+        }
 
         user_warn.valid = true
         user_warn.assigner = interaction.user.id

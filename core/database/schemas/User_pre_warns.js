@@ -17,82 +17,97 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("User_pre_warn", schema)
 
-async function getUserPreWarn(uid, sid, timestamp) {
-
-    if (!await model.exists({ uid: uid, sid: sid, timestamp: timestamp }))
-        await model.create({
-            uid: uid,
-            sid: sid,
-            timestamp: timestamp
-        })
-
-    return model.findOne({
-        uid: uid,
-        sid: sid,
+async function getUserPreWarn(client, uid, sid, timestamp) {
+    const filter = {
+        user_id: uid,
+        server_id: sid,
         timestamp: timestamp
-    })
+    }
+
+    const preWarn = await client.prisma.userPreWarns.findFirst({ where: filter })
+    if (!preWarn) return client.prisma.userPreWarns.create({ data: filter });
+
+    return preWarn
 }
 
-async function checkUserGuildPreWarned(sid) {
+async function checkUserGuildPreWarned(client, sid) {
 
     // Listando apenas os usuários que possuem anotações de advertência registradas no servidor
-    return model.find({
-        sid: sid,
-        valid: true
-    }).limit(50)
+    return client.prisma.userPreWarns.findMany({
+        where: {
+            server_id: sid,
+            valid: true
+        },
+        take: 50
+    })
 }
 
-async function listAllUserPreWarns(uid, sid) {
+async function listAllUserPreWarns(client, uid, sid) {
 
     // Listando todas as anotações de advertência que um usuário recebeu em um servidor
-    return model.find({
-        uid: uid,
-        sid: sid,
-        valid: true
+    return client.prisma.userPreWarns.findMany({
+        where: {
+            server_id: sid,
+            user_id: uid,
+            valid: true
+        }
     })
 }
 
-async function listAllGuildPreWarns(sid) {
+async function listAllGuildPreWarns(client, sid) {
 
     // Lista todas as anotações de advertência válidas do servidor
-    return model.find({
-        sid: sid,
-        valid: true
+    return client.prisma.userPreWarns.findMany({
+        where: {
+            server_id: sid,
+            valid: true
+        }
     })
 }
 
-async function listAllCachedUserPreWarns(uid, sid) {
+async function listAllCachedUserPreWarns(client, uid, sid) {
 
     // Listando as anotações de advertência em cache do usuário
-    return model.find({
-        uid: uid,
-        sid: sid,
-        valid: false
+    return client.prisma.userPreWarns.findMany({
+        where: {
+            server_id: sid,
+            user_id: uid,
+            valid: false
+        }
     })
 }
 
-async function removeUserPreWarn(uid, sid, timestamp) {
-    await model.findOneAndDelete({
-        uid: uid,
-        sid: sid,
-        timestamp: timestamp
+async function removeUserPreWarn(client, uid, sid, timestamp) {
+    await client.prisma.userPreWarns.deleteMany({
+        where: {
+            user_id: uid,
+            server_id: sid,
+            timestamp: timestamp
+        }
     })
 }
 
-async function dropAllUserGuildPreWarns(uid, sid) {
+async function dropAllUserGuildPreWarns(client, uid, sid) {
 
     // Remove todas as anotações de advertência que o usuário recebeu no servidor
-    await model.deleteMany({
-        uid: uid,
-        sid: sid
+    await client.prisma.userPreWarns.deleteMany({
+        where: {
+            user_id: uid,
+            server_id: sid
+        }
     })
 }
 
-async function dropAllGuildPreWarns(sid) {
+async function dropAllGuildPreWarns(client, sid) {
 
     // Remove todas as anotações de advertência registradas no servidor
-    await model.deleteMany({
-        sid: sid
+    await client.prisma.userPreWarns.deleteMany({ where: { server_id: sid  } })
+}
+
+async function updatePreWarn(client, preWarn){
+    await client.prisma.userPreWarns.update({
+        where: { id: preWarn.id },
+        data: preWarn
     })
 }
 
@@ -105,5 +120,6 @@ module.exports = {
     removeUserPreWarn,
     listAllCachedUserPreWarns,
     dropAllUserGuildPreWarns,
-    dropAllGuildPreWarns
+    dropAllGuildPreWarns,
+    updatePreWarn
 }

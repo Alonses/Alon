@@ -51,3 +51,9 @@ model Game {
   price       Float   @default(0)
   expire      Int?
 }
+
+model Vote {
+  user_id   String  @id
+  vote      String?
+  timestamp Int?
+}

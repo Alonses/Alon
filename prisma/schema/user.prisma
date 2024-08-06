@@ -5,9 +5,11 @@ model User {
   nick   String?
   guilds String[] @default([])
 
-  badge UserBadges[]
-
-  modules UserModules[]
+  badge      UserBadges[]
+  modules    UserModules[]
+  warns      UserWarns[]
+  pre_warns  UserPreWarns[]
+  statements UserStatement[]
 
   erase    UserOptionsErase @relation(fields: [erase_id], references: [id])
   erase_id Int              @unique
@@ -23,6 +25,12 @@ model User {
 
   conf    UserOptionsConf @relation(fields: [conf_id], references: [id])
   conf_id Int             @unique
+
+  rank_global    UserRankGlobal @relation(fields: [rank_global_id], references: [id])
+  rank_global_id Int            @unique
+
+  rank_guild    UserRankGuild @relation(fields: [rank_guild_id], references: [id])
+  rank_guild_id Int           @unique
 }
 
 model UserOptionsErase {
@@ -83,6 +91,28 @@ model UserOptionsConf {
   user          User?
 }
 
+model UserRankGlobal {
+  id        Int     @id @default(autoincrement())
+  server_id String?
+  nickname  String?
+  xp        Int     @default(0)
+  user      User?
+}
+
+model UserRankGuild {
+  id                Int     @id @default(autoincrement())
+  server_id         String?
+  nickname          String?
+  lastInteraction   Int?
+  warns             Int     @default(0)
+  caldeira_de_ceira Boolean @default(false)
+  xp                Int     @default(0)
+  ixp               Int     @default(0)
+  erase_valid       Boolean @default(false)
+  erase_on          Int?
+  user              User?
+}
+
 model UserBadges {
   id        Int @id @default(autoincrement())
   badge     Int
@@ -104,4 +134,112 @@ model UserModules {
 
   user    User?  @relation(fields: [user_id], references: [id])
   user_id String
+}
+
+model UserPreWarns {
+  id            Int     @id @default(autoincrement())
+  server_id     String
+  valid         Boolean @default(false)
+  timeout       Boolean @default(true)
+  nick          String?
+  assigner      String?
+  assigner_nick String?
+  relatory      String?
+  timestamp     Int
+
+  user    User?  @relation(fields: [user_id], references: [id])
+  user_id String
+}
+
+model UserWarns {
+  id            Int     @id @default(autoincrement())
+  server_id     String
+  nick          String?
+  hierarchy     Boolean @default(false)
+  valid         Boolean @default(false)
+  timeout       Boolean @default(true)
+  assigner      String?
+  assigner_nick String?
+  relatory      String?
+  timestamp     Int
+
+  user    User?  @relation(fields: [user_id], references: [id])
+  user_id String
+}
+
+model UserReports {
+  user_id   String
+  server_id String
+
+  nick        String?
+  issuer      String?
+  issuer_nick String?
+  relatory    String?
+  timestamp   Int?
+  archived    Boolean @default(false)
+  auto        Boolean @default(false)
+
+  @@id([user_id, server_id])
+}
+
+model UserRoles {
+  user_id   String
+  server_id String
+  role_id   String
+
+  nick          String?
+  valid         Boolean @default(false)
+  timeout       Int     @default(5)
+  assigner      String?
+  assigner_nick String?
+  relatory      String?
+  timestamp     Int?
+
+  @@id([user_id, server_id, role_id])
+}
+
+model UserStatement {
+  id        Int     @id @default(autoincrement())
+  operation String?
+  type      Boolean @default(false)
+  value     Float   @default(0)
+  timestamp Int?
+
+  user    User?  @relation(fields: [user_id], references: [id])
+  user_id String
+}
+
+model UserStrikes {
+  user_id   String
+  server_id String
+  strikes   Int    @default(0)
+
+  @@id([user_id, server_id])
+}
+
+model UserTasks {
+  id          Int     @id @default(autoincrement())
+  user_id     String
+  server_id   String
+  text        String
+  timestamp   Int
+  g_timestamp Int?
+  concluded   Boolean @default(false)
+}
+
+model UserTasksGroup {
+  id        Int    @id @default(autoincrement())
+  user_id   String
+  server_id String
+  name      String
+  timestamp Int
+}
+
+model UserTickets {
+  user_id   String
+  server_id String
+
+  channel_id String?
+
+  @@id([user_id, server_id])
 }

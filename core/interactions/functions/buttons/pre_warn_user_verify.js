@@ -21,10 +21,10 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
     if (escolha === 1) {
 
-        const row = [], user_warns = await listAllUserPreWarns(id_alvo, interaction.guild.id)
+        const row = [], user_warns = await listAllUserPreWarns(client, id_alvo, interaction.guild.id)
 
         // Removendo a advertência do usuário e verificando os cargos do mesmo
-        removeUserPreWarn(id_alvo, interaction.guild.id, timestamp)
+        await removeUserPreWarn(client, id_alvo, interaction.guild.id, timestamp)
 
         if (user_warns.length - 1 > 0)
             row.push({ id: "pre_warn_user_verify", name: client.tls.phrase(user, "menu.botoes.remover_outras"), type: 0, emoji: client.emoji(41), data: `11|${id_alvo}` })
@@ -54,7 +54,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
         })
     } else if (escolha === 9) {
 
-        const user_note = await getUserPreWarn(id_alvo, interaction.guild.id, timestamp)
+        const user_note = await getUserPreWarn(client, id_alvo, interaction.guild.id, timestamp)
         let motivo_remocao = ""
 
         if (interaction.options?.getString("reason"))
@@ -103,5 +103,5 @@ module.exports = async ({ client, user, interaction, dados }) => {
     if (escolha === 11) pagina_guia = 0
 
     dados = { id: id_alvo }
-    require('../../chunks/panel_guild_browse_pre_warns')({ client, user, interaction, dados, pagina_guia })
+    await require('../../chunks/panel_guild_browse_pre_warns')({client, user, interaction, dados, pagina_guia})
 }
