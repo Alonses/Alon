@@ -2,7 +2,7 @@ const { EmbedBuilder } = require('discord.js')
 
 const { listAllGuildWarns } = require('../../../database/schemas/Guild_warns')
 const { listAllUserPreWarns, listAllCachedUserPreWarns } = require('../../../database/schemas/User_pre_warns')
-const { listAllUserWarns, getUserWarn, listAllUserCachedHierarchyWarns } = require('../../../database/schemas/User_warns')
+const { listAllUserWarns, getUserWarn, listAllUserCachedHierarchyWarns, updateWarn} = require('../../../database/schemas/User_warns')
 
 const { atualiza_pre_warns } = require('../../../auto/triggers/guild_pre_warns')
 
@@ -104,15 +104,13 @@ module.exports = async ({ client, user, interaction, dados }) => {
     })
 
     // Verificando se há cards aguardando aprovação já enviados
-    if ((await listAllUserCachedHierarchyWarns(id_alvo, interaction.guild.id)).length > 0) return
+    if ((await listAllUserCachedHierarchyWarns(client, id_alvo, interaction.guild.id)).length > 0) return
 
     if (notas_recebidas.length >= notas_requeridas) {
 
         // Criando um card de advertência hierárquica ao membro
-        const hierarchy_warn = await getUserWarn(id_alvo, interaction.guild.id, client.timestamp())
-
-        hierarchy_warn.hierarchy = true
-        hierarchy_warn.save()
+        const hierarchy_warn = await getUserWarn(client, id_alvo, interaction.guild.id, client.timestamp())
+        await updateWarn(client, hierarchy_warn.id, { hierarchy: true })
 
         const embed = new EmbedBuilder()
             .setTitle(client.tls.phrase(guild, "mode.anotacoes.aplicar_advertencia"))

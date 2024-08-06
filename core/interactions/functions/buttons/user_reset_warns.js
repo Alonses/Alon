@@ -13,7 +13,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     if (escolha === 1) {
 
         // Removendo os warns do usuário no servidor
-        dropAllUserGuildWarns(id_alvo, interaction.guild.id)
+        await dropAllUserGuildWarns(client, id_alvo, interaction.guild.id)
     }
 
     if (escolha === 2) {
@@ -31,5 +31,5 @@ module.exports = async ({ client, user, interaction, dados }) => {
     }
 
     const id_cache = id_alvo
-    require('../../chunks/verify_user')({ client, user, interaction, id_cache })
+    await require('../../chunks/verify_user')({client, user, interaction, id_cache})
 }

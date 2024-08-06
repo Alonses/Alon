@@ -22,14 +22,14 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
     } else if (operacao === 1) {
 
-        const user_warn = await listAllUserWarns(id_alvo, interaction.guild.id)
+        const user_warn = await listAllUserWarns(client, id_alvo, interaction.guild.id)
 
         // Removendo os warns e os cargos de advertências do usuário no servidor
-        await dropAllUserGuildWarns(id_alvo, interaction.guild.id)
+        await dropAllUserGuildWarns(client, id_alvo, interaction.guild.id)
         client.verifyUserWarnRoles(id_alvo, interaction.guild.id, 10)
 
         // Verificando se há outros usuários com advertência no servidor para poder continuar editando
-        let advertencias_server = await checkUserGuildWarned(id_guild), row
+        let advertencias_server = await checkUserGuildWarned(client, id_guild), row
 
         const obj = {
             content: client.tls.phrase(user, "mode.warn.advertencias_removidas", 10),
@@ -90,7 +90,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
     } else if (operacao === 3) {
         // Menu para navegar entre os usuários advertidos
-        const advertencias_server = await checkUserGuildWarned(interaction.guild.id)
+        const advertencias_server = await checkUserGuildWarned(client, interaction.guild.id)
 
         if (advertencias_server.length < 1)
             return client.tls.reply(interaction, user, "mode.warns.sem_warns", true, 1)

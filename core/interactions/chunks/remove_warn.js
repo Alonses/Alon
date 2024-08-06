@@ -8,7 +8,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const timestamp = dados.split(".")[1]
     const pagina = dados.split(".")[2]
 
-    let alvo = await getUserWarn(id_alvo, interaction.guild.id, timestamp)
+    let alvo = await getUserWarn(client, id_alvo, interaction.guild.id, timestamp)
 
     const embed = new EmbedBuilder()
         .setTitle(client.tls.phrase(user, "mode.warn.remover_advertencia"))
@@ -17,7 +17,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
         .addFields(
             {
                 name: `:bust_in_silhouette: **${client.tls.phrase(user, "mode.report.usuario")}**`,
-                value: `${client.emoji("icon_id")} \`${alvo.uid}\`\n( <@${alvo.uid}> )`,
+                value: `${client.emoji("icon_id")} \`${alvo.user_id}\`\n( <@${alvo.user_id}> )`,
                 inline: true
             },
             {

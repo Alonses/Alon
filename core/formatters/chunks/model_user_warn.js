@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js')
 
-const { getUserWarn, listAllUserWarns } = require('../../database/schemas/User_warns')
+const { getUserWarn, listAllUserWarns, updateWarn} = require('../../database/schemas/User_warns')
 const { listAllGuildWarns } = require('../../database/schemas/Guild_warns')
 const { getUserPreWarn, listAllUserPreWarns, updatePreWarn } = require('../../database/schemas/User_pre_warns')
 
@@ -14,26 +14,27 @@ module.exports = async ({ client, user, interaction, guild, user_warns, guild_me
 
     let texto_rodape = "⠀", user_warn, id_warn = "warn_create"
 
+    const warns_recebidos = await listAllUserWarns(client, guild_member.id, interaction.guild.id)
+    const indice_warn = warns_recebidos.length >= guild_warns.length ? guild_warns.length - 1 : warns_recebidos.length
+
+    const update = {
+        valid: false,
+        relatory: descricao_warn,
+        nick: guild_member.user.username,
+        assigner: interaction.user.id,
+        assigner_nick: interaction.user.username,
+        timestamp: client.timestamp()
+    }
+
     if (!guild.warn.hierarchy.status) {
-        if (user_warns.length < guild_warns.length) user_warn = await getUserWarn(guild_member.id, interaction.guild.id, client.timestamp())
+        if (user_warns.length < guild_warns.length) user_warn = await getUserWarn(client, guild_member.id, interaction.guild.id, client.timestamp())
         else user_warn = user_warns[user_warns.length - 1]
+        await updateWarn(client, user_warn.id, update)
     } else {
         user_warn = await getUserPreWarn(client, guild_member.id, interaction.guild.id, client.timestamp())
         id_warn = "pre_warn_create"
+        await updatePreWarn(client, user_warn.id, update)
     }
-
-    const warns_recebidos = await listAllUserWarns(guild_member.id, interaction.guild.id)
-    const indice_warn = warns_recebidos.length >= guild_warns.length ? guild_warns.length - 1 : warns_recebidos.length
-
-    // Atualizando os dados da advertência do usuário
-    user_warn.valid = false
-    user_warn.relatory = descricao_warn
-    user_warn.nick = guild_member.user.username
-    user_warn.assigner = interaction.user.id
-    user_warn.assigner_nick = interaction.user.username
-    user_warn.timestamp = client.timestamp()
-
-    await updatePreWarn(client, user_warn)
 
     const embed = new EmbedBuilder()
         .setTitle(`${!guild.warn.hierarchy.status ? client.tls.phrase(user, "mode.warn.criando_advertencia") : client.tls.phrase(user, "mode.anotacoes.nova_anotacao")} :inbox_tray:`)
@@ -42,7 +43,7 @@ module.exports = async ({ client, user, interaction, guild, user_warns, guild_me
         .addFields(
             {
                 name: `:bust_in_silhouette: **${client.tls.phrase(user, "mode.report.usuario")}**`,
-                value: `${client.emoji("icon_id")} \`${guild_member.id}\`\n${client.emoji("mc_name_tag")} \`${user_warn.nick}\`\n( <@${guild_member.id}> )`,
+                value: `${client.emoji("icon_id")} \`${guild_member.id}\`\n${client.emoji("mc_name_tag")} \`${update.nick}\`\n( <@${guild_member.id}> )`,
                 inline: true
             },
             {

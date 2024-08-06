@@ -8,7 +8,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const id_alvo = dados.split(".")[0]
     const pagina = dados.split(".")[3]
 
-    const user_warns = await listAllUserWarns(id_alvo, interaction.guild.id)
+    const user_warns = await listAllUserWarns(client, id_alvo, interaction.guild.id)
     const member_guild = await client.getMemberGuild(interaction, id_alvo)
     const guild_warns = await listAllGuildWarns(client, interaction.guild.id)
 

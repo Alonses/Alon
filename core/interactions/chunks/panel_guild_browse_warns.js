@@ -5,7 +5,7 @@ const { listAllUserWarns } = require('../../database/schemas/User_warns')
 module.exports = async ({ client, user, interaction, dados }) => {
 
     let member = interaction.options?.getUser("user") || dados
-    const user_warns = await listAllUserWarns(member.id, interaction.guild.id)
+    const user_warns = await listAllUserWarns(client, member.id, interaction.guild.id)
 
     if (user_warns.length < 1)
         return interaction.reply({
@@ -25,7 +25,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     let counter = 0
 
     user_warns.forEach(warn => {
-        botoes.push({ id: "warn_user_verify", name: `${counter + 1}°`, emoji: client.defaultEmoji("guard"), type: 1, data: `9|${warn.uid}.${warn.timestamp}` })
+        botoes.push({ id: "warn_user_verify", name: `${counter + 1}°`, emoji: client.defaultEmoji("guard"), type: 1, data: `9|${warn.user_id}.${warn.timestamp}` })
         counter++
     })
 

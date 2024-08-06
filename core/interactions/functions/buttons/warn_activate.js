@@ -22,7 +22,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
     // Verificando se o membro já ultrapassou o número de anotações necessárias para cada advertência 
     const guild_warns = await listAllGuildWarns(client, interaction.guild.id)
-    let user_warns = await listAllUserWarns(id_alvo, interaction.guild.id)
+    let user_warns = await listAllUserWarns(client, id_alvo, interaction.guild.id)
 
     let indice_warn = user_warns.length > guild_warns.length ? user_warns.length - 1 : user_warns.length
     if (indice_warn < 1) indice_warn = 0
@@ -35,7 +35,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
             })
 
     // Rascunhos de advertências salvas em cache
-    user_warns = await listAllUserCachedHierarchyWarns(id_alvo, interaction.guild.id)
+    user_warns = await listAllUserCachedHierarchyWarns(client, id_alvo, interaction.guild.id)
 
     if (user_warns.length < 1) return
 

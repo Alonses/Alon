@@ -18,84 +18,102 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("Warn", schema)
 
-async function getUserWarn(uid, sid, timestamp) {
+async function getUserWarn(client, uid, sid, timestamp) {
 
-    if (!await model.exists({ uid: uid, sid: sid, timestamp: timestamp }))
-        await model.create({
-            uid: uid,
-            sid: sid,
-            timestamp: timestamp
-        })
-
-    return model.findOne({
-        uid: uid,
-        sid: sid,
+    const filter = {
+        user_id: uid,
+        server_id: sid,
         timestamp: timestamp
-    })
+    }
+
+    const warn = await client.prisma.userWarns.findFirst({ where: filter })
+
+    if (!warn) return client.prisma.userWarns.create(filter);
+
+    return warn
 }
 
-async function checkUserGuildWarned(sid) {
+async function checkUserGuildWarned(client, sid) {
 
     // Listando apenas os usuários que possuem advertências registradas no servidor
-    return model.find({
-        sid: sid,
-        valid: true
-    }).limit(50)
-}
-
-async function listAllUserWarns(uid, sid) {
-
-    // Listando todas as advertências que um usuário recebeu em um servidor
-    return model.find({
-        uid: uid,
-        sid: sid,
-        valid: true
+    return client.prisma.userWarns.findMany({
+        where: {
+            server_id: sid,
+            valid: true
+        },
+        take: 50
     })
 }
 
-async function listAllUserCachedHierarchyWarns(uid, sid) {
+async function listAllUserWarns(client, uid, sid) {
 
     // Listando todas as advertências que um usuário recebeu em um servidor
-    return model.find({
-        uid: uid,
-        sid: sid,
-        hierarchy: true,
-        valid: false
+    return client.prisma.userWarns.findMany({
+        where: {
+            user_id: uid,
+            server_id: sid,
+            valid: true
+        }
     })
 }
 
-async function listAllCachedUserWarns(uid, sid) {
+async function listAllUserCachedHierarchyWarns(client, uid, sid) {
+
+    // Listando todas as advertências que um usuário recebeu em um servidor
+    return client.prisma.userWarns.findMany({
+        where: {
+            user_id: uid,
+            server_id: sid,
+            hierarchy: true,
+            valid: false
+        }
+    })
+}
+
+async function listAllCachedUserWarns(client, uid, sid) {
 
     // Listando as advertências em cache do usuário
-    return model.find({
-        uid: uid,
-        sid: sid,
-        valid: false
+    return client.prisma.userWarns.findMany({
+        where: {
+            user_id: uid,
+            server_id: sid,
+            valid: false
+        }
     })
 }
 
-async function removeUserWarn(uid, sid, timestamp) {
-    await model.findOneAndDelete({
-        uid: uid,
-        sid: sid,
-        timestamp: timestamp
+async function removeUserWarn(client, uid, sid, timestamp) {
+
+    await client.prisma.userWarns.deleteMany({
+        where: {
+            user_id: uid,
+            server_id: sid,
+            timestamp: timestamp
+        }
     })
 }
 
-async function dropAllUserGuildWarns(uid, sid) {
+async function dropAllUserGuildWarns(client, uid, sid) {
 
     // Remove todas as advertências que o usuário recebeu no servidor
-    await model.deleteMany({
-        uid: uid,
-        sid: sid
+    await client.prisma.userWarns.deleteMany({
+        where: {
+            user_id: uid,
+            server_id: sid
+        }
     })
 }
 
-async function dropAllGuildWarns(sid) {
+async function dropAllGuildWarns(client, sid) {
 
     // Remove todas as advertências registradas no servidor
-    await model.deleteMany({
-        sid: sid
+    await client.prisma.userWarns.deleteMany({ where: { server_id: sid } })
+}
+
+async function updateWarn(client, id, update) {
+    await client.prisma.userWarns.update({
+        where: { id: id },
+        data: update
     })
 }
 
@@ -108,5 +126,6 @@ module.exports = {
     removeUserWarn,
     listAllCachedUserWarns,
     dropAllUserGuildWarns,
-    dropAllGuildWarns
+    dropAllGuildWarns,
+    updateWarn
 }

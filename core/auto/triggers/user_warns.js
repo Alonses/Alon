@@ -11,7 +11,7 @@ async function atualiza_warns(client) {
     const warns = []
 
     for (const guild of dados) {
-        const guild_warns = await checkUserGuildWarned(guild.id)
+        const guild_warns = await checkUserGuildWarned(client, guild.id)
 
         // Listando todas as advertências do servidor
         guild_warns.forEach(warn => { warns.push(warn) })
@@ -34,22 +34,22 @@ async function verifica_warns(client) {
         for (let i = 0; i < data.length; i++) {
 
             const warn = data[i]
-            const guild = guilds_map[warn.sid] ? guilds_map[warn.sid] : await client.getGuild(warn.sid, { warn: true })
+            const guild = guilds_map[warn.server_id] ? guilds_map[warn.server_id] : await client.getGuild(warn.server_id, { warn: true })
 
-            if (!guilds_map[warn.sid]) // Salvando a guild em cache
-                guilds_map[warn.sid] = guild
+            if (!guilds_map[warn.server_id]) // Salvando a guild em cache
+                guilds_map[warn.server_id] = guild
 
             // Verificando se a advertência ultrapassou o tempo de exclusão
             if (client.timestamp() > (warn.timestamp + spamTimeoutMap[guild.warn.reset])) {
 
                 // Excluindo o registro da advertência caso tenha zerado e verificando os cargos do usuário
-                await removeUserWarn(warn.uid, warn.sid, warn.timestamp)
-                client.verifyUserWarnRoles(warn.uid, warn.sid)
+                await removeUserWarn(client, warn.user_id, warn.server_id, warn.timestamp)
+                client.verifyUserWarnRoles(warn.user_id, warn.server_id)
             }
         }
 
         // Atualizando as advertências em cache
-        atualiza_warns(client)
+        await atualiza_warns(client)
     })
 }
 

@@ -20,11 +20,11 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
     if (escolha === 1) {
 
-        const row = [], user_warn = await getUserWarn(id_alvo, interaction.guild.id, timestamp)
-        const user_warns = await listAllUserWarns(id_alvo, interaction.guild.id)
+        const row = [], user_warn = await getUserWarn(client, id_alvo, interaction.guild.id, timestamp)
+        const user_warns = await listAllUserWarns(client, id_alvo, interaction.guild.id)
 
         // Removendo a advertência do usuário e verificando os cargos do mesmo
-        user_warn.delete()
+        await client.prisma.userWarns.delete({ where: { id: user_warn.id } })
         client.verifyUserWarnRoles(id_alvo, interaction.guild.id)
 
         if (user_warns.length - 1 > 0)
@@ -99,7 +99,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
         if (escolha === 4) // Inverte o valor para manter ou não o motivo para uso em outras advertências
             client.cached.warns.get(interaction.user.id).keep = !client.cached.warns.get(interaction.user.id).keep
 
-        const user_warn = await getUserWarn(id_alvo, interaction.guild.id, timestamp)
+        const user_warn = await getUserWarn(client, id_alvo, interaction.guild.id, timestamp)
         let motivo_remocao = ""
 
         if (client.cached.warns.has(interaction.user.id))
@@ -148,5 +148,5 @@ module.exports = async ({ client, user, interaction, dados }) => {
     }
 
     dados = { id: id_alvo }
-    require('../../chunks/panel_guild_browse_warns')({ client, user, interaction, dados })
+    await require('../../chunks/panel_guild_browse_warns')({client, user, interaction, dados})
 }

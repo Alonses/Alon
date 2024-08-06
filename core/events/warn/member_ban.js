@@ -29,6 +29,6 @@ module.exports = async ({ client, user, interaction, guild, user_warn, guild_mem
         reason: user_warn.relatory,
         deleteMessageSeconds: banMessageEraser[guild.warn.erase_ban_messages]
     }).then(async () => {
-        await dropAllUserGuildWarns(user_warn.uid, guild.sid) // Reiniciando as advertências do usuário no servidor
+        await dropAllUserGuildWarns(client, user_warn.user_id, guild.server_id) // Reiniciando as advertências do usuário no servidor
     }).catch(console.error)
 }
