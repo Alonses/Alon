@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require("discord.js")
 
-const { getReport } = require("../../database/schemas/User_reports")
+const { getReport, updateUserReport} = require("../../database/schemas/User_reports")
 
 module.exports = async ({ client, user, interaction, dados }) => {
 
@@ -8,14 +8,14 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const id_guild = dados.split(".")[1]
     const pagina = dados.split(".")[2]
 
-    const alvo = await getReport(id_alvo, id_guild)
+    const alvo = await getReport(client, id_alvo, id_guild)
 
     // Atribuindo um nome ao moderador que criou o reporte no servidor
     if (!alvo.issuer_nick) {
         const cached_issuer = await client.getCachedUser(alvo.issuer)
 
+        await updateUserReport(client, alvo, { issuer_nick: cached_issuer.username })
         alvo.issuer_nick = cached_issuer.username
-        await alvo.save()
     }
 
     const embed = new EmbedBuilder()
@@ -25,7 +25,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
         .addFields(
             {
                 name: `:bust_in_silhouette: **${client.tls.phrase(user, "mode.report.usuario")}**`,
-                value: `${client.emoji("icon_id")} \`${alvo.uid}\`\n\`${alvo.nick ? (alvo.nick.length > 20 ? `${alvo.nick.slice(0, 20)}...` : alvo.nick) : client.tls.phrase(user, "mode.report.apelido_desconhecido")}\`\n( <@${alvo.uid}> )`,
+                value: `${client.emoji("icon_id")} \`${alvo.user_id}\`\n\`${alvo.nick ? (alvo.nick.length > 20 ? `${alvo.nick.slice(0, 20)}...` : alvo.nick) : client.tls.phrase(user, "mode.report.apelido_desconhecido")}\`\n( <@${alvo.user_id}> )`,
                 inline: true
             },
             {
@@ -35,7 +35,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
             },
             {
                 name: ":globe_with_meridians: **Server**",
-                value: `${client.emoji("icon_id")} \`${alvo.sid}\`\n<t:${alvo.timestamp}:R>`,
+                value: `${client.emoji("icon_id")} \`${alvo.server_id}\`\n<t:${alvo.timestamp}:R>`,
                 inline: true
             }
         )

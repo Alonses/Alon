@@ -17,60 +17,77 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("Report", schema)
 
-async function getReport(uid, sid) {
-    if (!await model.exists({ uid: uid, sid: sid }))
-        await model.create({
-            uid: uid,
-            sid: sid
-        })
+async function getReport(client, uid, sid) {
+    const filter = {
+        user_id: uid,
+        server_id: sid
+    }
 
-    return model.findOne({
-        uid: uid,
-        sid: sid
+    return client.prisma.userReports.upsert({
+        where: filter,
+        update: { },
+        create: filter
     })
 }
 
-async function dropReport(uid, sid) {
-    await model.findOneAndDelete({
-        uid: uid,
-        sid: sid
+async function dropReport(client, uid, sid) {
+    await client.prisma.userReports.delete({
+        where: {
+            user_id: uid,
+            server_id: sid
+        }
     })
 }
 
-async function getUserReports(uid) {
-    return model.find({
-        uid: uid,
-        archived: false
+async function getUserReports(client, uid) {
+    return client.prisma.userReports.findMany({
+        where: {
+            user_id: uid,
+            archived: false
+        }
     })
 }
 
-async function getReportedUsers() {
-    return model.find({
-        archived: false
-    }).sort({
-        timestamp: -1
+async function getReportedUsers(client) {
+    return client.prisma.userReports.findMany({
+        where: { archived: false },
+        orderBy: { timestamp: "desc" }
     })
 }
 
-async function checkUserGuildReported(sid) {
-    return model.find({
-        sid: sid,
-        archived: false
-    }).sort({
-        timestamp: -1
-    }).limit(50)
+async function checkUserGuildReported(client, sid) {
+    return client.prisma.userReports.findMany({
+        where: {
+            server_id: sid,
+            archived: false
+        },
+        orderBy: { timestamp: "desc" },
+        take: 50
+    })
 }
 
-async function updateGuildReport(sid) {
+async function updateGuildReport(client, sid) {
 
     // Movendo os reportes para o servidor do Alonsal
-    const reportes = await model.find({
-        sid: sid
-    })
+    const reports = await client.prisma.userReports.findMany({ where: { server_id: sid } })
 
-    reportes.forEach(async reporte => {
-        reporte.sid = process.env.guild_id
-        await reporte.save()
+    for (const report of reports)
+        await client.prisma.userReports.update({
+            where: {
+                user_id: report.user_id,
+                server_id: report.server_id
+            },
+            data: { server_id: process.env.guild_id }
+        })
+}
+
+async function updateUserReport(client, report, update) {
+    await client.prisma.userReports.update({
+        where: {
+            user_id: report.user_id,
+            server_id: report.server_id
+        },
+        data: update
     })
 }
 
@@ -81,5 +98,6 @@ module.exports = {
     getUserReports,
     getReportedUsers,
     checkUserGuildReported,
-    updateGuildReport
+    updateGuildReport,
+    updateUserReport
 }

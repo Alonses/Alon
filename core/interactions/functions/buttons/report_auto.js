@@ -1,6 +1,6 @@
 const { PermissionsBitField } = require('discord.js')
 
-const { getReport } = require('../../../database/schemas/User_reports')
+const { getReport, updateUserReport} = require('../../../database/schemas/User_reports')
 const { badges } = require('../../../formatters/patterns/user')
 
 module.exports = async ({ client, user, interaction, dados }) => {
@@ -37,17 +37,17 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
             for (let i = 0; i < list.length; i++)
                 if (list[i].reason) {
-                    let alvo = await getReport(list[i].user.id, interaction.guild.id)
+                    const alvo = await getReport(client, list[i].user.id, interaction.guild.id);
 
-                    // Adicionando o usuário caso
-                    alvo.relatory = list[i].reason
-                    alvo.nick = list[i].user.username
-                    alvo.timestamp = client.timestamp()
-                    alvo.issuer = interaction.user.id
-                    alvo.auto = true
+                    await updateUserReport(client, alvo, {
+                        relatory: list[i].reason,
+                        nick: list[i].user.username,
+                        timestamp: client.timestamp(),
+                        issuer: interaction.user.id,
+                        auto: true
+                    })
 
                     adicionados++
-                    await alvo.save()
                 }
 
             let msg_feed = client.tls.phrase(user, "mode.report.usuarios_reportados", client.defaultEmoji("guard"), adicionados)

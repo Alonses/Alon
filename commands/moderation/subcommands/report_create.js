@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js')
 
-const { getReport } = require('../../../core/database/schemas/User_reports')
+const { getReport, updateUserReport} = require('../../../core/database/schemas/User_reports')
 
 module.exports = async ({ client, user, interaction }) => {
 
@@ -27,16 +27,18 @@ module.exports = async ({ client, user, interaction }) => {
     if (membro_guild?.user.bot) // Impede que outros bots sejam reportados
         return client.tls.reply(interaction, user, "mode.report.usuario_bot", true, client.emoji(0))
 
-    const alvo = await getReport(id_alvo, interaction.guild.id)
+    const alvo = await getReport(client, id_alvo, interaction.guild.id)
+    const relatory = interaction.options.getString("reason")
+    const timestamp = client.timestamp()
 
-    // Atribuindo o reporte ao usuário que disparou o comando
-    alvo.issuer = interaction.user.id
-    alvo.issuer_nick = interaction.user.username
-
-    alvo.archived = false
-    alvo.nick = user_alvo.username
-    alvo.relatory = interaction.options.getString("reason")
-    alvo.timestamp = client.timestamp()
+    await updateUserReport(client, alvo, {
+        issuer: interaction.user.id,
+        issuer_nick: interaction.user.username,
+        archived: false,
+        nick: user_alvo.username,
+        relatory: relatory,
+        timestamp: timestamp
+    })
 
     const guild = await client.getGuild(interaction.guild.id, {
         network: true,
@@ -51,21 +53,21 @@ module.exports = async ({ client, user, interaction }) => {
     const embed = new EmbedBuilder()
         .setTitle(`${client.tls.phrase(user, "mode.report.reportado")} 🛂`)
         .setColor(0xED4245)
-        .setDescription(`\`\`\`📃 | Descrição fornecida:\n\n${alvo.relatory}\`\`\`\n${client.tls.phrase(user, "mode.report.descricao_report")}${auto_ban}`)
+        .setDescription(`\`\`\`📃 | Descrição fornecida:\n\n${relatory}\`\`\`\n${client.tls.phrase(user, "mode.report.descricao_report")}${auto_ban}`)
         .addFields(
             {
                 name: `:bust_in_silhouette: **${client.tls.phrase(user, "mode.report.usuario")}**`,
-                value: `${client.emoji("icon_id")} \`${alvo.uid}\`\n( <@${alvo.uid}> )`,
+                value: `${client.emoji("icon_id")} \`${alvo.user_id}\`\n( <@${alvo.user_id}> )`,
                 inline: true
             },
             {
                 name: `${client.defaultEmoji("guard")} **${client.tls.phrase(user, "mode.report.reportador")}**`,
-                value: `${client.emoji("icon_id")} \`${alvo.issuer}\`\n( <@${alvo.issuer}> )`,
+                value: `${client.emoji("icon_id")} \`${interaction.user.id}\`\n( <@${interaction.user.id}> )`,
                 inline: true
             },
             {
                 name: ":globe_with_meridians: **Server**",
-                value: `${client.emoji("icon_id")} \`${alvo.sid}\`\n<t:${alvo.timestamp}:R>`,
+                value: `${client.emoji("icon_id")} \`${alvo.server_id}\`\n<t:${timestamp}:R>`,
                 inline: true
             }
         )
@@ -74,18 +76,15 @@ module.exports = async ({ client, user, interaction }) => {
             iconURL: client.avatar()
         })
 
-    // Salvando o alvo para editar posteriormente
-    await alvo.save()
-
     // Criando os botões para as funções de reporte
-    let botoes = [{ id: "report_user", name: client.tls.phrase(user, "menu.botoes.confirmar_anunciando"), type: 2, emoji: '📣', data: `1|${alvo.uid}` }]
+    let botoes = [{ id: "report_user", name: client.tls.phrase(user, "menu.botoes.confirmar_anunciando"), type: 2, emoji: '📣', data: `1|${alvo.user_id}` }]
 
     if (guild.network.link) // Habilitando opção de enviar o aviso apenas aos servidores do network
-        botoes.push({ id: "report_user", name: client.tls.phrase(user, "menu.botoes.anunciar_ao_network"), type: 0, emoji: client.emoji(36), data: `3|${alvo.uid}` })
+        botoes.push({ id: "report_user", name: client.tls.phrase(user, "menu.botoes.anunciar_ao_network"), type: 0, emoji: client.emoji(36), data: `3|${alvo.user_id}` })
 
     botoes.push(
-        { id: "report_user", name: client.tls.phrase(user, "menu.botoes.apenas_confirmar"), type: 1, emoji: '📫', data: `2|${alvo.uid}` },
-        { id: "report_user", name: client.tls.phrase(user, "menu.botoes.cancelar"), type: 3, emoji: client.emoji(0), data: `0|${alvo.uid}` }
+        { id: "report_user", name: client.tls.phrase(user, "menu.botoes.apenas_confirmar"), type: 1, emoji: '📫', data: `2|${alvo.user_id}` },
+        { id: "report_user", name: client.tls.phrase(user, "menu.botoes.cancelar"), type: 3, emoji: client.emoji(0), data: `0|${alvo.user_id}` }
     )
 
     return interaction.reply({

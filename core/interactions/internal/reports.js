@@ -4,7 +4,7 @@ const { getReportedUsers } = require("../../database/schemas/User_reports")
 
 module.exports = async ({ client, interaction }) => {
 
-    const reports = await getReportedUsers()
+    const reports = await getReportedUsers(client)
 
     const embed = new EmbedBuilder()
         .setTitle(`> Reportes gerados ${client.defaultEmoji("guard")}`)

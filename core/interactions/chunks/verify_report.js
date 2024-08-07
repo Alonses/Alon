@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require("discord.js")
 
-const { getUserReports, getReport } = require("../../database/schemas/User_reports")
+const { getUserReports, getReport, updateUserReport} = require("../../database/schemas/User_reports")
 
 module.exports = async ({ client, user, interaction, dados }) => {
 
@@ -9,13 +9,13 @@ module.exports = async ({ client, user, interaction, dados }) => {
     let avisos = 0, descricao = "", report_servidor = "", historico = []
 
     const alvo = {
-        uid: id_alvo,
+        user_id: id_alvo,
         nick: null,
         executer: null,
         issuer_nick: null
     }
 
-    const reports = await getUserReports(id_alvo)
+    const reports = await getUserReports(client, id_alvo)
 
     // Navegando por todos os reportes que o usuário recebeu e listando eles
     reports.forEach(valor => {
@@ -26,7 +26,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
 
         historico.push(`-> ${new Date(valor.timestamp * 1000).toLocaleString("pt-BR")} | ${valor.relatory}`)
 
-        if (valor.sid === interaction.guild.id) {
+        if (valor.server_id === interaction.guild.id) {
             report_servidor = `\n:globe_with_meridians: **${client.tls.phrase(user, "mode.report.reporte_neste_servidor")}**\n\`\`\`-> ${new Date(valor.timestamp * 1000).toLocaleString("pt-BR")} | ${valor.relatory}\`\`\``
             alvo.executer = valor.issuer
         }
@@ -35,11 +35,10 @@ module.exports = async ({ client, user, interaction, dados }) => {
     // Atribuindo um nome ao moderador que criou o reporte no servidor
     if (!alvo.issuer_nick && alvo.executer) {
         const cached_issuer = await client.getCachedUser(alvo.executer)
-        const user_report = await getReport(id_alvo, interaction.guild.id)
+        const user_report = await getReport(client, id_alvo, interaction.guild.id)
 
         alvo.issuer_nick = cached_issuer.username
-        user_report.issuer_nick = cached_issuer.username
-        await user_report.save()
+        await updateUserReport(client, user_report, { issuer_nick: cached_issuer.username })
     }
 
     if (avisos > 0)
@@ -52,7 +51,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
         .addFields(
             {
                 name: `:bust_in_silhouette: **${client.tls.phrase(user, "mode.report.usuario")}**`,
-                value: `${client.emoji("icon_id")} \`${alvo.uid}\`\n\`${alvo.nick ? (alvo.nick.length > 20 ? `${alvo.nick.slice(0, 20)}...` : alvo.nick) : client.tls.phrase(user, "mode.report.apelido_desconhecido")}\`\n( <@${alvo.uid}> )`,
+                value: `${client.emoji("icon_id")} \`${alvo.user_id}\`\n\`${alvo.nick ? (alvo.nick.length > 20 ? `${alvo.nick.slice(0, 20)}...` : alvo.nick) : client.tls.phrase(user, "mode.report.apelido_desconhecido")}\`\n( <@${alvo.user_id}> )`,
                 inline: true
             },
             {

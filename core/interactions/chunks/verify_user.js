@@ -15,7 +15,7 @@ module.exports = async ({ client, user, interaction, id_cache }) => {
     if (!user_alvo) return client.tls.reply(interaction, user, "mode.report.usuario_nao_encontrado", true, 1)
 
     // Coletando os dados de histórico do usuário
-    const reports = await getUserReports(id_alvo)
+    const reports = await getUserReports(client, id_alvo)
     const user_c = await client.getUser(id_alvo, { misc: true })
 
     let apelido = user_alvo.nickname !== null ? user_alvo.nickname : user_alvo.user.username

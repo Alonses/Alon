@@ -8,7 +8,7 @@ module.exports = async ({ client, user, interaction }) => {
     await client.deferedResponse({ interaction })
 
     const users = [], users_ids = [], id_membros_guild = []
-    const usuarios_reportados = await getReportedUsers()
+    const usuarios_reportados = await getReportedUsers(client)
     const warned_users = await client.getSingleWarnedGuildUser(interaction.guild.id, "warn")
     const user_notes = await client.getSingleWarnedGuildUser(interaction.guild.id, "pre_warn")
 
@@ -22,7 +22,7 @@ module.exports = async ({ client, user, interaction }) => {
             membros.forEach(membro => { id_membros_guild.push(membro.user.id) })
 
             for (const user of usuarios_reportados) // Listando os usuários que possuem denúncias e estão no servidor
-                if (id_membros_guild.includes(user.uid)) users_ids.push(user.uid)
+                if (id_membros_guild.includes(user.user_id)) users_ids.push(user.user_id)
 
             const embed = new EmbedBuilder()
                 .setTitle(`> ${interaction.guild.name}`)

@@ -1,6 +1,6 @@
 const { PermissionsBitField } = require('discord.js')
 
-const { getReport, dropReport } = require('../../../database/schemas/User_reports')
+const { getReport, dropReport, updateUserReport} = require('../../../database/schemas/User_reports')
 const { badges } = require('../../../formatters/patterns/user')
 
 module.exports = async ({ client, user, interaction, dados }) => {
@@ -9,7 +9,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const operacao = parseInt(dados.split(".")[1])
     const id_alvo = dados.split(".")[2]
 
-    const alvo = await getReport(id_alvo, interaction.guild.id)
+    const alvo = await getReport(client, id_alvo, interaction.guild.id)
     const guild = await client.getGuild(interaction.guild.id, {
         network: true,
         reports: true
@@ -21,7 +21,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     // 2 -> Confirma silenciosamente
 
     if (!operacao) { // Cancelando a criação do reporte
-        await dropReport(alvo.uid, interaction.guild.id)
+        await dropReport(client, alvo.user_id, interaction.guild.id)
         return client.tls.report(interaction, user, "menu.botoes.operacao_cancelada", true, 11, interaction.customId)
     }
 
@@ -35,7 +35,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
         await alvo.save()
 
         texto_retorno = client.tls.phrase(user, "mode.report.usuario_add", client.defaultEmoji("guard"))
-        require('../../../auto/send_report')({ client, alvo })
+        await require('../../../auto/send_report')({client, alvo})
     }
 
     if (operacao === 2) {
@@ -50,12 +50,11 @@ module.exports = async ({ client, user, interaction, dados }) => {
     if (operacao === 3) {
 
         // Adicionando e reportando para outros servidores que fazem parte do network
-        alvo.archived = false
-        await alvo.save()
+        await updateUserReport(client, alvo, { archived: false })
 
         const link = guild.network.link
         texto_retorno = client.tls.phrase(user, "mode.report.anuncio_network", client.defaultEmoji("guard"))
-        require('../../../auto/send_report')({ client, alvo, link })
+        await require('../../../auto/send_report')({client, alvo, link})
     }
 
     // Verificando se o usuário possui a badge de reporter e concedendo caso não possua
@@ -70,7 +69,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
         if (!bot_member.permissions.has(PermissionsBitField.Flags.BanMembers))
             texto_retorno += `\n${client.tls.phrase(user, "mode.report.auto_ban_permissao", 7)}`
 
-        const guild_member = await client.getMemberGuild(interaction, alvo.uid)
+        const guild_member = await client.getMemberGuild(interaction, alvo.user_id)
 
         if (!guild_member) texto_retorno += `\n${client.tls.phrase(user, "mode.report.auto_ban_nao_encontrado", client.defaultEmoji("guard"))}`
         else {

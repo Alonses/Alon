@@ -23,7 +23,7 @@ module.exports = async (client, dados) => {
     if (guild?.reports.notify) { // Notificando o servidor sobre a entrada de um usuário que possui reportes
         let historico = []
 
-        const reports = await getUserReports(dados.user.id)
+        const reports = await getUserReports(client, dados.user.id)
         reports.forEach(valor => {
             historico.push(`${client.defaultEmoji("time")} ${new Date(valor.timestamp * 1000).toLocaleString("pt-BR")} | ${valor.issuer_nick || client.tls.phrase(guild, "util.steam.undefined")}: ${valor.relatory}`)
         })
@@ -35,7 +35,7 @@ module.exports = async (client, dados) => {
 
         if (alvo.relatory.length > 5) {
             const id_canal = guild.reports_channel
-            require('../../../auto/send_report')({ client, alvo, id_canal })
+            await require('../../../auto/send_report')({client, alvo, id_canal})
         }
     }
 

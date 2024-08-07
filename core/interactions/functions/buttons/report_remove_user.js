@@ -22,10 +22,10 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     if (operacao === 1) {
 
         // Removendo o reporte do usuário no servidor
-        await dropReport(id_alvo, id_guild)
+        await dropReport(client, id_alvo, id_guild)
 
         // Verificando se há outros usuários reportados no servidor para poder continuar editando
-        let reportes_server = await checkUserGuildReported(id_guild), row
+        let reportes_server = await checkUserGuildReported(client, id_guild), row
 
         const obj = {
             content: client.tls.phrase(user, "mode.report.usuario_removido", 10),
@@ -60,5 +60,5 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     }
 
     if (operacao === 3) // Redirecionando o evento
-        require('./report_browse_user')({ client, user, interaction, pagina })
+        await require('./report_browse_user')({client, user, interaction, pagina})
 }

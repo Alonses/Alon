@@ -51,7 +51,7 @@ async function verifica_eraser(client) {
                 await dropAllUserGuilds(servidor.server_id)
 
                 // Atualizando o reportes gerados no servidor
-                await updateGuildReport(servidor.server_id)
+                await updateGuildReport(client, servidor.server_id)
 
                 // Atualizando os links suspeitos no servidor
                 await updateGuildSuspectLink(client, servidor.server_id)

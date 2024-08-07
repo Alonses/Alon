@@ -9,7 +9,7 @@ module.exports = async ({ client, user, interaction, pagina }) => {
     await client.deferedResponse({ interaction })
 
     const users = [], users_ids = []
-    const usuarios_reportados = await getReportedUsers()
+    const usuarios_reportados = await getReportedUsers(client)
 
     const id_membros_guild = []
 
@@ -23,7 +23,7 @@ module.exports = async ({ client, user, interaction, pagina }) => {
             membros.forEach(membro => { id_membros_guild.push(membro.user.id) })
 
             for (const user of usuarios_reportados) // Listando os usuários que possuem denúncias e estão no servidor
-                if (id_membros_guild.includes(user.uid)) users_ids.push(user.uid)
+                if (id_membros_guild.includes(user.user_id)) users_ids.push(user.user_id)
 
             // Verificando a quantidade de entradas e estimando o número de páginas
             const pages = users_ids.length / 6
@@ -70,7 +70,7 @@ module.exports = async ({ client, user, interaction, pagina }) => {
 
             if (users_ids.length > 0) {
                 // Menu para navegar entre os usuários reportados
-                const reportes_guild = await checkUserGuildReported(interaction.guild.id)
+                const reportes_guild = await checkUserGuildReported(client, interaction.guild.id)
 
                 if (reportes_guild.length > 0) {
                     // Subtrai uma página do total ( em casos de exclusão de itens e pagina em cache )

@@ -77,7 +77,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     } else if (operacao === 2) {
 
         const users = [], users_ids = [], id_membros_guild = []
-        const usuarios_reportados = await getReportedUsers()
+        const usuarios_reportados = await getReportedUsers(client)
 
         interaction.guild.members.fetch()
             .then(async membros => {
@@ -89,7 +89,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
                 membros.forEach(membro => { id_membros_guild.push(membro.user.id) })
 
                 for (const user of usuarios_reportados) // Listando os usuários que possuem denúncias e estão no servidor
-                    if (id_membros_guild.includes(user.uid)) users_ids.push(user.uid)
+                    if (id_membros_guild.includes(user.user_id)) users_ids.push(user.user_id)
 
                 const obj = {
                     content: users_ids.length > 0 ? client.tls.phrase(user, "mode.report.escolher_usuario") : client.tls.phrase(user, "mode.report.sem_usuarios_report", 1),
@@ -100,9 +100,9 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
                     let reportes_guild
 
                     if (interaction.guild.id !== process.env.guild_id)
-                        reportes_guild = await checkUserGuildReported(interaction.guild.id)
+                        reportes_guild = await checkUserGuildReported(client, interaction.guild.id)
                     else if (process.env.owner_id.includes(interaction.user.id))
-                        reportes_guild = await getReportedUsers() // Lista todos os usuários reportados salvos no Alonsal
+                        reportes_guild = await getReportedUsers(client) // Lista todos os usuários reportados salvos no Alonsal
 
                     if (reportes_guild.length > 0) {
 
@@ -143,5 +143,5 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
                 return interaction.editReply(obj)
             })
     } else
-        require('../../chunks/panel_guild_verify')({ client, user, interaction })
+        await require('../../chunks/panel_guild_verify')({client, user, interaction})
 }
