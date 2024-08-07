@@ -28,7 +28,7 @@ module.exports = async ({ client, user, interaction, id_cache }) => {
 
     // Avatar do usuário
     const avatar_user = user_alvo.user.avatarURL({ dynamic: true, size: 2048 }), historico = []
-    const strikes = await getUserStrikes(id_alvo, interaction.guild.id)
+    const strikes = await getUserStrikes(client, id_alvo, interaction.guild.id)
 
     const guild_warns = await listAllGuildWarns(client, interaction.guild.id)
     const warns = await listAllUserWarns(client, id_alvo, interaction.guild.id)

@@ -1,6 +1,6 @@
 const { PermissionsBitField } = require("discord.js")
 
-const { getUserStrikes } = require("../database/schemas/User_strikes")
+const { getUserStrikes, updateUserStrike} = require("../database/schemas/User_strikes")
 const { listAllGuildStrikes, getGuildStrike } = require("../database/schemas/Guild_strikes")
 const { registerSuspiciousLink, verifySuspiciousLink } = require("../database/schemas/Spam_links")
 
@@ -121,12 +121,11 @@ async function nerfa_spam({ client, message, guild, suspect_link }) {
         tempo_timeout = spamTimeoutMap[strike_aplicado.timeout]
 
     if (guild.spam.strikes) { // Server with active strike progression
-        let user_strikes = await getUserStrikes(message.author.id, message.guild.id)
+        let user_strikes = await getUserStrikes(client, message.author.id, message.guild.id)
 
         strike_aplicado = strikes[user_strikes.strikes] || strikes[strikes.length - 1]
 
-        user_strikes.strikes++
-        user_strikes.save()
+        await updateUserStrike(client, user_strikes, { strikes: user_strikes.strikes + 1 })
     }
 
     // Requests coming from suspicious links

@@ -11,30 +11,40 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("User_strikes", schema)
 
-async function getUserStrikes(uid, sid) {
-    if (!await model.exists({ uid: uid, sid: sid }))
-        await model.create({
-            uid: uid,
-            sid: sid
-        })
+async function getUserStrikes(client, uid, sid) {
+    const filter = {
+        user_id: uid,
+        server_id: sid
+    }
 
-    return model.findOne({
-        uid: uid,
-        sid: sid
+    return client.prisma.userStrikes.upsert({
+        where: filter,
+        update: { },
+        create: filter
     })
 }
 
-async function removeStrike(uid, sid) {
-    await model.findOneAndDelete({
-        uid: uid,
-        sid: sid
+async function removeStrike(client, uid, sid) {
+    await client.prisma.userStrikes.delete({
+        where: {
+            user_id: uid,
+            server_id: sid
+        }
     })
 }
 
 // Apagando todos os strikes registrados no servidor sobre um membro
-async function dropUserGuildStrikes(sid) {
-    await model.deleteMany({
-        sid: sid
+async function dropUserGuildStrikes(client, sid) {
+    await client.prisma.userStrikes.delete({ where: { server_id: sid } })
+}
+
+async function updateUserStrike(client, strike, update) {
+    await client.prisma.userStrikes.update({
+        where: {
+            user_id: strike.user_id,
+            server_id: strike.server_id
+        },
+        data: update
     })
 }
 
@@ -42,5 +52,6 @@ module.exports.User_strike = model
 module.exports = {
     getUserStrikes,
     removeStrike,
-    dropUserGuildStrikes
+    dropUserGuildStrikes,
+    updateUserStrike
 }

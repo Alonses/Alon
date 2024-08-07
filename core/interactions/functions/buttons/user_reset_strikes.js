@@ -1,4 +1,4 @@
-const { getUserStrikes } = require("../../../database/schemas/User_strikes")
+const { getUserStrikes, updateUserStrike} = require("../../../database/schemas/User_strikes")
 
 module.exports = async ({ client, user, interaction, dados }) => {
 
@@ -13,10 +13,8 @@ module.exports = async ({ client, user, interaction, dados }) => {
     if (escolha === 1) {
 
         // Removendo os strikes do usuário no servidor
-        const user_strikes = await getUserStrikes(id_alvo, interaction.guild.id)
-        user_strikes.strikes = 0
-
-        await user_strikes.save()
+        const user_strikes = await getUserStrikes(client, id_alvo, interaction.guild.id)
+        await updateUserStrike(client, user_strikes, { strikes: 0 })
     }
 
     if (escolha === 2) {
@@ -34,5 +32,5 @@ module.exports = async ({ client, user, interaction, dados }) => {
     }
 
     const id_cache = id_alvo
-    require('../../chunks/verify_user')({ client, user, interaction, id_cache })
+    await require('../../chunks/verify_user')({client, user, interaction, id_cache})
 }
