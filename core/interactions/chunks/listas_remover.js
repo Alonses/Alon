@@ -2,7 +2,7 @@ const { listAllUserGroups } = require("../../database/schemas/User_tasks_group")
 
 module.exports = async ({ client, user, interaction, autor_original, pagina }) => {
 
-    const listas = await (user?.conf.global_tasks ? listAllUserGroups(interaction.user.id) : listAllUserGroups(interaction.user.id, interaction.guild.id))
+    const listas = await (user?.conf.global_tasks ? listAllUserGroups(client, interaction.user.id) : listAllUserGroups(client, interaction.user.id, interaction.guild.id))
 
     if (listas.length < 1) // Sem listas
         return client.tls.reply(interaction, user, "util.tarefas.sem_lista_r", true, client.emoji(0))

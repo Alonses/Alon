@@ -5,7 +5,7 @@ module.exports = async ({ client, user, interaction, autor_original }) => {
 
     // Navegando por listas de tarefas
     // Verificando se o usuário desabilitou as tasks globais
-    let listas = await (user?.conf.global_tasks ? listAllUserGroups(interaction.user.id) : listAllUserGroups(interaction.user.id, interaction.guild.id))
+    let listas = await (user?.conf.global_tasks ? listAllUserGroups(client, interaction.user.id) : listAllUserGroups(client, interaction.user.id, interaction.guild.id))
 
     if (listas.length < 1) // Listando listas
         return client.tls.reply(interaction, user, "util.tarefas.sem_lista_n", true, client.emoji(0))

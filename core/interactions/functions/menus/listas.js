@@ -1,5 +1,5 @@
 const { getTask } = require('../../../database/schemas/User_tasks')
-const { getUserGroup } = require('../../../database/schemas/User_tasks_group')
+const { getUserGroup, updateUserTaskGroup} = require('../../../database/schemas/User_tasks_group')
 
 module.exports = async ({ client, user, interaction, dados, autor_original }) => {
 
@@ -26,7 +26,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
         })
 
     // Atualizando os dados da lista
-    const lista = await getUserGroup(interaction.user.id, timestamp_lista)
+    const lista = await getUserGroup(client, interaction.user.id, timestamp_lista)
 
     if (!lista)
         return interaction.update({
@@ -37,7 +37,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
         })
 
     client.atualiza_dados(task, interaction)
-    client.atualiza_dados(lista, interaction)
+    await updateUserTaskGroup(client, lista, { guild_id: interaction.guild.id })
 
     task.g_timestamp = timestamp_lista
     await task.save()

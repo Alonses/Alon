@@ -74,7 +74,7 @@ async function verifica_user_eraser(client) {
 
                 // Excluindo todas as tarefas e grupos relacionadas ao usuário
                 await dropAllUserTasks(id_user)
-                await dropAllUserGroups(id_user)
+                await dropAllUserGroups(client, id_user)
 
                 // Excluindo todas as badges que estão vinculadas ao usuário
                 await dropAllUserBadges(id_user)
@@ -121,7 +121,7 @@ async function verifica_user_eraser(client) {
             if (client.timestamp() > (usuario.erase.erase_on + 604800)) {
 
                 // Excluindo todas as tarefas e grupos relacionadas ao usuário no servidor
-                await dropAllGuildUserGroups(id_user, id_guild)
+                await dropAllGuildUserGroups(client, id_user, id_guild)
                 await dropAllGuildUserTasks(id_user, id_guild)
 
                 // Excluindo o ranking do servidor que faz referência ao usuário

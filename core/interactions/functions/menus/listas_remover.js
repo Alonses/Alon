@@ -1,5 +1,5 @@
 const { listAllUserGroupTasks } = require('../../../database/schemas/User_tasks')
-const { getUserGroup } = require('../../../database/schemas/User_tasks_group')
+const { getUserGroup, updateUserTaskGroup} = require('../../../database/schemas/User_tasks_group')
 
 module.exports = async ({ client, user, interaction, dados, autor_original }) => {
 
@@ -8,7 +8,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
 
     // Apagando uma lista especificada
     const lista_timestamp = dados.split(".")[1]
-    const lista = await getUserGroup(interaction.user.id, parseInt(lista_timestamp))
+    const lista = await getUserGroup(client, interaction.user.id, parseInt(lista_timestamp))
     const tarefas = await listAllUserGroupTasks(interaction.user.id, lista_timestamp)
 
     // Botão para retornar até as listas do usuário
@@ -25,7 +25,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
         })
 
     // Atualiza os dados das tarefas e listas
-    client.atualiza_dados(lista, interaction)
+    await updateUserTaskGroup(client, lista, { guild_id: interaction.guild.id })
 
     const row = client.create_buttons([
         { id: "return_button", name: client.tls.phrase(user, "menu.botoes.retornar"), type: 0, emoji: client.emoji(19), data: "listas_remover" },

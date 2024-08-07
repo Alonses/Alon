@@ -22,9 +22,9 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
 
         // Verificando se o usuário desabilitou as tasks globais
         if (client.decider(user?.conf.global_tasks, 1))
-            listas = await listAllUserGroups(interaction.user.id)
+            listas = await listAllUserGroups(client, interaction.user.id)
         else
-            listas = await listAllUserGroups(interaction.user.id, interaction.guild.id)
+            listas = await listAllUserGroups(client, interaction.user.id, interaction.guild.id)
 
         const data = {
             title: { tls: "util.tarefas.escolher_lista_navegar" },

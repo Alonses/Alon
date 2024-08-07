@@ -1,5 +1,5 @@
 const { createTask } = require('../../../core/database/schemas/User_tasks')
-const { listAllUserGroups } = require('../../../core/database/schemas/User_tasks_group')
+const { listAllUserGroups, updateUserTaskGroup} = require('../../../core/database/schemas/User_tasks_group')
 
 module.exports = async ({ client, user, interaction }) => {
 
@@ -8,9 +8,9 @@ module.exports = async ({ client, user, interaction }) => {
 
     // Verificando se o usuário desabilitou as tasks globais
     if (client.decider(user?.conf.global_tasks, 1))
-        listas = await listAllUserGroups(interaction.user.id)
+        listas = await listAllUserGroups(client, interaction.user.id)
     else
-        listas = await listAllUserGroups(interaction.user.id, interaction.guild.id)
+        listas = await listAllUserGroups(client, interaction.user.id, interaction.guild.id)
 
     if (listas.length < 1)
         return client.tls.reply(interaction, user, "util.tarefas.sem_lista", true, client.emoji(0))
@@ -18,15 +18,13 @@ module.exports = async ({ client, user, interaction }) => {
     const task = await createTask(interaction.user.id, interaction.guild.id, interaction.options.getString("description"), timestamp)
 
     // Adicionando a tarefa a uma lista automaticamente caso só exista uma lista
-    if (listas.length == 1) {
+    if (listas.length === 1) {
         task.g_timestamp = listas[0].timestamp
         await task.save()
 
         // Verificando se a lista não possui algum servidor mencionado
-        if (!listas[0].sid) {
-            listas[0].sid = interaction.guid.id
-            await listas[0].save()
-        }
+        if (!listas[0].server_id)
+            await updateUserTaskGroup(client, listas[0], { guild_id: interaction.guild.id })
 
         return interaction.reply({
             content: `${client.tls.phrase(user, "util.tarefas.tarefa_adicionada", client.defaultEmoji("paper"))} \`${listas[0].name}\`!`,

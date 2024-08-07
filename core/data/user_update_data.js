@@ -67,7 +67,7 @@ async function clear_data({ client, user, interaction, operador, caso }) {
 
             if (alvos[i] === 8) { // Excluindo todas as tarefas e listas de tarefas
                 await dropAllUserTasks(user.id)
-                await dropAllUserGroups(user.id)
+                await dropAllUserGroups(client, user.id)
             }
 
             if (alvos[i] === 9) // Excluindo todos os módulos

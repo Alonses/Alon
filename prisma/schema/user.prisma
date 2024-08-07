@@ -228,11 +228,12 @@ model UserTasks {
 }
 
 model UserTasksGroup {
-  id        Int    @id @default(autoincrement())
   user_id   String
   server_id String
   name      String
   timestamp Int
+
+  @@id([user_id, server_id, name])
 }
 
 model UserTickets {

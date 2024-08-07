@@ -12,7 +12,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
         return require("../../chunks/tarefas_remover")({ client, user, interaction })
 
     const task = await getTask(interaction.user.id, parseInt(dados.split(".")[1]))
-    const lista = await getUserGroup(interaction.user.id, task.g_timestamp)
+    const lista = await getUserGroup(client, interaction.user.id, task.g_timestamp)
 
     // Botão para retornar até as listas do usuário
     let row_2 = client.create_buttons([

@@ -12,75 +12,94 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("Task_group", schema)
 
-async function createGroup(uid, name, sid, timestamp) {
-    if (!await model.exists({ uid: uid, sid: sid, name: name }))
-        await model.create({
-            uid: uid,
+async function createGroup(client, uid, name, sid, timestamp) {
+
+    const group = await client.prisma.userTasksGroup.findUnique({
+        where: {
+            user_id: uid,
+            server_id: sid,
+            name: name
+        }
+    })
+
+    if (!group) return client.prisma.userTasksGroup.create({
+        data: {
+            user_id: uid,
+            server_id: sid,
             name: name,
-            sid: sid,
             timestamp: timestamp
-        })
+        }
+    })
 
-    return model.findOne({
-        uid: uid,
-        sid: sid,
+    return group
+}
+
+async function getUserGroup(client, uid, timestamp) {
+    return client.prisma.userTasksGroup.findFirst({
+        where: {
+            user_id: uid,
+            timestamp: timestamp
+        }
+    })
+}
+
+async function listAllUserGroups(client, uid, sid) {
+    const filter = !sid ? { user_id: uid } : {
+            user_id: uid,
+            server_id: sid
+        }
+
+    return client.prisma.userTasksGroup.findFirst({
+        where: filter
+    })
+}
+
+async function checkUserGroup(client, uid, name, sid) {
+    const filter = !sid ? {
+        user_id: uid,
         name: name
-    })
-}
-
-async function getUserGroup(uid, timestamp) {
-    return model.findOne({
-        uid: uid,
-        timestamp: timestamp
-    })
-}
-
-async function listAllUserGroups(uid, sid) {
-
-    if (sid)
-        return model.find({
-            uid: uid,
-            sid: sid
-        })
-
-    return model.find({
-        uid: uid
-    })
-}
-
-async function checkUserGroup(uid, name, sid) {
-
-    if (sid)
-        return model.find({
-            uid: uid,
-            name: name,
-            sid: sid
-        })
-
-    return model.find({
-        uid: uid,
+    } : {
+        user_id: uid,
+        server_id: sid,
         name: name
+    }
+
+    return client.prisma.userTasksGroup.findFirst({
+        where: filter
     })
 }
 
 // Apaga o grupo de tasks do usuário
-async function dropGroup(uid, timestamp) {
-    await model.findOneAndDelete({
-        uid: uid,
-        timestamp: timestamp
+async function dropGroup(client, uid, timestamp) {
+    await client.prisma.userTasksGroup.deleteMany({
+        where: {
+            user_id: uid,
+            timestamp: timestamp
+        }
     })
 }
 
-async function dropAllUserGroups(uid) {
-    await model.deleteMany({
-        uid: uid
+async function dropAllUserGroups(client, uid) {
+    await client.prisma.userTasksGroup.deleteMany({ where: { user_id: uid } })
+}
+
+async function dropAllGuildUserGroups(client, uid, sid) {
+    await client.prisma.userTasksGroup.deleteMany({
+        where: {
+            user_id: uid,
+            server_id: sid
+        }
     })
 }
 
-async function dropAllGuildUserGroups(uid, sid) {
-    await model.deleteMany({
-        uid: uid,
-        sid: sid
+async function updateUserTaskGroup(client, group, update) {
+    await client.prisma.userTasksGroup.update({
+        where: {
+            user_id: group.user_id,
+            server_id: group.server_id,
+            name: group.name
+        },
+        data: update
     })
 }
 
@@ -92,5 +111,6 @@ module.exports = {
     dropAllUserGroups,
     listAllUserGroups,
     dropGroup,
-    dropAllGuildUserGroups
+    dropAllGuildUserGroups,
+    updateUserTaskGroup
 }

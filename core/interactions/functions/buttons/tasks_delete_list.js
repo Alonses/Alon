@@ -27,7 +27,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
     const lista_timestamp = parseInt(dados.split(".")[2])
 
     await dropTaskByGroup(interaction.user.id, lista_timestamp)
-    await dropGroup(interaction.user.id, lista_timestamp)
+    await dropGroup(client, interaction.user.id, lista_timestamp)
 
     interaction.update({
         content: client.tls.phrase(user, "util.tarefas.exclusao_lista", 13),
