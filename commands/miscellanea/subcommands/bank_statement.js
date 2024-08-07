@@ -18,7 +18,7 @@ module.exports = async ({ client, user, interaction, local }) => {
         daily = "", titulo_embed = client.tls.phrase(user, "misc.banco.bufunfas_outros", null, alvo.username)
 
     let data_atual = date1.toDateString("pt-BR")
-    if (data_atual === user.misc.daily && user_interno.uid === interaction.user.id) {
+    if (data_atual === user.misc.daily && user_interno.id === interaction.user.id) {
         const tempo_restante = Math.floor((date1.getTime() + (((23 - date1.getHours()) * 3600000) + ((59 - date1.getMinutes()) * 60000) + ((60 - date1.getSeconds()) * 1000))) / 1000)
 
         daily = `${client.tls.phrase(user, "misc.banco.daily")} <t:${tempo_restante}:R>\n( <t:${tempo_restante}:f> )`
@@ -29,9 +29,9 @@ module.exports = async ({ client, user, interaction, local }) => {
     if (user_interno.misc.money < 0)
         lang = "diff"
 
-    if (interaction.user.id === user_interno.uid) {
+    if (interaction.user.id === user_interno.id) {
 
-        const movimentacoes = await getUserStatements(user_interno.uid)
+        const movimentacoes = await getUserStatements(client, user_interno.id)
 
         movimentacoes.forEach(movimentacao => {
             // Traduzindo a movimentação conforme o idioma do usuário
@@ -54,7 +54,7 @@ module.exports = async ({ client, user, interaction, local }) => {
         .setColor(client.embed_color(user_interno.misc.color))
         .setDescription(`:bank: ${client.tls.phrase(user, "misc.banco.bufunfas")}\`\`\`${lang}\nB$ ${client.locale(user_interno.misc.money)}\`\`\`\n${daily}${extrato}`)
 
-    if (user_interno.uid === interaction.user.id)
+    if (user_interno.id === interaction.user.id)
         embed.setFooter({
             text: client.tls.phrase(user, "misc.banco.dica_rodape"),
             iconURL: interaction.user.avatarURL({ dynamic: true })

@@ -14,12 +14,12 @@ const model = mongoose.model("Statement", schema)
 
 async function registryStatement(client, uid, operation, type, value) {
 
-    const statements = await getUserStatements(uid)
+    const statements = await getUserStatements(client, uid)
     if (statements.length > 9) //  Exclui a última movimentação após 10 novas entradas
-        dropUserStatement(uid, statements[9].timestamp)
+        await dropUserStatement(uid, statements[9].timestamp)
 
-    await model.create({
-        uid: uid,
+    await client.prisma.userStatement.create({
+        user_id: uid,
         operation: operation,
         type: type,
         value: value,
@@ -27,25 +27,24 @@ async function registryStatement(client, uid, operation, type, value) {
     })
 }
 
-async function getUserStatements(uid) {
-    return model.find({
-        uid: uid
-    }).sort({
-        timestamp: -1
+async function getUserStatements(client, uid) {
+    return client.prisma.userStatement.findMany({
+        where: { user_id: uid },
+        orderBy: { timestamp: "desc" }
     })
 }
 
-async function dropUserStatement(uid, timestamp) {
-    await model.findOneAndDelete({
-        uid: uid,
-        timestamp: timestamp
+async function dropUserStatement(client, uid, timestamp) {
+    await client.prisma.userStatement.deleteMany({
+        where: {
+            user_id: uid,
+            timestamp: timestamp
+        }
     })
 }
 
-async function dropAllUserStatements(uid) {
-    await model.deleteMany({
-        uid: uid
-    })
+async function dropAllUserStatements(client, uid) {
+    await client.prisma.userStatement.deleteMany({ where: { user_id: uid } })
 }
 
 module.exports.Statement = model

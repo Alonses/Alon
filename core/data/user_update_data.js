@@ -75,7 +75,7 @@ async function clear_data({ client, user, interaction, operador, caso }) {
 
             if (alvos[i] === 10) { // Zerando as bufunfas do usuário e limpando o histórico de movimentações
                 user.misc.money = 0
-                await dropAllUserStatements(user.id)
+                await dropAllUserStatements(client, user.id)
             }
 
             if (alvos[i] === 11) // Dados extras que podem ser excluídos

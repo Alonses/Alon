@@ -87,7 +87,7 @@ async function verifica_user_eraser(client) {
                 await dropAllUserModules(client, id_user)
 
                 // Excluindo o histórico de transações bancárias do usuário
-                await dropAllUserStatements(id_user)
+                await dropAllUserStatements(client, id_user)
 
                 // Excluindo todos os tickets criados por um usuário
                 await dropAllUserTickets(client, id_user)
