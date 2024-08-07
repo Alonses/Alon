@@ -1,4 +1,4 @@
-const { dropTask, getTask } = require('../../../database/schemas/User_tasks')
+const { dropTask, getTask, updateUserTask} = require('../../../database/schemas/User_tasks')
 const { listAllUserGroups } = require('../../../database/schemas/User_tasks_group')
 
 module.exports = async ({ client, user, interaction, dados, autor_original }) => {
@@ -51,7 +51,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
     ], interaction)
 
     if (operacao === 0) {
-        await dropTask(interaction.user.id, timestamp)
+        await dropTask(client, interaction.user.id, timestamp)
 
         return interaction.update({
             content: client.tls.phrase(user, "util.tarefas.tarefa_excluida", 10),
@@ -61,7 +61,8 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
         })
     }
 
-    const task = await getTask(interaction.user.id, timestamp)
+    const task = await getTask(client, interaction.user.id, timestamp)
+    const update = { }
 
     if (!task)
         return interaction.update({
@@ -72,13 +73,13 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
         })
 
     // Verificando se a task não possui algum servidor mencionado
-    if (!task.sid)
-        task.sid = interaction.guild.id
+    if (!task.server_id)
+        update.server_id = interaction.guild.id
 
     if (operacao === 1) {
 
-        task.concluded = true
-        await task.save()
+        update.concluded = true
+        await updateUserTask(client, task.id, update)
 
         return interaction.update({
             content: client.tls.phrase(user, "util.tarefas.tarefa_movida_1", 10),
@@ -90,8 +91,8 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
 
     if (operacao === 3) {
 
-        task.concluded = false
-        await task.save()
+        update.concluded = false
+        await updateUserTask(client, task.id, update)
 
         return interaction.update({
             content: client.tls.phrase(user, "util.tarefas.tarefa_movida_2", 10),

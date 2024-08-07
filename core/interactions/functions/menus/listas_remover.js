@@ -9,7 +9,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
     // Apagando uma lista especificada
     const lista_timestamp = dados.split(".")[1]
     const lista = await getUserGroup(client, interaction.user.id, parseInt(lista_timestamp))
-    const tarefas = await listAllUserGroupTasks(interaction.user.id, lista_timestamp)
+    const tarefas = await listAllUserGroupTasks(client, interaction.user.id, lista_timestamp)
 
     // Botão para retornar até as listas do usuário
     let row_2 = client.create_buttons([

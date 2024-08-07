@@ -13,7 +13,7 @@ module.exports = async ({ client, user, interaction, operador, autor_original })
         }
 
         // Verificando se o usuário desabilitou as tasks globais
-        const tarefas = await (user?.conf.global_tasks ? listAllUserTasks(interaction.user.id) : listAllUserTasks(interaction.user.id, interaction.guild.id))
+        const tarefas = await (user?.conf.global_tasks ? listAllUserTasks(client, interaction.user.id) : listAllUserTasks(client, interaction.user.id, interaction.guild.id))
 
         // Validando se há tasks registradas para o usuário
         if (tarefas.length < 1)
@@ -73,7 +73,7 @@ module.exports = async ({ client, user, interaction, operador, autor_original })
         const lista_timestamp = parseInt(operador.split("|")[1])
 
         // Retornando o usuário para a lista escolhida anteriormente
-        const tarefas = await listAllUserGroupTasks(interaction.user.id, lista_timestamp)
+        const tarefas = await listAllUserGroupTasks(client, interaction.user.id, lista_timestamp)
 
         if (tarefas.length < 1) {
 
@@ -109,7 +109,7 @@ module.exports = async ({ client, user, interaction, operador, autor_original })
         const lista_timestamp = parseInt(operador.split("|")[1])
 
         // Retornando o usuário para a lista escolhida anteriormente
-        const tarefas = await listAllUserGroupTasks(interaction.user.id, lista_timestamp)
+        const tarefas = await listAllUserGroupTasks(client, interaction.user.id, lista_timestamp)
 
         if (tarefas.length < 1) {
 
@@ -152,7 +152,7 @@ filtra_tarefas = (tarefas, caso) => {
 
     // Filtrando o array para o estado de conclusão
     for (let i = 0; i < tarefas.length; i++)
-        if (tarefas[i].concluded == caso)
+        if (tarefas[i].concluded === caso)
             array.push(tarefas[i])
 
     return array

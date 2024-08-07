@@ -26,7 +26,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
     // Apagando a lista especificada e as tarefas vinculadas a ela
     const lista_timestamp = parseInt(dados.split(".")[2])
 
-    await dropTaskByGroup(interaction.user.id, lista_timestamp)
+    await dropTaskByGroup(client, interaction.user.id, lista_timestamp)
     await dropGroup(client, interaction.user.id, lista_timestamp)
 
     interaction.update({

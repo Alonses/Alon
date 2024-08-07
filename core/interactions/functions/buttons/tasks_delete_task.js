@@ -29,7 +29,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
     // Apagando a tarefa
     const tarefa_timestamp = parseInt(dados.split(".")[2])
 
-    await dropTask(interaction.user.id, tarefa_timestamp)
+    await dropTask(client, interaction.user.id, tarefa_timestamp)
 
     // Botão para retornar até as listas do usuário
     let row = client.create_buttons([

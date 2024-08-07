@@ -67,13 +67,13 @@ async function verifica_user_eraser(client) {
         for (let i = 0; i < data.length; i++) {
 
             const usuario = data[i]
-            const id_user = usuario.uid
+            const id_user = usuario.user_id
 
             // Apenas realiza a ação após 2 semanas após usuário ser movido para exclusão
             if (client.timestamp() > (usuario.erase.erase_on + 1209600)) {
 
                 // Excluindo todas as tarefas e grupos relacionadas ao usuário
-                await dropAllUserTasks(id_user)
+                await dropAllUserTasks(client, id_user)
                 await dropAllUserGroups(client, id_user)
 
                 // Excluindo todas as badges que estão vinculadas ao usuário
@@ -122,7 +122,7 @@ async function verifica_user_eraser(client) {
 
                 // Excluindo todas as tarefas e grupos relacionadas ao usuário no servidor
                 await dropAllGuildUserGroups(client, id_user, id_guild)
-                await dropAllGuildUserTasks(id_user, id_guild)
+                await dropAllGuildUserTasks(client, id_user, id_guild)
 
                 // Excluindo o ranking do servidor que faz referência ao usuário
                 await dropUserRankServer(id_user, id_guild)

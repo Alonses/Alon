@@ -3,7 +3,7 @@ const { listAllUserTasks } = require('../../database/schemas/User_tasks')
 module.exports = async ({ client, user, interaction, autor_original }) => {
 
     // Verificando se o usuário desabilitou as tasks globais
-    const tarefas = await (user?.conf.global_tasks ? listAllUserTasks(interaction.user.id) : listAllUserTasks(interaction.user.id, interaction.guild.id))
+    const tarefas = await (user?.conf.global_tasks ? listAllUserTasks(client, interaction.user.id) : listAllUserTasks(client, interaction.user.id, interaction.guild.id))
 
     if (tarefas.length < 1) // Sem tarefas
         return client.tls.reply(interaction, user, "util.tarefas.sem_lista_r", true, client.emoji(0))

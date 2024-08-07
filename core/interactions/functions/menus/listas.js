@@ -1,4 +1,4 @@
-const { getTask } = require('../../../database/schemas/User_tasks')
+const { getTask, updateUserTask} = require('../../../database/schemas/User_tasks')
 const { getUserGroup, updateUserTaskGroup} = require('../../../database/schemas/User_tasks_group')
 
 module.exports = async ({ client, user, interaction, dados, autor_original }) => {
@@ -10,7 +10,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
     const timestamp_task = parseInt(dados.split(".")[2])
 
     // Coletando os dados da tarefa
-    const task = await getTask(interaction.user.id, timestamp_task)
+    const task = await getTask(client, interaction.user.id, timestamp_task)
 
     // Botão para retornar até as listas do usuário
     let row_2 = client.create_buttons([
@@ -36,11 +36,11 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
             ephemeral: true
         })
 
-    client.atualiza_dados(task, interaction)
     await updateUserTaskGroup(client, lista, { guild_id: interaction.guild.id })
-
-    task.g_timestamp = timestamp_lista
-    await task.save()
+    await updateUserTask(client, task.id, {
+        guild_id: interaction.guild.id,
+        g_timestamp: timestamp_lista
+    })
 
     // Botão para levar o usuário até a lista que foi incluída a tarefa
     let row = client.create_buttons([

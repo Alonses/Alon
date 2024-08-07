@@ -14,80 +14,89 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("Task", schema)
 
-async function createTask(uid, sid, text, timestamp) {
-
-    if (!await model.exists({ uid: uid, sid: sid, text: text, timestamp: timestamp }))
-        await model.create({
-            uid: uid,
-            sid: sid,
-            text: text,
-            timestamp: timestamp
-        })
-
-    return model.findOne({
-        uid: uid,
-        sid: sid,
+async function createTask(client, uid, sid, text, timestamp) {
+    const filter = {
+        user_id: uid,
+        server_id: sid,
         text: text,
         timestamp: timestamp
+    }
+
+    const task = await client.prisma.userTasks.findFirst({ where: filter })
+    if (!task) return client.prisma.userTasks.create({data: filter});
+
+    return task
+}
+
+async function getTask(client, uid, timestamp) {
+    return client.prisma.userTasks.findFirst({
+        where: {
+            user_id: uid,
+            timestamp: timestamp
+        }
     })
 }
 
-async function getTask(uid, timestamp) {
-    return model.findOne({
-        uid: uid,
-        timestamp: timestamp
+async function listAllUserTasks(client, uid, sid) {
+    if (sid) return client.prisma.userTasks.findMany({
+        where: {
+            user_id: uid,
+            server_id: sid
+        },
+        orderBy: { timestamp: "desc" }
+    })
+
+    return client.prisma.userTasks.findMany({
+        where: { user_id: uid },
+        orderBy: { timestamp: "desc" }
     })
 }
 
-async function listAllUserTasks(uid, sid) {
-
-    if (sid)
-        return model.find({
-            uid: uid,
-            sid: sid
-        }).sort({
-            timestamp: -1
-        })
-
-    return model.find({
-        uid: uid
-    }).sort({
-        timestamp: -1
-    })
-}
-
-async function listAllUserGroupTasks(uid, g_timestamp) {
-    return model.find({
-        uid: uid,
-        g_timestamp: g_timestamp
+async function listAllUserGroupTasks(client, uid, g_timestamp) {
+    return client.prisma.userTasks.findMany({
+        where: {
+            user_id: uid,
+            g_timestamp: g_timestamp
+        }
     })
 }
 
 // Apaga uma task do usuário
-async function dropTask(uid, timestamp) {
-    await model.findOneAndDelete({
-        uid: uid,
-        timestamp: timestamp
+async function dropTask(client, uid, timestamp) {
+    await client.prisma.userTasks.deleteMany({
+        where: {
+            user_id: uid,
+            timestamp: timestamp
+        }
     })
 }
 
-async function dropTaskByGroup(uid, g_timestamp) {
-    await model.deleteMany({
-        uid: uid,
-        g_timestamp: g_timestamp
+async function dropTaskByGroup(client, uid, g_timestamp) {
+    await client.prisma.userTasks.deleteMany({
+        where: {
+            user_id: uid,
+            g_timestamp: g_timestamp
+        }
     })
 }
 
-async function dropAllUserTasks(uid) {
-    await model.deleteMany({
-        uid: uid
+async function dropAllUserTasks(client, uid) {
+    await client.prisma.userTasks.deleteMany({ where: { user_id: uid } })
+}
+
+async function dropAllGuildUserTasks(client, uid, sid) {
+    await client.prisma.userTasks.deleteMany({
+        where: {
+            user_id: uid,
+            server_id: sid
+        }
     })
 }
 
-async function dropAllGuildUserTasks(uid, sid) {
-    await model.deleteMany({
-        uid: uid,
-        sid: sid
+async function updateUserTask(client, id, update) {
+    await client.prisma.userTasks.update({
+        where: { id: id },
+        data: update
     })
 }
 
@@ -100,5 +109,6 @@ module.exports = {
     dropAllUserTasks,
     listAllUserTasks,
     listAllUserGroupTasks,
-    dropAllGuildUserTasks
+    dropAllGuildUserTasks,
+    updateUserTask
 }

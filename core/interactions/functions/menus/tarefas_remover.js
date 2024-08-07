@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js')
 
-const { getTask } = require('../../../database/schemas/User_tasks')
+const { getTask, updateUserTask} = require('../../../database/schemas/User_tasks')
 const { getUserGroup } = require('../../../database/schemas/User_tasks_group')
 
 module.exports = async ({ client, user, interaction, dados, autor_original }) => {
@@ -11,7 +11,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
     if (!autor_original) // Redirecionando o usuário secundário
         return require("../../chunks/tarefas_remover")({ client, user, interaction })
 
-    const task = await getTask(interaction.user.id, parseInt(dados.split(".")[1]))
+    const task = await getTask(client, interaction.user.id, parseInt(dados.split(".")[1]))
     const lista = await getUserGroup(client, interaction.user.id, task.g_timestamp)
 
     // Botão para retornar até as listas do usuário
@@ -30,7 +30,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
         })
 
     // Atualiza os dados das tarefas e listas
-    client.atualiza_dados(task, interaction)
+    await updateUserTask(client, task.id, { guild_id: interaction.guild.id })
 
     const embed = new EmbedBuilder()
         .setTitle(client.tls.phrase(user, "util.tarefas.sua_tarefa"))

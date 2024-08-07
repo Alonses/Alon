@@ -66,7 +66,7 @@ async function clear_data({ client, user, interaction, operador, caso }) {
                 await dropAllUserGuildRanks(user.id)
 
             if (alvos[i] === 8) { // Excluindo todas as tarefas e listas de tarefas
-                await dropAllUserTasks(user.id)
+                await dropAllUserTasks(client, user.id)
                 await dropAllUserGroups(client, user.id)
             }
 

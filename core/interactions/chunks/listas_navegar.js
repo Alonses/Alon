@@ -21,7 +21,7 @@ module.exports = async ({ client, user, interaction, autor_original }) => {
     if (listas.length === 1) {
 
         // Listando todas as tarefas vinculadas a lista criada
-        const tarefas = await listAllUserGroupTasks(interaction.user.id, listas[0].timestamp)
+        const tarefas = await listAllUserGroupTasks(client, interaction.user.id, listas[0].timestamp)
 
         if (tarefas.length < 1)
             if (autor_original) return client.tls.report(interaction, user, "util.tarefas.sem_tarefa_l", client.decider(user?.conf.ghost_mode, 0), 1, interaction.customId)
