@@ -24,7 +24,7 @@ module.exports = async ({ client }) => {
     await atualiza_warns(client)
     await atualiza_pre_warns(client)
 
-    await atualiza_roles()
+    await atualiza_roles(client)
     await atualiza_join_guilds(client)
 
     await atualiza_modulos(client)

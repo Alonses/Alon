@@ -1,7 +1,7 @@
 const { EmbedBuilder, PermissionsBitField } = require("discord.js")
 
 const { atualiza_roles } = require("./user_roles")
-const { getUserRole } = require("../../database/schemas/User_roles")
+const { getUserRole, updateUserRole} = require("../../database/schemas/User_roles")
 const { getRoleAssigner } = require("../../database/schemas/Guild_role_assigner")
 
 const { defaultRoleTimes } = require("../../formatters/patterns/timeout")
@@ -17,7 +17,7 @@ module.exports = async ({ client, guild, interaction, dados, acionador, indice_w
         // Checking bot permissions on the server
         if (!await client.permissions(interaction, client.id(), [PermissionsBitField.Flags.ManageRoles, PermissionsBitField.Flags.ModerateMembers])) return
 
-        cargos.attribute.split(".").forEach(async cargo => {
+        for (const cargo of cargos.attribute.split(".")) {
 
             // Verificando se o membro ainda não possui o cargo
             if (!await client.hasRole(interaction, cargo, interaction.user.id)) {
@@ -28,7 +28,7 @@ module.exports = async ({ client, guild, interaction, dados, acionador, indice_w
                 if (role.editable) // Checking if the role is editable
                     await membro_guild.roles.add(role).catch(console.error)
             }
-        })
+        }
 
         return
     }
@@ -49,20 +49,19 @@ module.exports = async ({ client, guild, interaction, dados, acionador, indice_w
 
                 // Strike com um cargo temporário vinculado
                 if (dados.timed_role.status) {
+                    const cargo = await getUserRole(client, interaction.author.id, guild.sid, client.timestamp() + defaultRoleTimes[dados.timed_role.timeout])
+                    const relatory = acionador === "spam" ? client.tls.phrase(guild, "mode.timed_roles.rodape_spam", null, dados.rank + 1) : client.tls.phrase(guild, "mode.timed_roles.rodape_warn", null, indice_warn + 1)
 
-                    const cargo = await getUserRole(interaction.author.id, guild.sid, client.timestamp() + defaultRoleTimes[dados.timed_role.timeout])
+                    await updateUserRole(client, cargo.id, {
+                        nick: membro_guild.user.username,
+                        role_id: dados.role,
+                        valid: true,
+                        assigner: client.id(),
+                        assigner_nick: client.username(),
+                        relatory: relatory
+                    })
 
-                    cargo.nick = membro_guild.user.username
-                    cargo.rid = dados.role
-                    cargo.valid = true
-
-                    cargo.assigner = client.id()
-                    cargo.assigner_nick = client.username()
-
-                    cargo.relatory = acionador === "spam" ? client.tls.phrase(guild, "mode.timed_roles.rodape_spam", null, dados.rank + 1) : client.tls.phrase(guild, "mode.timed_roles.rodape_warn", null, indice_warn + 1)
-                    cargo.save()
-
-                    const motivo = `\n\`\`\`fix\n💂‍♂️ ${client.tls.phrase(guild, "mode.timed_roles.nota_moderador")}\n\n${cargo.relatory}\`\`\``
+                    const motivo = `\n\`\`\`fix\n💂‍♂️ ${client.tls.phrase(guild, "mode.timed_roles.nota_moderador")}\n\n${relatory}\`\`\``
 
                     const embed_timed_role = new EmbedBuilder()
                         .setTitle(client.tls.phrase(guild, "mode.timed_roles.titulo_cargo_concedido"))
@@ -71,7 +70,7 @@ module.exports = async ({ client, guild, interaction, dados, acionador, indice_w
                         .addFields(
                             {
                                 name: `${client.defaultEmoji("playing")} **${client.tls.phrase(guild, "mode.anuncio.cargo")}**`,
-                                value: `${client.emoji("mc_name_tag")} \`${role.name}\`\n<@&${cargo.rid}>`,
+                                value: `${client.emoji("mc_name_tag")} \`${role.name}\`\n<@&${dados.role}>`,
                                 inline: true
                             },
                             {
@@ -81,14 +80,14 @@ module.exports = async ({ client, guild, interaction, dados, acionador, indice_w
                             },
                             {
                                 name: `${client.emoji("icon_integration")} **${client.tls.phrase(guild, "mode.warn.moderador")} ( ${client.tls.phrase(guild, "util.user.alonsal")} )**`,
-                                value: `${client.emoji("icon_id")} \`${cargo.assigner}\`\n${client.emoji("mc_name_tag")} \`${cargo.assigner_nick}\`\n( <@${cargo.assigner}> )`,
+                                value: `${client.emoji("icon_id")} \`${client.id()}\`\n${client.emoji("mc_name_tag")} \`${client.username()}\`\n( <@${client.id()}> )`,
                                 inline: true
                             }
                         )
 
                     // Enviando o aviso ao canal do servidor
                     client.notify(acionador === "spam" ? guild.spam.channel : guild.warn.channel, { embeds: [embed_timed_role] })
-                    atualiza_roles()
+                    await atualiza_roles(client)
                 }
             }
         } else

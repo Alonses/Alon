@@ -19,113 +19,112 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("User_role", schema)
 
-async function getUserRole(uid, sid, timestamp) {
-
-    if (!await model.exists({ uid: uid, sid: sid, timestamp: timestamp }))
-        await model.create({
-            uid: uid,
-            sid: sid,
-            timestamp: timestamp
-        })
-
-    return model.findOne({
-        uid: uid,
-        sid: sid,
+async function getUserRole(client, uid, sid, timestamp) {
+    const filter = {
+        user_id: uid,
+        server_id: sid,
         timestamp: timestamp
+    }
+
+    const role = await client.prisma.userRoles.findFirst({ where: filter })
+    if (!role) return client.prisma.userRoles.create({ data: filter })
+
+    return role
+}
+
+async function getTimedRoleAssigner(client, uid, sid) {
+    return client.prisma.userRoles.findFirst({
+        where: {
+            user_id: uid,
+            server_id: sid,
+            valid: false
+        },
+        orderBy: { timestamp: "desc" }
     })
 }
 
-async function getTimedRoleAssigner(uid, sid) {
-
-    return model.findOne({
-        uid: uid,
-        sid: sid,
-        valid: false
-    }).sort({
-        timestamp: -1
-    }).limit(1)
-}
-
-async function checkUserGuildRoles(sid) {
-
-    // Listando apenas os usuários que possuem cargos concedidos no servidor
-    return model.find({
-        sid: sid,
-        valid: true
-    }).limit(50)
-}
-
-async function listAllUserValidyRoles() {
-
-    // Listando todos os membrosque possuem cargos temporários ativos
-    return model.find({
-        valid: true
+async function checkUserGuildRoles(client, sid) {
+    return client.prisma.userRoles.findMany({
+        where: {
+            server_id: sid,
+            valid: true
+        },
+        take: 50
     })
 }
 
-async function filterRemovedTimedRole(uid, sid, rid) {
+async function listAllUserValidyRoles(client) {
+    return client.prisma.userRoles.findMany({ where: { valid: true } })
+}
 
-    // Procura se há um cargo temporário ativo que foi removido manualmente por um moderador
-    return model.find({
-        uid: uid,
-        sid: sid,
-        rid: rid,
-        valid: true
+async function filterRemovedTimedRole(client, uid, sid, rid) {
+    return client.prisma.userRoles.findMany({
+        where: {
+            user_id: uid,
+            server_id: sid,
+            role_id: rid,
+            valid: true
+        }
     })
 }
 
-async function listAllUserGuildRoles(uid, sid) {
-
-    // Listando todos os cargos que um usuário recebeu em um servidor
-    return model.find({
-        uid: uid,
-        sid: sid,
-        valid: true
+async function listAllUserGuildRoles(client, uid, sid) {
+    return client.prisma.userRoles.findMany({
+        where: {
+            user_id: uid,
+            server_id: sid,
+            valid: true
+        }
     })
 }
 
-async function listAllCachedUserGuildRoles(uid, sid) {
-
-    // Listando os cargos em cache de um usuário
-    return model.find({
-        uid: uid,
-        sid: sid,
-        valid: false
+async function listAllCachedUserGuildRoles(client, uid, sid) {
+    return client.prisma.userRoles.findMany({
+        where: {
+            user_id: uid,
+            server_id: sid,
+            valid: false
+        }
     })
 }
 
-async function removeCachedUserRole(uid, sid) {
-    await model.findOneAndDelete({
-        uid: uid,
-        sid: sid,
-        valid: false
+async function removeCachedUserRole(client, uid, sid) {
+    return client.prisma.userRoles.deleteMany({
+        where: {
+            user_id: uid,
+            server_id: sid,
+            valid: false
+        }
     })
 }
 
-async function dropAllUserGuildRoles(uid, sid) {
-
-    // Remove todos os cargos que um usuário recebeu no servidor
-    await model.deleteMany({
-        uid: uid,
-        sid: sid
+async function dropAllUserGuildRoles(client, uid, sid) {
+    return client.prisma.userRoles.deleteMany({
+        where: {
+            user_id: uid,
+            server_id: sid
+        }
     })
 }
 
-async function dropUserTimedRole(uid, sid, rid) {
-
-    // Remove o cargo do vinculo com o membro
-    await model.deleteMany({
-        uid: uid,
-        sid: sid,
-        rid: rid
+async function dropUserTimedRole(client, uid, sid, rid) {
+    return client.prisma.userRoles.deleteMany({
+        where: {
+            user_id: uid,
+            server_id: sid,
+            role_id: rid
+        }
     })
 }
 
-async function dropAllGuildRoles(sid) {
+async function dropAllGuildRoles(client, sid) {
+    return client.prisma.userRoles.deleteMany({ where: { server_id: sid } })
+}
 
-    // Remove todos os cargos salvos no servidor
-    await model.deleteMany({
-        sid: sid
+async function updateUserRole(client, id, update) {
+    await client.prisma.userRoles.update({
+        where: { id: id },
+        data: update
     })
 }
 
@@ -141,5 +140,6 @@ module.exports = {
     dropAllGuildRoles,
     dropUserTimedRole,
     listAllUserValidyRoles,
-    filterRemovedTimedRole
+    filterRemovedTimedRole,
+    updateUserRole
 }

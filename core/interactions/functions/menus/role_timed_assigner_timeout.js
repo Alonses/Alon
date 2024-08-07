@@ -1,4 +1,4 @@
-const { getTimedRoleAssigner } = require('../../../database/schemas/User_roles')
+const { getTimedRoleAssigner, updateUserRole} = require('../../../database/schemas/User_roles')
 
 module.exports = async ({ client, user, interaction, dados }) => {
 
@@ -6,12 +6,10 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const user_alvo = dados.split(".")[1]
 
     // Atualizando o tempo de expiração do cargo
-    const cargo = await getTimedRoleAssigner(user_alvo, interaction.guild.id)
-    cargo.timeout = tempo_exclusao
-
-    await cargo.save()
+    const cargo = await getTimedRoleAssigner(client, user_alvo, interaction.guild.id)
+    await updateUserRole(client, cargo.id, { timeout: tempo_exclusao })
 
     // Redirecionando o evento
     dados = { id: user_alvo }
-    require('../../chunks/role_timed_assigner')({ client, user, interaction, dados })
+    await require('../../chunks/role_timed_assigner')({client, user, interaction, dados})
 }

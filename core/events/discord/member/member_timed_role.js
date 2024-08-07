@@ -13,12 +13,12 @@ module.exports = async ({ client, guild, dados }) => {
         })
 
     // Verificando se o membro possuia um cargo temporário vinculado
-    if ((await filterRemovedTimedRole(user_alvo.id, guild.sid, removidos[0])).length > 0) {
+    if ((await filterRemovedTimedRole(client, user_alvo.id, guild.server_id, removidos[0])).length > 0) {
 
         // Excluindo o vinculo do cargo com o membro
-        await dropUserTimedRole(user_alvo.id, guild.sid, removidos[0])
+        await dropUserTimedRole(client, user_alvo.id, guild.server_id, removidos[0])
 
         // Atualizando a lista de cargos temporários em cache
-        atualiza_roles()
+        await atualiza_roles(client)
     }
 }

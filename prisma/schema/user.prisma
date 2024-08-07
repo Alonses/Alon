@@ -183,6 +183,8 @@ model UserReports {
 }
 
 model UserRoles {
+  id Int @id @default(autoincrement())
+
   user_id   String
   server_id String
   role_id   String
@@ -194,8 +196,6 @@ model UserRoles {
   assigner_nick String?
   relatory      String?
   timestamp     Int?
-
-  @@id([user_id, server_id, role_id])
 }
 
 model UserStatement {

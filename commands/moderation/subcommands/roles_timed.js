@@ -1,6 +1,7 @@
 const { PermissionsBitField } = require('discord.js')
 
 const { getUserRole } = require('../../../core/database/schemas/User_roles.js')
+const {updateUserRole} = require("../../../core/database/schemas/User_roles");
 
 module.exports = async ({ client, user, interaction }) => {
 
@@ -40,22 +41,23 @@ module.exports = async ({ client, user, interaction }) => {
         })
 
     const user_alvo = interaction.options.getUser("user")
-    const role = await getUserRole(user_alvo.id, interaction.guild.id, client.timestamp())
+    const role = await getUserRole(client, user_alvo.id, interaction.guild.id, client.timestamp())
+    const update = { }
 
     if (guild.timed_roles_timeout) // Sincroniza o cargo temporário com o tempo minimo do servidor
-        role.timeout = guild.timed_roles_timeout
+        update.timeout = guild.timed_roles_timeout
 
-    role.rid = interaction.options.getRole("role").id
-    role.nick = user_alvo.username
+    update.role_id = interaction.options.getRole("role").id
+    update.nick = user_alvo.username
 
     // Salvando dados do moderador que acionou o comando
-    role.assigner = interaction.user.id
-    role.assigner_nick = interaction.user.username
+    update.assigner = interaction.user.id
+    update.assigner_nick = interaction.user.username
 
     if (interaction.options?.getString("reason"))
-        role.relatory = interaction.options.getString("reason")
+        update.relatory = interaction.options.getString("reason")
 
-    await role.save()
+    await updateUserRole(client, role.id, update)
 
     return require('../../../core/interactions/chunks/role_timed_assigner.js')({ client, user, interaction })
 }

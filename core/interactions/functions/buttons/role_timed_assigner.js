@@ -1,6 +1,6 @@
 const { PermissionsBitField, EmbedBuilder } = require('discord.js')
 
-const { getTimedRoleAssigner, removeCachedUserRole } = require('../../../database/schemas/User_roles')
+const { getTimedRoleAssigner, removeCachedUserRole, updateUserRole} = require('../../../database/schemas/User_roles')
 const { atualiza_roles } = require('../../../auto/triggers/user_roles')
 
 const { defaultRoleTimes } = require('../../../formatters/patterns/timeout')
@@ -19,12 +19,12 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
     // 10 -> Confirmar a atribuição de cargo para o membro
 
-    const cargo = await getTimedRoleAssigner(user_alvo, interaction.guild.id)
+    const cargo = await getTimedRoleAssigner(client, user_alvo, interaction.guild.id)
 
     if (operacao === 0) {
 
         // Excluindo o cargo salvo em cache para configuração
-        removeCachedUserRole(user_alvo, interaction.guild.id)
+        await removeCachedUserRole(client, user_alvo, interaction.guild.id)
 
         return client.reply(interaction, {
             content: client.tls.phrase(user, "menu.botoes.operacao_cancelada", 11),
@@ -59,7 +59,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             reback: "browse_button.role_timed_assigner",
             operation: operacao,
             submenu: `${user_alvo}.${operacao}`,
-            values: await client.getGuildRoles(interaction, cargo.rid)
+            values: await client.getGuildRoles(interaction, cargo.role_id)
         }
 
         // Subtrai uma página do total ( em casos de exclusão de itens e pagina em cache )
@@ -114,13 +114,13 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             })
 
         // Membro já possui o cargo mencionado
-        if (await client.hasRole(interaction, cargo.rid, cargo.uid))
+        if (await client.hasRole(interaction, cargo.role_id, cargo.user_id))
             return interaction.update({
                 content: client.tls.phrase(user, "mode.timed_roles.cargo_ja_concedido", 7),
                 ephemeral: true
             })
 
-        const role = client.getGuildRole(interaction, cargo.rid)
+        const role = client.getGuildRole(interaction, cargo.role_id)
         const bot_member = await client.getMemberGuild(interaction.guild.id, client.id())
 
         if (role.position > bot_member.roles.highest.position)
@@ -130,13 +130,15 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             })
 
         // Adicionado o cargo temporário ao membro
-        const membro_guild = await client.getMemberGuild(interaction, cargo.uid)
+        const membro_guild = await client.getMemberGuild(interaction, cargo.user_id)
         membro_guild.roles.add(role).then(async () => {
 
             // Atualizando os status do cargo para poder cronometrar
-            cargo.valid = true
-            cargo.timestamp = client.timestamp() + defaultRoleTimes[cargo.timeout]
-            await cargo.save()
+            const timestamp = client.timestamp() + defaultRoleTimes[cargo.timeout]
+            await updateUserRole(client, cargo.id, {
+                valid: true,
+                timestamp: timestamp
+            })
 
             let motivo = ""
 
@@ -150,12 +152,12 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
                 .addFields(
                     {
                         name: `${client.defaultEmoji("playing")} **${client.tls.phrase(guild, "mode.anuncio.cargo")}**`,
-                        value: `${client.emoji("mc_name_tag")} \`${role.name}\`\n<@&${cargo.rid}>`,
+                        value: `${client.emoji("mc_name_tag")} \`${role.name}\`\n<@&${cargo.role_id}>`,
                         inline: true
                     },
                     {
                         name: `${client.defaultEmoji("time")} **${client.tls.phrase(guild, "mode.warn.validade")}**`,
-                        value: `<t:${cargo.timestamp}:f>\n( <t:${cargo.timestamp}:R> )`,
+                        value: `<t:${timestamp}:f>\n( <t:${timestamp}:R> )`,
                         inline: true
                     },
                     {
@@ -169,10 +171,10 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
             // Enviando o aviso ao canal do servidor
             client.notify(guild.timed_roles_channel, { content: `${membro_guild}`, embeds: [embed] })
-            atualiza_roles()
+            await atualiza_roles(client)
 
             return interaction.update({
-                content: client.tls.phrase(user, "mode.timed_role.cargo_concedido", 10, [cargo.rid, cargo.uid, cargo.timestamp]),
+                content: client.tls.phrase(user, "mode.timed_role.cargo_concedido", 10, [cargo.role_id, cargo.user_id, cargo.timestamp]),
                 embeds: [],
                 components: [],
                 ephemeral: true
@@ -180,8 +182,6 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
         }).catch(console.error)
 
     } else {
-
-        await cargo.save()
-        require('../../chunks/role_assigner')({ client, user, interaction })
+        await require('../../chunks/role_assigner')({client, user, interaction})
     }
 }

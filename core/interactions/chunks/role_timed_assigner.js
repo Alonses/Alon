@@ -7,7 +7,7 @@ const { defaultRoleTimes } = require('../../formatters/patterns/timeout')
 module.exports = async ({ client, user, interaction, dados }) => {
 
     const user_alvo = interaction.options?.getUser("user") || dados
-    const role = await getTimedRoleAssigner(user_alvo.id, interaction.guild.id)
+    const role = await getTimedRoleAssigner(client, user_alvo.id, interaction.guild.id)
 
     const razao = role.relatory ? `\n\`\`\`fix\n${role.relatory}\`\`\`` : "\n```fix\nSem motivo informado```"
 
@@ -18,12 +18,12 @@ module.exports = async ({ client, user, interaction, dados }) => {
         .addFields(
             {
                 name: `${client.defaultEmoji("person")} **${client.tls.phrase(user, "mode.report.usuario")}**`,
-                value: `${client.emoji("icon_id")} \`${role.uid}\`\n( <@${role.uid}> )`,
+                value: `${client.emoji("icon_id")} \`${role.user_id}\`\n( <@${role.user_id}> )`,
                 inline: true
             },
             {
                 name: `${client.emoji("mc_name_tag")} **${client.tls.phrase(user, "mode.roles.cargo_selecionado")}**`,
-                value: `<@&${role.rid}>`,
+                value: `<@&${role.role_id}>`,
                 inline: true
             },
             {
@@ -34,14 +34,14 @@ module.exports = async ({ client, user, interaction, dados }) => {
         )
 
     const row = [
-        { id: "role_timed_assigner", name: client.tls.phrase(user, "mode.anuncio.cargo"), type: 1, emoji: client.emoji("mc_name_tag"), data: `2.${role.uid}` },
-        { id: "role_timed_assigner", name: client.tls.phrase(user, "menu.botoes.expiracao"), type: 1, emoji: client.defaultEmoji("time"), data: `3.${role.uid}` }
+        { id: "role_timed_assigner", name: client.tls.phrase(user, "mode.anuncio.cargo"), type: 1, emoji: client.emoji("mc_name_tag"), data: `2.${role.user_id}` },
+        { id: "role_timed_assigner", name: client.tls.phrase(user, "menu.botoes.expiracao"), type: 1, emoji: client.defaultEmoji("time"), data: `3.${role.user_id}` }
     ]
 
     if (role.timeout !== null) // Só libera a função caso um tempo seja selecionado
-        row.push({ id: "role_timed_assigner", name: client.tls.phrase(user, "menu.botoes.conceder"), type: 2, emoji: client.emoji(10), data: `1.${role.uid}` })
+        row.push({ id: "role_timed_assigner", name: client.tls.phrase(user, "menu.botoes.conceder"), type: 2, emoji: client.emoji(10), data: `1.${role.user_id}` })
 
-    row.push({ id: "role_timed_assigner", name: client.tls.phrase(user, "menu.botoes.cancelar"), type: 3, emoji: client.emoji(0), data: `0.${role.uid}` })
+    row.push({ id: "role_timed_assigner", name: client.tls.phrase(user, "menu.botoes.cancelar"), type: 3, emoji: client.emoji(0), data: `0.${role.user_id}` })
 
     client.reply(interaction, {
         embeds: [embed],

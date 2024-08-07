@@ -2,9 +2,9 @@ const { writeFileSync, readFile } = require('fs')
 
 const { listAllUserValidyRoles, dropUserTimedRole } = require('../../database/schemas/User_roles')
 
-async function atualiza_roles() {
+async function atualiza_roles(client) {
 
-    const dados = await listAllUserValidyRoles()
+    const dados = await listAllUserValidyRoles(client)
 
     // Salvando os cargos temporários no cache do bot
     writeFileSync("./files/data/user_timed_roles.txt", JSON.stringify(dados))
@@ -26,14 +26,14 @@ async function verifica_roles(client) {
             if (client.timestamp() > role.timestamp) {
 
                 // Excluindo o vinculo do cargo com o membro
-                await dropUserTimedRole(role.uid, role.sid, role.rid)
+                await dropUserTimedRole(client, role.user_id, role.server_id, role.role_id)
 
                 // Removendo o cargo temporário do membro no servidor
-                const guild = await client.guilds(role.sid)
+                const guild = await client.guilds(role.server_id)
                 if (!guild) return
 
-                const cached_role = guild.roles.cache.get(role.rid)
-                const membro_guild = await client.getMemberGuild(role.sid, role.uid)
+                const cached_role = guild.roles.cache.get(role.role_id)
+                const membro_guild = await client.getMemberGuild(role.server_id, role.user_id)
 
                 if (cached_role && membro_guild)
                     membro_guild.roles.remove(cached_role).catch(console.error)
@@ -41,7 +41,7 @@ async function verifica_roles(client) {
         }
 
         // Atualizando os cargos em cache
-        atualiza_roles()
+        await atualiza_roles(client)
     })
 }
 
