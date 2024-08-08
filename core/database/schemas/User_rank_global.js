@@ -11,36 +11,32 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("Rankobal", schema)
 
-async function getRankGlobal() {
-    return model.find().sort({
-        xp: -1
-    }).limit(50)
+async function getRankGlobal(client, limit = 50) {
+    return client.prisma.userRankGlobal.findMany({
+        orderBy: { xp: "desc" },
+        take: limit
+    })
 }
 
-async function getUserGlobalRank(uid, xp, nickname, sid) {
-    if (!await model.exists({ uid: uid }))
-        return model.create({
-            uid: uid,
+async function getUserGlobalRank(client, uid, xp, nickname, sid) {
+    return client.prisma.userRankGlobal.upsert({
+        where: { user_id: uid },
+        update: { },
+        create: {
+            user_id: uid,
+            server_id: sid,
             xp: xp,
-            nickname: nickname,
-            sid: sid
-        })
-
-    return model.findOne({
-        uid: uid
+            nickname: nickname
+        }
     })
 }
 
-async function findUserGlobalRankIndex(uid) {
-    return model.find({
-        uid: uid
-    })
+async function findUserGlobalRankIndex(client, uid) {
+    return client.prisma.userRankGlobal.findUnique({ where: { user_id: uid } })
 }
 
-async function dropUserGlobalRank(uid) {
-    await model.findOneAndDelete({
-        uid: uid
-    })
+async function dropUserGlobalRank(client, uid) {
+    await client.prisma.userRankGlobal.delete({ where: { user_id: uid } })
 }
 
 module.exports.Rankobal = model

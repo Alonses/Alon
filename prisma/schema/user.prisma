@@ -25,9 +25,6 @@ model User {
 
   conf    UserOptionsConf @relation(fields: [conf_id], references: [id])
   conf_id Int             @unique
-
-  rank_global    UserRankGlobal @relation(fields: [rank_global_id], references: [id])
-  rank_global_id Int            @unique
 }
 
 model UserOptionsErase {
@@ -89,11 +86,10 @@ model UserOptionsConf {
 }
 
 model UserRankGlobal {
-  id        Int     @id @default(autoincrement())
+  user_id   String  @id
   server_id String?
   nickname  String?
   xp        Int     @default(0)
-  user      User?
 }
 
 model UserRankGuild {

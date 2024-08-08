@@ -46,7 +46,7 @@ async function verifyDynamicBadge(client, alvo, badge_id) {
     let top_users
 
     if (alvo !== "hoster")
-        top_users = await (alvo === "bufunfas" ? getRankMoney(client) : getRankGlobal())
+        top_users = await (alvo === "bufunfas" ? getRankMoney(client) : getRankGlobal(client))
     else // Usuários que mais convidaram o Alonsal
         top_users = await getRankHosters(client)
 
@@ -55,36 +55,36 @@ async function verifyDynamicBadge(client, alvo, badge_id) {
     const users = {}
 
     // Badges do primeiro colocado no rank de bufunfas
-    await getUserBadges(client, top_users[0].id)
+    await getUserBadges(client, top_users[0].user_id)
         .then(badges => {
             badges.forEach(badge => {
-                if (users[top_users[0].id])
-                    users[top_users[0].id].push(badge.badge)
+                if (users[top_users[0].user_id])
+                    users[top_users[0].user_id].push(badge.badge)
                 else
-                    users[top_users[0].id] = [badge.badge]
+                    users[top_users[0].user_id] = [badge.badge]
             })
         })
 
     // Badges do segundo colocado no rank de bufunfas
-    await getUserBadges(top_users[1].id)
+    await getUserBadges(top_users[1].user_id)
         .then(badges => {
             badges.forEach(badge => {
-                if (users[top_users[1].id])
-                    users[top_users[1].id].push(badge.badge)
+                if (users[top_users[1].user_id])
+                    users[top_users[1].user_id].push(badge.badge)
                 else
-                    users[top_users[1].id] = [badge.badge]
+                    users[top_users[1].user_id] = [badge.badge]
             })
         })
 
-    if (users[top_users[0].id]) { // Verificando se o primeiro colocado possui a badge dinâmica enviada
-        if (!users[top_users[0].id].includes(badge_id))
-            await createBadge(top_users[0].id, badge_id, client.timestamp())
+    if (users[top_users[0].user_id]) { // Verificando se o primeiro colocado possui a badge dinâmica enviada
+        if (!users[top_users[0].user_id].includes(badge_id))
+            await createBadge(top_users[0].user_id, badge_id, client.timestamp())
     } else
-        await createBadge(top_users[0].id, badge_id, client.timestamp())
+        await createBadge(top_users[0].user_id, badge_id, client.timestamp())
 
     // Verificando se o segundo colocado possui a badge dinâmica e removendo-a
-    if (users[top_users[1].id] && users[top_users[1].id].includes(badge_id)) {
-        await removeBadge(top_users[1].id, badge_id)
+    if (users[top_users[1].user_id] && users[top_users[1].user_id].includes(badge_id)) {
+        await removeBadge(top_users[1].user_id, badge_id)
 
         // Removendo a badge dinâmica do fixado caso o usuário não possua mais
         if (top_users[1].misc.fixed_badge === badge_id) {

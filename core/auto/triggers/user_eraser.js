@@ -76,11 +76,11 @@ async function verifica_user_eraser(client) {
                 await dropAllUserGroups(client, id_user)
 
                 // Excluindo todas as badges que estão vinculadas ao usuário
-                await dropAllUserBadges(id_user)
+                await dropAllUserBadges(client, id_user)
 
                 // Excluindo todos os rankings globais e de servidores que fazem referência ao usuário
                 await dropAllUserGuildRanks(client, id_user)
-                await dropUserGlobalRank(id_user)
+                await dropUserGlobalRank(client, id_user)
 
                 // Excluindo todos os módulos do usuário
                 await dropAllUserModules(client, id_user)
@@ -92,7 +92,7 @@ async function verifica_user_eraser(client) {
                 await dropAllUserTickets(client, id_user)
 
                 // Excluindo todos os servidores salvos em cache do usuário
-                await dropAllUserGuilds(id_user)
+                await dropAllUserGuilds(client, id_user)
 
                 // Exclui o usuário por completo
                 await dropUser(client, id_user)

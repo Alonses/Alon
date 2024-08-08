@@ -28,16 +28,16 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
         await client.deferedResponse({ interaction, ephemeral })
     }
 
-    if (operacao === 3 || operacao == 5) {
+    if (operacao === 3 || operacao === 5) {
 
         // Coletando os dados para o servidor ou para o global
-        const data_usuarios = await (caso === "server" ? getRankServer(client, interaction.guild.id) : getRankGlobal())
+        const data_usuarios = await (caso === "server" ? getRankServer(client, interaction.guild.id) : getRankGlobal(client))
         let posicao = 1
 
         if (operacao === 3) {
 
             for (let i = 0; i < data_usuarios.length; i++) {
-                if (interaction.user.id !== data_usuarios[i].uid) posicao++
+                if (interaction.user.id !== data_usuarios[i].user_id) posicao++
                 else break
             }
 

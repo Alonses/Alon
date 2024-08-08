@@ -23,7 +23,7 @@ module.exports = async ({ client, user, interaction, pagina_guia, caso, defer, a
     }
 
     // Coleta o ID do usuário mencionado
-    data_usuarios = await (escopo === "server" ? getRankServer(client, interaction.guild.id) : getRankGlobal())
+    data_usuarios = await (escopo === "server" ? getRankServer(client, interaction.guild.id) : getRankGlobal(client))
     let rodape = interaction.user.username, user_alvo_data
 
     if (interaction.options?.getUser("user")) // Usuário alvo definido
