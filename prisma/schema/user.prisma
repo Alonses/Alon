@@ -28,9 +28,6 @@ model User {
 
   rank_global    UserRankGlobal @relation(fields: [rank_global_id], references: [id])
   rank_global_id Int            @unique
-
-  rank_guild    UserRankGuild @relation(fields: [rank_guild_id], references: [id])
-  rank_guild_id Int           @unique
 }
 
 model UserOptionsErase {
@@ -100,8 +97,8 @@ model UserRankGlobal {
 }
 
 model UserRankGuild {
-  id                Int     @id @default(autoincrement())
-  server_id         String?
+  user_id           String
+  server_id         String
   nickname          String?
   lastInteraction   Int?
   warns             Int     @default(0)
@@ -110,7 +107,8 @@ model UserRankGuild {
   ixp               Int     @default(0)
   erase_valid       Boolean @default(false)
   erase_on          Int?
-  user              User?
+
+  @@id([user_id, server_id])
 }
 
 model UserBadges {

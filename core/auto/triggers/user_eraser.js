@@ -10,6 +10,7 @@ const { dropAllUserStatements } = require('../../database/schemas/User_statement
 const { dropAllUserTickets, dropTicket } = require('../../database/schemas/User_tickets.js')
 const { dropAllUserGuilds, dropUserGuild } = require('../../database/schemas/User_guilds.js')
 const { dropUserGlobalRank } = require('../../database/schemas/User_rank_global.js')
+const {updateUserRankGuild} = require("../../database/schemas/User_rank_guild");
 
 async function atualiza_user_eraser(client) {
 
@@ -31,24 +32,22 @@ async function atualiza_user_eraser(client) {
     // Salvando os usuários marcados para exclusão no cache do bot
     writeFileSync("./files/data/erase_user.txt", JSON.stringify(dados))
 
-    dados = await getGuildOutdatedUsers(client.timestamp())
+    dados = await getGuildOutdatedUsers(client, client.timestamp())
 
     // Atualizando o status de exclusão por servidor para o usuário
     for (let i = 0; i < dados.length; i++) {
 
         const usuario = dados[i]
-        const guild = await client.guilds(usuario.sid)
+        const guild = await client.guilds(usuario.server_id)
         let nome_servidor
 
         if (guild)
-            nome_servidor = `\`${usuario.sid}\` | \`${guild.name}\``
+            nome_servidor = `\`${usuario.server_id}\` | \`${guild.name}\``
         else
-            nome_servidor = `\`${usuario.sid}\` | \`${client.tls.phrase(usuario, "manu.data.server_desconhecido")}\``
+            nome_servidor = `\`${usuario.server_id}\` | \`${client.tls.phrase(usuario, "manu.data.server_desconhecido")}\``
 
-        if (!usuario.erase.valid) { // Avisando sobre a atualização de status para exclusão dos dados do usuário
-            usuario.erase.valid = true
-            await usuario.save()
-        }
+        if (!usuario.erase.valid) // Avisando sobre a atualização de status para exclusão dos dados do usuário
+            await updateUserRankGuild(client, usuario, { erase_valid: true })
     }
 
     // Salvando os usuários marcados para exclusão no cache do bot
@@ -80,7 +79,7 @@ async function verifica_user_eraser(client) {
                 await dropAllUserBadges(id_user)
 
                 // Excluindo todos os rankings globais e de servidores que fazem referência ao usuário
-                await dropAllUserGuildRanks(id_user)
+                await dropAllUserGuildRanks(client, id_user)
                 await dropUserGlobalRank(id_user)
 
                 // Excluindo todos os módulos do usuário
@@ -125,7 +124,7 @@ async function verifica_user_eraser(client) {
                 await dropAllGuildUserTasks(client, id_user, id_guild)
 
                 // Excluindo o ranking do servidor que faz referência ao usuário
-                await dropUserRankServer(id_user, id_guild)
+                await dropUserRankServer(client, id_user, id_guild)
 
                 // Excluindo o ticket criado pelo usuário no servidor
                 await dropTicket(client, id_user, id_guild)

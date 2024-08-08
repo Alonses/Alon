@@ -8,7 +8,7 @@ const idioma = require('./core/data/language')
 const database = require('./core/database/database')
 
 const { nerfa_spam } = require('./core/events/spam')
-const { checkUser } = require('./core/database/schemas/User')
+const { checkUser, updateUser} = require('./core/database/schemas/User')
 const { getUserRankServer } = require('./core/database/schemas/User_rank_guild')
 const { verifySuspiciousLink } = require('./core/database/schemas/Spam_links')
 
@@ -78,7 +78,7 @@ client.discord.on("messageCreate", async message => {
 
 	if (user) { // It only runs if the member is saved in the database
 
-		let user_rank_guild = await getUserRankServer(user.uid, message.guild.id)
+		let user_rank_guild = await getUserRankServer(client, user.id, message.guild.id)
 
 		// Ignoring banned users and those moved to data deletion
 		if (user.conf?.banned || user.erase.valid || user_rank_guild.erase.valid) return
@@ -86,15 +86,12 @@ client.discord.on("messageCreate", async message => {
 		// Syncing user data
 		if (!user.profile.avatar || !user.profile.avatar?.includes(message.author.avatar)) {
 
-			const user_guild = await client.getMemberGuild(message, user.uid)
-			user.profile.avatar = user_guild.user.avatarURL({ dynamic: true })
-
-			await user.save()
+			const user_guild = await client.getMemberGuild(message, user.id)
+			await updateUser(client, user.id, { avatar: user_guild.user.avatarURL({ dynamic: true }) })
 		}
 
 		if (!user.nick) {
-			user.nick = message.author.username
-			await user.save()
+			await updateUser(client, user.id, { nick: message.author.username })
 		}
 
 		// Updating users' XP, experience received by the user

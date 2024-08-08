@@ -54,7 +54,7 @@ function internal_clock(client, tempo_restante) {
         }
 
         if (client.timestamp() % 1800 < 60) // 30 Minutos
-            await verifica_servers() // Sincronizando o ranking global dos usuários que ganharam XP
+            await verifica_servers(client) // Sincronizando o ranking global dos usuários que ganharam XP
 
         internal_clock(client, 60000)
     }, tempo_restante)

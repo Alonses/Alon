@@ -60,10 +60,10 @@ async function clear_data({ client, user, interaction, operador, caso }) {
                 await dropUnknownRankServers(client, user.id)
 
             if (alvos[i] === 6) // Excluindo o rank do servidor
-                await dropUserRankServer(user.id, interaction.guild.id)
+                await dropUserRankServer(client, user.id, interaction.guild.id)
 
             if (alvos[i] === 7) // Excluindo o rank global
-                await dropAllUserGuildRanks(user.id)
+                await dropAllUserGuildRanks(client, user.id)
 
             if (alvos[i] === 8) { // Excluindo todas as tarefas e listas de tarefas
                 await dropAllUserTasks(client, user.id)

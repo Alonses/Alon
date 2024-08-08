@@ -33,7 +33,7 @@ async function verifica_eraser(client) {
             if (client.timestamp() > servidor.erase.timestamp) {
 
                 // Excluindo todos os rankings registrados no servidor
-                await dropAllRankGuild(servidor.server_id)
+                await dropAllRankGuild(client, servidor.server_id)
 
                 // Excluindo todas as advertências criadas no servidor
                 await dropAllGuildWarns(client, servidor.server_id)

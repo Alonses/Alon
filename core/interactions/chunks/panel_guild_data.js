@@ -1,14 +1,13 @@
 const { EmbedBuilder, PermissionsBitField } = require('discord.js')
 
 const { listRankGuild } = require('../../database/schemas/User_rank_guild')
-const { getNetworkedGuilds } = require('../../database/schemas/Guild')
 const { checkUserGuildReported } = require('../../database/schemas/User_reports')
 const { listAllGuildWarns } = require('../../database/schemas/Guild_warns')
 const { defaultEraser } = require('../../formatters/patterns/timeout')
 
 module.exports = async ({ client, user, interaction, operador, pagina_guia }) => {
 
-    const rank = await listRankGuild(interaction.guild.id)
+    const rank = await listRankGuild(client, interaction.guild.id)
     const warns = await listAllGuildWarns(client, interaction.guild.id)
     const reportes = await checkUserGuildReported(client, interaction.guild.id)
 

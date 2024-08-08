@@ -1,9 +1,10 @@
 const { atualiza_user_eraser } = require('../auto/triggers/user_eraser')
 const { getUserGlobalRank } = require('../database/schemas/User_rank_global')
-const { getUserRankServer, getUserRankServers } = require('../database/schemas/User_rank_guild')
+const { getUserRankServer, getUserRankServers, updateUserRankGuild} = require('../database/schemas/User_rank_guild')
 
 const { CHECKS } = require('../formatters/patterns/user')
 const { defaultUserEraser } = require('../formatters/patterns/timeout')
+const {client_data} = require("../../setup");
 
 let members_xp = []
 
@@ -13,15 +14,15 @@ module.exports = async ({ client, message, caso }) => {
     let id_alvo = message.user?.id || message.author?.id
 
     // Coletando os dados do usuário alvo
-    let user = await getUserRankServer(id_alvo, message.guild.id)
+    const user = await getUserRankServer(client, id_alvo, message.guild.id);
 
     // Sincronizando o XP interno de todos os servidores que o usuário faz parte
     if (!user.ixp) {
         user.ixp = user.xp
-        await sincroniza_xp(user)
+        await sincroniza_xp(client, user)
     }
 
-    const user_data = await client.getUser(user.uid, {
+    const user_data = await client.getUser(user.user_id, {
         erase: true,
         misc: true
     }) // Salvando a última interação do usuário
@@ -37,20 +38,20 @@ module.exports = async ({ client, message, caso }) => {
         cached_erase = true
     }
 
-    if (user.erase.valid) { // Usuário interagiu com o Alonsal novamente
+    if (user.erase_valid) { // Usuário interagiu com o Alonsal novamente
         client.sendDM(user_data.id, { content: client.tls.phrase(user_data, "manu.data.aviso_remocao_exclusao_servidor", client.defaultEmoji("person"), await (client.guilds(message.guild.id)).name) })
 
-        user.erase.valid = false // Retirando a etiqueta para remoção de dados
+        user.erase_valid = false // Retirando a etiqueta para remoção de dados
         cached_erase = true
     }
 
-    user_data.erase.erase_on = client.timestamp() + defaultUserEraser[user_data.erase.timeout]
+    user_data.erase_on = client.timestamp() + defaultUserEraser[user_data.erase.timeout]
 
     if (cached_erase) // Atualizando a lista de usuários que estão marcados para exclusão
-        atualiza_user_eraser(client)
+        await atualiza_user_eraser(client)
 
     // Validando se o usuário tem o ranking habilitado
-    if (!await client.verifyUserRanking(user.uid)) return
+    if (!await client.verifyUserRanking(user.user_id)) return
 
     //              Comandos                  Mensagens
     user.nickname = message.user?.username || message.author?.username
@@ -61,7 +62,7 @@ module.exports = async ({ client, message, caso }) => {
             user.warns = 0
 
             validador = true
-            await user.save()
+            await updateUserRankGuild(client, user, user)
             await client.prisma.userOptionsErase.update({
                 where: { id: user_data.id },
                 data: user_data.erase
@@ -111,7 +112,7 @@ module.exports = async ({ client, message, caso }) => {
     }
 
     // Bônus em Bufunfas por subir de nível
-    if (parseInt(user.ixp / 1000) !== parseInt(xp_anterior / 1000)) {
+    if (user.ixp !== xp_anterior) {
         await client.prisma.userOptionsMisc.update({
             where: { id: user_data.misc_id },
             data: { money: { increment: 250 } }
@@ -124,24 +125,20 @@ module.exports = async ({ client, message, caso }) => {
 
     // Registrando no relatório algumas informações
     client.journal(caso)
-    await user.save()
+    await updateUserRankGuild(client, user, user)
 
     // Adicionando o usuário na fila de ranking global para a próxima sincronização
-    if (!members_xp.includes(user.uid)) members_xp.push(user.uid)
+    if (!members_xp.includes(user.user_id)) members_xp.push(user.user_id)
 }
 
-sincroniza_xp = async (user) => {
+sincroniza_xp = async (client, user) => {
+    const servidores = await getUserRankServers(client, user.user_id)
 
-    const servidores = await getUserRankServers(user.uid)
-
-    servidores.forEach(async servidor => {
-        servidor.ixp = servidor.xp
-
-        await servidor.save()
-    })
+    for (const servidor of servidores)
+        await updateUserRankGuild(client, servidor, { ixp: servidor.xp })
 }
 
-async function verifica_servers() {
+async function verifica_servers(client) {
 
     let array_copia = members_xp
     members_xp = []
@@ -153,19 +150,19 @@ async function verifica_servers() {
 
             /* Verifica todos os servidores em busca do servidor com maior XP
             e salvando o maior servidor válido no ranking global */
-            const servers = await getUserRankServers(id_user)
-            let user_global = await getUserGlobalRank(id_user), maior = 0
+            const servers = await getUserRankServers(client, id_user)
+            let user_global = await getUserGlobalRank(client, id_user), maior = 0
 
-            servers.forEach(async servidor => {
+            for (const servidor of servers) {
                 if (servidor.ixp > maior) {
                     maior = servidor.ixp
 
-                    user_global.xp = servidor.ixp
-                    user_global.sid = servidor.sid
+                    await updateUserRankGuild(client_data, user_global, {
+                        xp: servidor.ixp,
+                        server_id: servidor.server_id
+                    })
                 }
-            })
-
-            await user_global.save()
+            }
             array_copia.shift()
         }
 }

@@ -23,7 +23,7 @@ module.exports = async ({ client, user, interaction, pagina_guia, caso, defer, a
     }
 
     // Coleta o ID do usuário mencionado
-    data_usuarios = await (escopo === "server" ? getRankServer(interaction.guild.id) : getRankGlobal())
+    data_usuarios = await (escopo === "server" ? getRankServer(client, interaction.guild.id) : getRankGlobal())
     let rodape = interaction.user.username, user_alvo_data
 
     if (interaction.options?.getUser("user")) // Usuário alvo definido
@@ -86,7 +86,19 @@ module.exports = async ({ client, user, interaction, pagina_guia, caso, defer, a
         return retorna_card_alvo({ client, user, interaction, usuario_alvo, user_alvo_data })
 
     // Exibindo o rank do servidor ou global
-    retorna_ranking({ client, user, interaction, ids, usernames, experiencias, levels, rodape, escopo, autor_original, deferido })
+    await retorna_ranking({
+        client,
+        user,
+        interaction,
+        ids,
+        usernames,
+        experiencias,
+        levels,
+        rodape,
+        escopo,
+        autor_original,
+        deferido
+    })
 }
 
 async function retorna_ranking({ client, user, interaction, ids, usernames, experiencias, levels, rodape, escopo, autor_original, deferido }) {

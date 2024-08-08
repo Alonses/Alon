@@ -22,121 +22,112 @@ const schema = new mongoose.Schema({
 
 const model = mongoose.model("Rankerver", schema)
 
-async function getRankServer(sid) {
-    if (!await model.exists({ sid: sid }))
-        return null
-
-    return model.find({
-        sid: sid
-    }).sort({
-        xp: -1
-    }).limit(50)
-}
-
-async function listRankGuild(sid) {
-    return model.find({
-        sid: sid
+async function getRankServer(client, sid) {
+    return client.prisma.userRankGuild.findMany({
+        where: { server_id: sid },
+        orderBy: { xp: "desc" },
+        take: 50
     })
 }
 
-async function getAllUsers() {
-    return model.find()
+async function listRankGuild(client, sid) {
+    return client.prisma.userRankGuild.findMany({ where: { server_id: sid } })
 }
 
-async function getUserRankServers(uid) {
-    if (!await model.exists({
-        uid: uid
-    })) return
-
-    return model.find({
-        uid: uid
-    })
+async function getAllUsers(client) {
+    return client.prisma.userRankGuild.findMany()
 }
 
-async function getUserRankServer(uid, sid) {
-    if (!await model.exists({ uid: uid, sid: sid }))
-        await model.create({
-            uid: uid,
-            sid: sid
-        })
+async function getUserRankServers(client, uid) {
+    return client.prisma.userRankGuild.findMany({ where: { user_id: uid } })
+}
 
-    return model.findOne({
-        uid: uid,
-        sid: sid
+async function getUserRankServer(client, uid, sid) {
+    const filter = {
+        user_id: uid,
+        server_id: sid
+    }
+
+    return client.prisma.userRankGuild.upsert({
+        where: filter,
+        update: { },
+        create: filter
     })
 }
 
 // Buscando os usuários que estão desatualizados no escopo de servidor para exclusão dos dados
-async function getGuildOutdatedUsers(timestamp) {
-
-    return await model.find({
-        "erase.erase_on": { $lte: timestamp }
+async function getGuildOutdatedUsers(client, timestamp) {
+    return client.prisma.userRankGuild.findMany({
+        where: { erase_on: { lte: timestamp } }
     })
 }
 
-async function createRankServer(uid, server_id, experience) {
-    await model.create({
-        uid: uid,
-        sid: server_id,
-        xp: experience
+async function createRankServer(client, uid, sid, experience) {
+    await client.prisma.userRankGuild.create({
+        data: {
+            user_id: uid,
+            server_id: sid,
+            xp: experience
+        }
     })
 }
 
-async function dropUserRankServer(uid, sid) {
-    await model.findOneAndDelete({
-        uid: uid,
-        sid: sid
+async function dropUserRankServer(client, uid, sid) {
+    await client.prisma.userRankGuild.delete({
+        where: {
+            user_id: uid,
+            server_id: sid
+        }
     })
 }
 
-async function dropAllRankGuild(sid) {
-    await model.deleteMany({
-        sid: sid
-    })
+async function dropAllRankGuild(client, sid) {
+    await client.prisma.userRankGuild.deleteMany({ where: { server_id: sid } })
 }
 
-async function dropAllUserGuildRanks(uid) {
-    await model.deleteMany({
-        uid: uid
-    })
+async function dropAllUserGuildRanks(client, uid) {
+    await client.prisma.userRankGuild.deleteMany({ where: { user_id: uid } })
 }
 
 async function dropUnknownRankServers(client, uid) {
 
-    const guilds_ranking = await getUserRankServers(uid)
+    const guilds_ranking = await getUserRankServers(client, uid)
 
     // Procurando servidores que o usuário possui rank porém o bot não está incluso
-    guilds_ranking.forEach(async valor => {
-        let server = await client.guilds().get(valor.sid)
+    for (const valor of guilds_ranking) {
+        let server = await client.guilds().get(valor.server_id)
 
-        if (!server)
-            await dropUserRankServer(uid, valor.sid)
-    })
+        if (!server) await dropUserRankServer(client, uid, valor.server_id)
+    }
 }
 
-async function updateUserRank() {
-
-    const users = await this.getAllUsers()
+async function updateUserRank(client) {
+    const users = await getAllUsers(client)
 
     for (let i = 0; i < users.length; i++) {
-        users[i].internal_xp = users[i].xp
-
-        await users[i].save()
+        await updateUserRankGuild(client, users[i], { ixp: users[i].xp })
     }
 }
 
 // Define um tempo de expiração para todos os usuários sem tempo definido no escopo de servidor
 async function getUnknowLastInteraction(client) {
-
-    const users = await model.find({ "erase.erase_on": null })
+    const users = await client.prisma.userRankGuild.findMany({ where: { erase_on: null } })
 
     for (let i = 0; i < users.length; i++) {
 
         const usuario = users[i]
-        usuario.erase.erase_on = client.timestamp() + 2419200
-
-        await usuario.save()
+        await updateUserRankGuild(client, usuario, { erase_on: client.timestamp() + 2419200 })
     }
+}
+
+async function updateUserRankGuild(client, userRank, update) {
+    await client.prisma.userRankGuild.update({
+        where: {
+            user_id: userRank.user_id,
+            server_id: userRank.server_id
+        },
+        data: update
+    })
 }
 
 module.exports.Rankerver = model
@@ -149,6 +140,7 @@ module.exports = {
     getGuildOutdatedUsers,
     createRankServer,
     updateUserRank,
+    updateUserRankGuild,
     dropUserRankServer,
     dropAllRankGuild,
     dropAllUserGuildRanks,

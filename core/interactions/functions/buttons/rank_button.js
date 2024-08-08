@@ -31,7 +31,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
     if (operacao === 3 || operacao == 5) {
 
         // Coletando os dados para o servidor ou para o global
-        const data_usuarios = await (caso === "server" ? getRankServer(interaction.guild.id) : getRankGlobal())
+        const data_usuarios = await (caso === "server" ? getRankServer(client, interaction.guild.id) : getRankGlobal())
         let posicao = 1
 
         if (operacao === 3) {
@@ -49,5 +49,13 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
         } else pagina_guia = Math.ceil(data_usuarios.length / 6)
     }
 
-    require('../../../formatters/chunks/model_rank')({ client, user, interaction, pagina_guia, caso, defer, autor_original })
+    await require('../../../formatters/chunks/model_rank')({
+        client,
+        user,
+        interaction,
+        pagina_guia,
+        caso,
+        defer,
+        autor_original
+    })
 }

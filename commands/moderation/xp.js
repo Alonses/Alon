@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, PermissionsBitField, PermissionFlagsBits } = require('discord.js')
 
-const { getUserRankServer } = require('../../core/database/schemas/User_rank_guild')
+const { getUserRankServer, updateUserRankGuild} = require('../../core/database/schemas/User_rank_guild')
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -53,20 +53,20 @@ module.exports = {
 
         // Coletando os dados do usuário informado no servidor
         const alvo = interaction.options.getUser("user")
-        const user_c = await getUserRankServer(alvo.id, interaction.guild.id)
+        const user_c = await getUserRankServer(client, alvo.id, interaction.guild.id)
 
         // Validando se o usuário tem o ranking habilitado
         if (!await client.verifyUserRanking(user_c.uid))
             return client.tls.reply(interaction, user, "mode.ranking.error", true, 5)
 
-        user_c.nickname = alvo.username
-        let novo_exp = parseFloat(interaction.options.get('xp').value)
+        const novo_exp = parseFloat(interaction.options.get('xp').value)
+        const novo_nivel = novo_exp / 1000
 
-        user_c.xp = parseFloat(novo_exp)
-        novo_nivel = parseFloat(novo_exp / 1000)
+        await updateUserRankGuild(client, user_c, {
+            nickname: alvo.username,
+            xp: novo_exp
+        })
 
-        await user_c.save()
-
-        client.tls.reply(interaction, user, "mode.xp.sucesso", true, 17, [user_c.nickname, novo_exp.toFixed(2), novo_nivel.toFixed(2)])
+        client.tls.reply(interaction, user, "mode.xp.sucesso", true, 17, [alvo.username, novo_exp.toFixed(2), novo_nivel.toFixed(2)])
     }
 }
