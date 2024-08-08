@@ -18,7 +18,7 @@ async function getUserStrikes(client, uid, sid) {
     }
 
     return client.prisma.userStrikes.upsert({
-        where: filter,
+        where: { id: filter },
         update: { },
         create: filter
     })
@@ -27,22 +27,26 @@ async function getUserStrikes(client, uid, sid) {
 async function removeStrike(client, uid, sid) {
     await client.prisma.userStrikes.delete({
         where: {
-            user_id: uid,
-            server_id: sid
+            id: {
+                user_id: uid,
+                server_id: sid
+            }
         }
     })
 }
 
 // Apagando todos os strikes registrados no servidor sobre um membro
 async function dropUserGuildStrikes(client, sid) {
-    await client.prisma.userStrikes.delete({ where: { server_id: sid } })
+    await client.prisma.userStrikes.deleteMany({ where: { server_id: sid } })
 }
 
 async function updateUserStrike(client, strike, update) {
     await client.prisma.userStrikes.update({
         where: {
-            user_id: strike.user_id,
-            server_id: strike.server_id
+            id: {
+                user_id: strike.user_id,
+                server_id: strike.server_id
+            }
         },
         data: update
     })

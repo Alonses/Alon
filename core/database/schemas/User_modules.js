@@ -20,7 +20,7 @@ async function getActiveModules(client, uid) {
     const filter = { active: true }
     if (uid !== undefined) filter.user_id = uid
 
-    return await client.prisma.findMany({ where: filter })
+    return client.prisma.userModules.findMany({where: filter});
 }
 
 async function createModule(client, uid, type, timestamp) {

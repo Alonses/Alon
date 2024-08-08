@@ -19,7 +19,7 @@ async function getTicket(client, sid, uid) {
     }
 
     return client.prisma.userTickets.upsert({
-        where: filter,
+        where: { id: filter },
         update: { },
         create: filter
     })
@@ -29,8 +29,10 @@ async function getTicket(client, sid, uid) {
 async function dropTicket(client, sid, uid) {
     await client.prisma.userTickets.delete({
         where: {
-            user_id: uid,
-            server_id: sid
+            id: {
+                user_id: uid,
+                server_id: sid
+            }
         }
     })
 }
@@ -41,7 +43,7 @@ async function dropAllGuildTickets(client, sid) {
 }
 
 // Apaga todos os tickets criados por um usuário
-async function dropAllUserTickets(uid) {
+async function dropAllUserTickets(client, uid) {
     await client.prisma.userTickets.deleteMany({ where: { user_id: uid } })
 }
 

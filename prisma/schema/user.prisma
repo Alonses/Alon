@@ -104,7 +104,7 @@ model UserRankGuild {
   erase_valid       Boolean @default(false)
   erase_on          Int?
 
-  @@id([user_id, server_id])
+  @@id(name: "id", [user_id, server_id])
 }
 
 model UserBadges {
@@ -173,7 +173,7 @@ model UserReports {
   archived    Boolean @default(false)
   auto        Boolean @default(false)
 
-  @@id([user_id, server_id])
+  @@id(name: "id", [user_id, server_id])
 }
 
 model UserRoles {
@@ -208,7 +208,7 @@ model UserStrikes {
   server_id String
   strikes   Int    @default(0)
 
-  @@id([user_id, server_id])
+  @@id(name: "id", [user_id, server_id])
 }
 
 model UserTasks {
@@ -227,7 +227,7 @@ model UserTasksGroup {
   name      String
   timestamp Int
 
-  @@id([user_id, server_id, name])
+  @@id(name: "id", [user_id, server_id, name])
 }
 
 model UserTickets {
@@ -236,5 +236,5 @@ model UserTickets {
 
   channel_id String?
 
-  @@id([user_id, server_id])
+  @@id(name: "id", [user_id, server_id])
 }

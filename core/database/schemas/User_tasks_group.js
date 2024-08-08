@@ -16,9 +16,11 @@ async function createGroup(client, uid, name, sid, timestamp) {
 
     const group = await client.prisma.userTasksGroup.findUnique({
         where: {
-            user_id: uid,
-            server_id: sid,
-            name: name
+            id: {
+                user_id: uid,
+                server_id: sid,
+                name: name
+            }
         }
     })
 
@@ -95,9 +97,11 @@ async function dropAllGuildUserGroups(client, uid, sid) {
 async function updateUserTaskGroup(client, group, update) {
     await client.prisma.userTasksGroup.update({
         where: {
-            user_id: group.user_id,
-            server_id: group.server_id,
-            name: group.name
+            id: {
+                user_id: group.user_id,
+                server_id: group.server_id,
+                name: group.name
+            }
         },
         data: update
     })

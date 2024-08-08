@@ -24,7 +24,7 @@ async function getReport(client, uid, sid) {
     }
 
     return client.prisma.userReports.upsert({
-        where: filter,
+        where: { id: filter },
         update: { },
         create: filter
     })
@@ -33,8 +33,10 @@ async function getReport(client, uid, sid) {
 async function dropReport(client, uid, sid) {
     await client.prisma.userReports.delete({
         where: {
-            user_id: uid,
-            server_id: sid
+            id: {
+                user_id: uid,
+                server_id: sid
+            }
         }
     })
 }
@@ -74,8 +76,10 @@ async function updateGuildReport(client, sid) {
     for (const report of reports)
         await client.prisma.userReports.update({
             where: {
-                user_id: report.user_id,
-                server_id: report.server_id
+                id: {
+                    user_id: report.user_id,
+                    server_id: report.server_id
+                }
             },
             data: { server_id: process.env.guild_id }
         })
@@ -84,8 +88,10 @@ async function updateGuildReport(client, sid) {
 async function updateUserReport(client, report, update) {
     await client.prisma.userReports.update({
         where: {
-            user_id: report.user_id,
-            server_id: report.server_id
+            id: {
+                user_id: report.user_id,
+                server_id: report.server_id
+            }
         },
         data: update
     })

@@ -49,7 +49,7 @@ async function getUserRankServer(client, uid, sid) {
     }
 
     return client.prisma.userRankGuild.upsert({
-        where: filter,
+        where: { id: filter },
         update: { },
         create: filter
     })
@@ -75,8 +75,10 @@ async function createRankServer(client, uid, sid, experience) {
 async function dropUserRankServer(client, uid, sid) {
     await client.prisma.userRankGuild.delete({
         where: {
-            user_id: uid,
-            server_id: sid
+            id: {
+                user_id: uid,
+                server_id: sid
+            }
         }
     })
 }
@@ -123,8 +125,10 @@ async function getUnknowLastInteraction(client) {
 async function updateUserRankGuild(client, userRank, update) {
     await client.prisma.userRankGuild.update({
         where: {
-            user_id: userRank.user_id,
-            server_id: userRank.server_id
+            id: {
+                user_id: userRank.user_id,
+                server_id: userRank.server_id
+            }
         },
         data: update
     })
