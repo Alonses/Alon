@@ -74,7 +74,7 @@ module.exports = async ({ client, message, caso }) => {
         if (message.createdTimestamp - user.lastInteraction < CHECKS.DIFF) {
             user.warns++
 
-            await user.save()
+            await updateUserRankGuild(client, user, user)
             await client.prisma.userOptionsErase.update({
                 where: { id: user_data.erase_id },
                 data: user_data.erase
@@ -94,7 +94,7 @@ module.exports = async ({ client, message, caso }) => {
     let xp_anterior = user.ixp
 
     // Recalculando o tempo de inatividade do usuário
-    user.erase.erase_on = client.timestamp() + defaultUserEraser[user_data.erase.guild_timeout]
+    user.erase_on = client.timestamp() + defaultUserEraser[user_data.erase.guild_timeout]
 
     if (caso === "messages") {
 

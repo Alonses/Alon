@@ -28,7 +28,7 @@ async function getUserWarn(client, uid, sid, timestamp) {
 
     const warn = await client.prisma.userWarns.findFirst({ where: filter })
 
-    if (!warn) return client.prisma.userWarns.create(filter);
+    if (!warn) return client.prisma.userWarns.create({ data: filter });
 
     return warn
 }

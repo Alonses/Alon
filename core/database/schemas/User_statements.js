@@ -19,11 +19,13 @@ async function registryStatement(client, uid, operation, type, value) {
         await dropUserStatement(uid, statements[9].timestamp)
 
     await client.prisma.userStatement.create({
-        user_id: uid,
-        operation: operation,
-        type: type,
-        value: value,
-        timestamp: client.timestamp()
+        data: {
+            user_id: uid,
+            operation: operation,
+            type: type,
+            value: value,
+            timestamp: client.timestamp()
+        }
     })
 }
 
