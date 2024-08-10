@@ -35,8 +35,8 @@ module.exports = {
                 })
                 .setMinValue(15)
                 .setMaxValue(350)),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, { misc: true })
         const tamanho = interaction.options.getInteger("length") || 15
 
         let bonus = ''

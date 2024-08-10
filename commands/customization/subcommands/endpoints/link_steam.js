@@ -1,11 +1,11 @@
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id, { social: true })
     await interaction.deferReply({ ephemeral: true })
 
-    user.social.steam = interaction.options.getString("value")
+    const steam = interaction.options.getString("value")
 
     // Verificando se o local existe antes de salvar
-    await fetch(`https://steamcommunity.com/id/${user.social.steam}`)
+    await fetch(`https://steamcommunity.com/id/${steam}`)
         .then(response => response.text())
         .then(async res => {
 
@@ -15,7 +15,10 @@ module.exports = async ({ client, user, interaction }) => {
                     ephemeral: true
                 })
 
-            await user.save()
+            await client.prisma.userOptionsSocial.update({
+                where: { id: user.social_id },
+                data: { steam: steam }
+            })
 
             interaction.editReply({
                 content: client.tls.phrase(user, "util.lastfm.new_link", client.emoji("emojis_dancantes"), ["steam", "</steam:1018609879562334384>"]),

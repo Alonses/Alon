@@ -1,11 +1,11 @@
 const { languagesMap } = require('../../../formatters/patterns/user')
+const {updateUser} = require("../../../database/schemas/User");
 
 module.exports = async ({ client, user, interaction, dados }) => {
 
     // Alterando o idioma do usuário para a nova escolha
-    user.lang = languagesMap[dados][0]
-    await user.save()
+    await updateUser(client, user.id, { lang: languagesMap[dados][0] })
 
     // Redirecionando o evento
-    require('../../chunks/browse_help')({ client, user, interaction })
+    await require('../../chunks/browse_help')({client, user, interaction})
 }

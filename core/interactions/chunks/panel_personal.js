@@ -1,16 +1,19 @@
 const { EmbedBuilder } = require('discord.js')
 
-module.exports = async ({ client, user, interaction, operador, pagina_guia }) => {
-
+module.exports = async ({ client, interaction, operador, pagina_guia }) => {
+    const user = await client.getUser(interaction.user.id, {
+        conf: true,
+        misc: true
+    })
     const pagina = pagina_guia || 0
 
     if (operador) { // Função usada com um atalho
 
         if (operador === "data") // Atalho para a guia de configurações de exclusão de dados
-            return require('./panel_personal_data')({ client, user, interaction })
+            return require('./panel_personal_data')({ client, interaction })
 
         const dados = `${interaction.user.id}.${operador}`
-        return require('../functions/buttons/user_panel_button')({ client, user, interaction, dados })
+        return require('../functions/buttons/user_panel_button')({ client, interaction, dados })
     }
 
     const embed = new EmbedBuilder()
@@ -81,10 +84,10 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
 
     const c_menu = [false, false]
     // Botão de voltar
-    if (pagina == 0) c_menu[0] = true
+    if (pagina === 0) c_menu[0] = true
 
     // Botão para avançar
-    if (pagina == 2) c_menu[1] = true
+    if (pagina === 2) c_menu[1] = true
 
     let botoes = [{ id: "navigation_button_panel", name: '◀️', type: 0, data: `${pagina}.0.panel_personal`, disabled: c_menu[0] }]
 

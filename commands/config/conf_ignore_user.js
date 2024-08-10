@@ -8,7 +8,7 @@ module.exports = {
             option.setName("usuario")
                 .setDescription("O ID do usuário")
                 .setRequired(true)),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         if (interaction.user.id !== client.x.owners[0] || client.x.owners.includes(interaction.options.getString("usuario"))) return
 

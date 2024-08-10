@@ -3,7 +3,8 @@ const fetch = (...args) =>
 
 const { EmbedBuilder } = require('discord.js')
 
-module.exports = async ({ client, user, interaction }) => {
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id, { conf: true })
 
     let texto_entrada = ""
 
@@ -30,7 +31,7 @@ module.exports = async ({ client, user, interaction }) => {
             texto_entrada = user_alvo.social.lastfm
 
     // Aumentando o tempo de duração da resposta
-    await interaction.deferReply({ ephemeral: interaction.user.id === alvo.id ? false : true })
+    await interaction.deferReply({ ephemeral: interaction.user.id !== alvo.id })
 
     fetch(`${process.env.url_apisal}/lastfm?profile=${texto_entrada}&now=true`)
         .then(response => response.json())
@@ -63,7 +64,7 @@ module.exports = async ({ client, user, interaction }) => {
             interaction.editReply({
                 embeds: [embed],
                 components: [client.create_buttons(row, interaction)],
-                ephemeral: interaction.user.id === alvo.id ? false : true
+                ephemeral: interaction.user.id !== alvo.id
             })
         })
 }

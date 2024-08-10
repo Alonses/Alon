@@ -1,11 +1,11 @@
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id)
     await interaction.deferReply({ ephemeral: true })
 
-    user.misc.locale = interaction.options.getString("value")
+    const locale = interaction.options.getString("value")
 
     // Verificando se o local existe antes de salvar
-    await fetch(`${process.env.url_weather}appid=${process.env.key_weather}&q=${user.misc.locale}&units=metric&lang=pt`)
+    await fetch(`${process.env.url_weather}appid=${process.env.key_weather}&q=${locale}&units=metric&lang=pt`)
         .then(response => response.json())
         .then(async res => {
 
@@ -15,10 +15,13 @@ module.exports = async ({ client, user, interaction }) => {
                     ephemeral: true
                 })
 
-            await user.save()
+            await client.prisma.userOptionsMisc.update({
+                where: { id: user.misc_id },
+                data: { locale: locale }
+            })
 
             interaction.editReply({
-                content: client.tls.phrase(user, "util.tempo.new_link", client.emoji("emojis_dancantes"), user.misc.locale),
+                content: client.tls.phrase(user, "util.tempo.new_link", client.emoji("emojis_dancantes"), locale),
                 ephemeral: true
             })
         })

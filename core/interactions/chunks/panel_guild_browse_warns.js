@@ -2,8 +2,8 @@ const { EmbedBuilder } = require('discord.js')
 
 const { listAllUserWarns } = require('../../database/schemas/User_warns')
 
-module.exports = async ({ client, user, interaction, dados }) => {
-
+module.exports = async ({ client, interaction, dados }) => {
+    const user = await client.getUser(interaction.user.id)
     let member = interaction.options?.getUser("user") || dados
     const user_warns = await listAllUserWarns(client, member.id, interaction.guild.id)
 

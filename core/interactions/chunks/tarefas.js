@@ -1,6 +1,7 @@
 const { listAllUserTasks, listAllUserGroupTasks } = require('../../database/schemas/User_tasks')
 
-module.exports = async ({ client, user, interaction, operador, autor_original }) => {
+module.exports = async ({ client, interaction, operador, autor_original }) => {
+    const user = await client.getUser(interaction.user.id, { conf: true })
 
     if (!autor_original) // Redirecionando o usuário secundário
         return require('./listas_navegar')({ client, user, interaction, autor_original })
@@ -146,7 +147,7 @@ module.exports = async ({ client, user, interaction, operador, autor_original })
     }
 }
 
-filtra_tarefas = (tarefas, caso) => {
+const filtra_tarefas = (tarefas, caso) => {
 
     const array = []
 

@@ -2,8 +2,8 @@ const { EmbedBuilder } = require('discord.js')
 
 const { getUserStatements } = require('../../../core/database/schemas/User_statements')
 
-module.exports = async ({ client, user, interaction, local }) => {
-
+module.exports = async ({ client, interaction, local }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     const date1 = new Date()
     let alvo = interaction.options.getUser("user") || interaction.user
     let user_interno = await client.getUser(alvo.id, { misc: true })

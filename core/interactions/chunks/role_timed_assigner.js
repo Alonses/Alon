@@ -4,8 +4,8 @@ const { getTimedRoleAssigner } = require('../../database/schemas/User_roles')
 
 const { defaultRoleTimes } = require('../../formatters/patterns/timeout')
 
-module.exports = async ({ client, user, interaction, dados }) => {
-
+module.exports = async ({ client, interaction, dados }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     const user_alvo = interaction.options?.getUser("user") || dados
     const role = await getTimedRoleAssigner(client, user_alvo.id, interaction.guild.id)
 

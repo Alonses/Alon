@@ -70,9 +70,9 @@ module.exports = {
                             "pt-BR": 'Motivo pela concessão deste cargo'
                         })))
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers | PermissionFlagsBits.ManageRoles),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         // Redirecionando o evento
-        require(`./subcommands/roles_${interaction.options.getSubcommand()}`)({ client, user, interaction })
+        require(`./subcommands/roles_${interaction.options.getSubcommand()}`)({ client, interaction })
     }
 }

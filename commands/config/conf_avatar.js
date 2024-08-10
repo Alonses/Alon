@@ -9,7 +9,7 @@ module.exports = {
                 .setDescription("A nova foto de perfil do bot")
                 .setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild | PermissionFlagsBits.Administrator),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         if (!client.x.owners.includes(interaction.user.id)) return
 

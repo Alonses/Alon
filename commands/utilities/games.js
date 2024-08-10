@@ -19,9 +19,9 @@ module.exports = {
             "pt-BR": '⌠💡⌡ O(s) jogo(s) gratuito(s) do momento',
             "ru": '⌠💡⌡ Текущие бесплатные игры'
         }),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         // Redirecionando o evento
-        require('../../core/formatters/chunks/model_free_games')(client, user, interaction)
+        await require('../../core/formatters/chunks/model_free_games')(client, interaction)
     }
 }

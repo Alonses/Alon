@@ -1,6 +1,10 @@
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
     // Redirecionando o evento
     const pagina = 0, dados = `${interaction.user.id}.3`
-    require('../../../core/interactions/functions/buttons/report_remove_user')({ client, user, interaction, dados, pagina })
+    await require('../../../core/interactions/functions/buttons/report_remove_user')({
+        client,
+        interaction,
+        dados,
+        pagina
+    })
 }

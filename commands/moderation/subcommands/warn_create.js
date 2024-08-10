@@ -4,8 +4,8 @@ const { listAllGuildWarns } = require('../../../core/database/schemas/Guild_warn
 const { guildPermissions } = require('../../../core/formatters/patterns/guild')
 const { listAllUserPreWarns } = require('../../../core/database/schemas/User_pre_warns')
 
-module.exports = async ({ client, user, interaction, guild }) => {
-
+module.exports = async ({ client, interaction, guild }) => {
+    const user = await client.getUser(interaction.user.id)
     // Verificando a quantidade de advertências customizadas no servidor
     const warns_guild = await listAllGuildWarns(client, interaction.guild.id)
 
@@ -72,7 +72,6 @@ module.exports = async ({ client, user, interaction, guild }) => {
     // Redirecionando o evento
     await require('../../../core/formatters/chunks/model_user_warn')({
         client,
-        user,
         interaction,
         guild,
         user_warns,

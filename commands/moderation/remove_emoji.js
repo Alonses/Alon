@@ -38,7 +38,8 @@ module.exports = {
                         })
                         .setRequired(true)))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageEmojisAndStickers),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id)
 
         // Verificando se o bot pode gerenciar emojis e stickers
         if (!await client.permissions(interaction, client.id(), [PermissionsBitField.Flags.ManageEmojisAndStickers]))

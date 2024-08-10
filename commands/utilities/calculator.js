@@ -119,9 +119,9 @@ module.exports = {
                         })
                         .setMinValue(0)
                         .setRequired(true))),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         // Solicitando a função e executando
-        require(`./subcommands/calculator_${interaction.options.getSubcommand()}`)({ client, user, interaction })
+        require(`./subcommands/calculator_${interaction.options.getSubcommand()}`)({ client, interaction })
     }
 }

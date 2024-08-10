@@ -2,8 +2,8 @@ const { EmbedBuilder } = require('discord.js')
 
 const { rgbToHex } = require('../../../core/functions/hex_color')
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     // Cor customizada
     const rgb = {
         r: interaction.options.getInteger("r"),

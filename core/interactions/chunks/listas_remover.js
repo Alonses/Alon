@@ -1,7 +1,7 @@
 const { listAllUserGroups } = require("../../database/schemas/User_tasks_group")
 
-module.exports = async ({ client, user, interaction, autor_original, pagina }) => {
-
+module.exports = async ({ client, interaction, autor_original, pagina }) => {
+    const user = await client.getUser(interaction.user.id, { conf: true })
     const listas = await (user?.conf.global_tasks ? listAllUserGroups(client, interaction.user.id) : listAllUserGroups(client, interaction.user.id, interaction.guild.id))
 
     if (listas.length < 1) // Sem listas

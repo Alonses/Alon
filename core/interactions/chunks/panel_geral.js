@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js')
 
-module.exports = async ({ client, user, interaction }) => {
+module.exports = async ({ client, interaction }) => {
 
     const embed = new EmbedBuilder()
         .setTitle("> Painel de controle do Alonsal")

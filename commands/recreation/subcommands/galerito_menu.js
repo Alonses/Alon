@@ -1,7 +1,7 @@
 const { relation } = require('../../../files/songs/galerito/songs.json')
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id, { conf: true })
     const data = {
         title: { tls: "Escolha uma frase do galerito e cia!" },
         pattern: "phrases",

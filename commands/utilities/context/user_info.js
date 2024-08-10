@@ -4,9 +4,9 @@ module.exports = {
     menu_data: new ContextMenuCommandBuilder()
         .setName("Info")
         .setType(ApplicationCommandType.User),
-    async menu({ client, user, interaction }) {
+    async menu({ client, interaction }) {
 
         // Redirecionando o evento
-        require("../subcommands/user_info")({ client, user, interaction })
+        await require("../subcommands/user_info")({client, interaction})
     }
 }

@@ -3,7 +3,11 @@ const fetch = (...args) =>
 
 const { EmbedBuilder } = require('discord.js')
 
-module.exports = async (client, user, dados, interaction) => {
+module.exports = async (client, dados, interaction) => {
+    const user = await client.getUser(interaction.user.id, {
+        conf: true,
+        misc: true
+    })
 
     if (!dados) dados = ""
 

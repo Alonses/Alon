@@ -5,8 +5,8 @@ const { operation_codes } = require('../../formatters/patterns/guild')
 // Funções sem guias de configuração
 const direct_functions = [10]
 
-module.exports = async ({ client, user, interaction, operador, pagina_guia }) => {
-
+module.exports = async ({ client, interaction, operador, pagina_guia }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     const pagina = pagina_guia || 0
 
     // Códigos de funções
@@ -25,9 +25,9 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
     const c_buttons = [false, false, false, false, false, false, false, false, false, false, false, false, false, false]
     const c_menu = [false, false]
 
-    if (pagina == 0) // Botão de voltar
+    if (pagina === 0) // Botão de voltar
         c_menu[0] = true
-    if (pagina == 2) // Botão para avançar
+    if (pagina === 2) // Botão para avançar
         c_menu[1] = true
 
     let botoes = [{ id: "navigation_button_panel", name: '◀️', type: 0, data: `${pagina}.0.panel_guild`, disabled: c_menu[0] }]
@@ -79,7 +79,7 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
             // Permissão válida
             if (direct_functions.includes(operation_codes[operador])) { // Funções sem guia de configuração
                 const dados = `${interaction.user.id}.${operation_codes[operador]}`
-                return require('../functions/buttons/guild_panel_button')({ client, user, interaction, dados })
+                return require('../functions/buttons/guild_panel_button')({ client, interaction, dados })
             } else {
 
                 // Acessando diretamente uma guia de função
@@ -93,7 +93,7 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
                 if (c_buttons[operation_codes[operador]])
                     return client.tls.reply(interaction, user, "manu.painel.user_sem_permissao", true, 7)
 
-                return require(`./panel_guild_${operador}`)({ client, user, interaction, pagina_guia })
+                return require(`./panel_guild_${operador}`)({ client, interaction, pagina_guia })
             }
         }
 

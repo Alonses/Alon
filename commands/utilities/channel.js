@@ -31,8 +31,11 @@ module.exports = {
                     "pt-BR": 'Mencione um canal',
                     "ru": 'упомянуть канал'
                 })),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, {
+            conf: true,
+            misc: true
+        })
         let canal = interaction.options.getChannel("channel") || interaction.channel
 
         // Coletando os dados do canal informado

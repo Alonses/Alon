@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js')
+const {updateUser} = require("../../core/database/schemas/User");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -12,8 +13,8 @@ module.exports = {
             "pt-BR": '⌠💸⌡ Pegue sua bufunfa diária',
             "ru": '⌠💸⌡ Получай свой ежедневный Bufunfa'
         }),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, { misc: true })
         const date1 = new Date()
         let data_atual = date1.toDateString('pt-BR')
 
@@ -25,12 +26,16 @@ module.exports = {
 
         const bufunfa = client.random(600, 1200)
 
-        user.misc.money += bufunfa
-        user.misc.daily = data_atual
-        await user.save()
+        await client.prisma.userOptionsMisc.update({
+            where: { id: user.misc_id },
+            data: {
+                money: { increment: bufunfa },
+                daily: data_atual
+            }
+        })
 
         // Registrando as movimentações de bufunfas para o usuário
-        await client.registryStatement(user.uid, "misc.b_historico.daily", true, bufunfa)
+        await client.registryStatement(user.id, "misc.b_historico.daily", true, bufunfa)
         await client.journal("gerado", bufunfa)
 
         interaction.reply({

@@ -1,9 +1,9 @@
 const { dropTicket } = require('../../../core/database/schemas/User_tickets')
 
-module.exports = async ({ client, user, interaction, channel, solicitante, canal_servidor }) => {
-
+module.exports = async ({ client, interaction, channel, solicitante, canal_servidor }) => {
+    const user = await client.getUser(interaction.user.id)
     // Sem canal de denúncias ativo
-    if (channel.cid === null)
+    if (channel.channel_id === null)
         return client.tls.reply(interaction, user, "mode.denuncia.canal_fechado", true, 4)
 
     const date1 = new Date()

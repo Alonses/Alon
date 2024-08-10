@@ -1,8 +1,8 @@
 const { buildAllBadges, busca_badges } = require('../../data/user_badges')
 const { getUserReports } = require('../../database/schemas/User_reports')
 
-module.exports = async ({ client, user, interaction, dados, autor_original }) => {
-
+module.exports = async ({ client, interaction, dados, autor_original }) => {
+    const user = await client.getUser(interaction.user.id, { conf: true })
     // Códigos de operação
     // 0 -> Perfil
     // 1 -> Permissões

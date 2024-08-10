@@ -2,8 +2,8 @@ const { EmbedBuilder, PermissionsBitField } = require("discord.js")
 
 const { banMessageEraser } = require('../../formatters/patterns/timeout')
 
-module.exports = async ({ client, user, interaction, pagina_guia }) => {
-
+module.exports = async ({ client, interaction, pagina_guia }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     const guild = await client.getGuild(interaction.guild.id, { reports: true })
     const pagina = pagina_guia || 0
     let botoes = []

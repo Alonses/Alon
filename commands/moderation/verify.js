@@ -46,9 +46,9 @@ module.exports = {
                     "ru": '⌠💂⌡ Просмотр предупрежденных пользователей на сервере'
                 }))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         // Solicitando a função e executando
-        require(`./subcommands/verify_${interaction.options.getSubcommand()}`)({ client, user, interaction })
+        require(`./subcommands/verify_${interaction.options.getSubcommand()}`)({ client, interaction })
     }
 }

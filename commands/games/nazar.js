@@ -15,8 +15,11 @@ module.exports = {
             "pt-BR": '⌠🎲⌡ Mostra onde a Madame Nazar se encontra hoje',
             "ru": '⌠🎲⌡ Показывает, где сегодня находится мадам Назар'
         }),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, {
+            conf: true,
+            misc: true
+        })
         fetch("https://madam-nazar-location-api.herokuapp.com/location/current")
             .then(res => res.json())
             .then(dados => {

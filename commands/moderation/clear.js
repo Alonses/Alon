@@ -47,25 +47,25 @@ module.exports = {
         })
         .setType(ApplicationCommandType.Message)
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
         const qtd_msg = interaction.options.getInteger("amount")
-        deleteMessages(client, user, interaction, qtd_msg)
+        await deleteMessages(client, interaction, qtd_msg)
     },
-    async menu({ client, user, interaction }) {
+    async menu({ client, interaction }) {
         const messageDate = interaction.targetMessage.createdAt
 
         interaction.targetMessage.channel.messages.fetch()
             .then(messages => {
                 const count = messages.filter(m => m.createdAt >= messageDate).size
 
-                deleteMessages(client, user, interaction, count)
+                deleteMessages(client, interaction, count)
             })
             .catch(console.error)
     }
 }
 
-deleteMessages = async (client, user, interaction, qtd_msg) => {
-
+const deleteMessages = async (client, interaction, qtd_msg) => {
+    const user = await client.getUser(interaction.user.id)
     // Verificando se o bot pode gerenciar as mensagens do servidor
     if (!await client.permissions(interaction, client.id(), [PermissionsBitField.Flags.ManageMessages]))
         return client.tls.reply(interaction, user, "mode.clear.permissao", true, 3)

@@ -3,7 +3,8 @@ const fetch = (...args) =>
 
 const { EmbedBuilder } = require('discord.js')
 
-module.exports = async ({ client, user, interaction }) => {
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id, { conf: true })
 
     const idioma_definido = client.idioma.getLang(interaction)
     let texto_entrada = ''

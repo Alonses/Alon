@@ -2,8 +2,8 @@ const { EmbedBuilder } = require("discord.js")
 
 const { verifySuspiciousLink, registerCachedSuspiciousLink } = require("../../../core/database/schemas/Spam_links")
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id)
     let linkRaw = `${interaction.options.getString("link")} `
 
     // Verificando se o link é válido

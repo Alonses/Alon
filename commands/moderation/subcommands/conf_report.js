@@ -1,7 +1,7 @@
 const { PermissionsBitField, ChannelType } = require('discord.js')
-const {updateGuild} = require("../../../core/database/schemas/Guild");
 
-module.exports = async ({ client, user, interaction }) => {
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id)
     const reports = await client.getGuild(interaction.guild.id, { reports: true }).reports
     let canal_alvo
 

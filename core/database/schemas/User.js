@@ -59,18 +59,19 @@ async function checkUser(client, uid) {
 }
 
 async function getUser(client, uid, includes = { }) {
-   return await client.prisma.user.upsert({
-       where: { id: uid },
-       update: { },
-       create: {
-           id: uid,
-           erase: { create: { } },
-           social: { create: { } },
-           profile: { create: { } },
-           misc: { create: { } },
-           conf: { create: { } }
+    const hash = client.hash(uid)
+    return await client.prisma.user.upsert({
+        where: { id: hash },
+        update: { },
+        create: {
+            id: hash,
+            erase: { create: { } },
+            social: { create: { } },
+            profile: { create: { } },
+            misc: { create: { } },
+            conf: { create: { } }
         },
-       include: includes
+        include: includes
     })
 }
 
@@ -103,14 +104,23 @@ async function getUnknownUsers(client) {
     }
 }
 
+async function addMoney(client, user, amount) {
+    await client.prisma.userOptionsMisc.update({
+        where: { id: user.misc_id },
+        data: { money: { increment: amount } }
+    })
+}
+
 // Exclui o usuário por completo
 async function dropUser(client, uid) {
-    await client.prisma.user.deleteOne({ where: { id: uid } })
+    const hash = client.hash(uid)
+    await client.prisma.user.deleteOne({ where: { id: hash } })
 }
 
 async function updateUser(client, uid, update) {
+    const hash = client.hash(uid)
     await client.prisma.user.update({
-        where: { id: uid },
+        where: { id: hash },
         data: update
     })
 }
@@ -127,6 +137,7 @@ module.exports = {
     dropUser,
     updateUser,
     getRankMoney,
+    addMoney,
     getUnknownUsers,
     getOutdatedUsers,
     getUserWithFixedBadges

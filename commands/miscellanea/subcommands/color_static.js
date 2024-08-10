@@ -1,5 +1,5 @@
-module.exports = async ({ client, user, interaction }) => {
+module.exports = async ({ client, interaction }) => {
 
     // Redirecionando o evento
-    require("../../../core/interactions/chunks/static_color")({ client, user, interaction })
+    await require("../../../core/interactions/chunks/static_color")({client, interaction})
 }

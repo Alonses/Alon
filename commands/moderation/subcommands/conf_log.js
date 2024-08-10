@@ -1,7 +1,7 @@
 const { PermissionsBitField, ChannelType } = require('discord.js')
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id)
     const logger = await client.getGuild(interaction.guild.id, { logger: true }).logger
     let canal_alvo
 
@@ -25,7 +25,7 @@ module.exports = async ({ client, user, interaction }) => {
             return client.tls.reply(interaction, user, "mode.logger.mencao_canal", true, 1)
 
         if (typeof canal_alvo !== "object") // Restaurando o canal do cache
-            canal_alvo = await client.channels().get(guild.logger.channel)
+            canal_alvo = await client.channels().get(logger.channel)
 
         if (!canal_alvo) { // Canal salvo em cache foi apagado
             logger.enabled = false

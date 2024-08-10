@@ -1,7 +1,10 @@
 const { EmbedBuilder } = require('discord.js')
 
-module.exports = async ({ client, user, interaction, texto_entrada }) => {
-
+module.exports = async ({ client, interaction, texto_entrada }) => {
+    const user = await client.getUser(interaction.user.id, {
+        conf: true,
+        misc: true
+    })
     // Contador de caracteres e palavras
     const palavras = texto_entrada.split(" ").length
     const caracteres_c = texto_entrada.length
@@ -37,12 +40,12 @@ module.exports = async ({ client, user, interaction, texto_entrada }) => {
     })
 }
 
-contarVogais = (palavra) => {
+const contarVogais = (palavra) => {
     let totalVogal = 0, totalConsoantes = 0, totalNumeros = 0
     const vogais = ['a', 'e', 'i', 'o', 'u']
 
     for (let i = 0; i < palavra.length; i++)
-        if (vogais.indexOf(palavra[i]) != -1) {
+        if (vogais.indexOf(palavra[i]) !== -1) {
             totalVogal++
         } else if (!isNaN(parseInt(palavra[i]))) {
             totalNumeros++

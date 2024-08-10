@@ -116,9 +116,9 @@ module.exports = {
     //         .setDescriptionLocalizations({
     //             "pt-BR": '⌠👤⌡ Configure seu perfil'
     //         }))
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         // Navegando pelos módulos
-        require(`./subcommands/profile_${interaction.options.getSubcommand()}`)({ client, user, interaction })
+        require(`./subcommands/profile_${interaction.options.getSubcommand()}`)({ client, interaction })
     }
 }

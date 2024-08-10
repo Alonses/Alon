@@ -12,9 +12,9 @@ module.exports = {
             "pt-BR": '⌠👤⌡ Tudo o que sabemos sobre você',
             "ru": '⌠👤⌡ Все, что мы знаем о тебе'
         }),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         // Redirecionando o usuário para o painel com as opções de data
-        require("../../core/interactions/chunks/panel_personal_data")({ client, user, interaction })
+        await require("../../core/interactions/chunks/panel_personal_data")({client, interaction})
     }
 }

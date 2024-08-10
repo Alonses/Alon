@@ -12,10 +12,10 @@ module.exports = {
             "pt-BR": '⌠📡⌡ Informações do Alonsal',
             "ru": '⌠📡⌡ Информация от Алонсал'
         }),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         // Redirecionando o evento
         const caso = 0
-        require('../../core/interactions/chunks/browse_info')({ client, user, interaction, caso })
+        await require('../../core/interactions/chunks/browse_info')({client, interaction, caso})
     }
 }

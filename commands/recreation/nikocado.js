@@ -6,7 +6,8 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("nikocado")
 		.setDescription("⌠😂⌡ It's your fault"),
-	async execute({ client, user, interaction }) {
+	async execute({ client, interaction }) {
+		const user = await client.getUser(interaction.user.id, { conf: true })
 
 		interaction.reply({
 			content: gifs[client.random(gifs)],

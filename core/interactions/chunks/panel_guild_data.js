@@ -5,8 +5,8 @@ const { checkUserGuildReported } = require('../../database/schemas/User_reports'
 const { listAllGuildWarns } = require('../../database/schemas/Guild_warns')
 const { defaultEraser } = require('../../formatters/patterns/timeout')
 
-module.exports = async ({ client, user, interaction, operador, pagina_guia }) => {
-
+module.exports = async ({ client, interaction, operador, pagina_guia }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     const rank = await listRankGuild(client, interaction.guild.id)
     const warns = await listAllGuildWarns(client, interaction.guild.id)
     const reportes = await checkUserGuildReported(client, interaction.guild.id)

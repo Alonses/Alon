@@ -80,11 +80,11 @@ module.exports = {
                     "pt-BR": 'Escolha um!',
                     "ru": 'Выбери один!'
                 })),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         let texto_entrada = interaction.options.getString("text")
 
         // Redirecionando para a opção respectiva
-        require(`./subcommands/text_${interaction.options.getString("operation")}`)({ client, user, interaction, texto_entrada })
+        require(`./subcommands/text_${interaction.options.getString("operation")}`)({ client, interaction, texto_entrada })
     }
 }

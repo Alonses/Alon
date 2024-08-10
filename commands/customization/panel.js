@@ -112,9 +112,9 @@ module.exports = {
                             { name: '💂 In-server reports', value: 'tickets' },
                             { name: '🔗 Tracked Invitations', value: 'tracked_invites' }
                         ))),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         const operador = interaction.options.getString("function")
-        require(`../../core/interactions/chunks/panel_${interaction.options.getSubcommand()}`)({ client, user, interaction, operador })
+        require(`../../core/interactions/chunks/panel_${interaction.options.getSubcommand()}`)({ client, interaction, operador })
     }
 }

@@ -1,7 +1,9 @@
-module.exports = async ({ client, user, interaction }) => {
-
-    user.profile.cache.about = interaction.options.getString("description")
-    await user.save()
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id)
+    await client.prisma.userOptionsProfile.update({
+        where: { id: user.profile_id },
+        data: { cache_about: interaction.options.getString("description") }
+    })
 
     // Enviando o embed para validação
     const id_alvo = interaction.user.id, operador = 0

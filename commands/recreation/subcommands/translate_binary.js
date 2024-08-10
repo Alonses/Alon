@@ -1,7 +1,10 @@
 const { EmbedBuilder } = require("discord.js")
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id, {
+        conf: true,
+        misc: true
+    })
     let aviso = ""
 
     const codificar = {
@@ -54,13 +57,13 @@ module.exports = async ({ client, user, interaction }) => {
         .catch(() => client.tls.reply(interaction, user, "util.binario.error_1", true, client.emoji(0)))
 }
 
-textToBinary = (str) => {
+const textToBinary = (str) => {
     return str.split('').map(char => {
         return char.charCodeAt(0).toString(2);
     }).join(' ')
 }
 
-binaryToText = (str) => {
+const binaryToText = (str) => {
     return str.split(" ").map((elem) => {
         return String.fromCharCode(parseInt(elem, 2));;
     }).join("")

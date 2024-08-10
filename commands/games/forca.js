@@ -1,3 +1,5 @@
+const {addMoney} = require("../../core/database/schemas/User")
+
 const fetch = (...args) =>
     import('node-fetch').then(({ default: fetch }) => fetch(...args))
 
@@ -14,8 +16,11 @@ module.exports = {
         .addStringOption(option =>
             option.setName("entrada")
                 .setDescription("Uma letra ou a palavra inteira!")),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, {
+            conf: true,
+            misc: true
+        })
         if (!games[interaction.user.id]) {
             fetch('https://api.dicionario-aberto.net/random')
                 .then(res => res.json())
@@ -39,17 +44,17 @@ module.exports = {
             if (interaction.options.data.length === 1) {
                 const entrada = interaction.options.getString("entrada").toLowerCase()
 
-                verifica_chute(client, entrada, interaction, user)
+                await verifica_chute(client, entrada, interaction, user)
             }
 
             // Verifica se o jogo ainda existe
             if (games[interaction.user.id])
-                retorna_jogo(client, interaction, user)
+                await retorna_jogo(client, interaction, user)
         }
     }
 }
 
-verifica_chute = (client, entrada, interaction, user) => {
+const verifica_chute = async (client, entrada, interaction, user) => {
 
     const split = games[interaction.user.id].word.split("")
 
@@ -74,24 +79,22 @@ verifica_chute = (client, entrada, interaction, user) => {
             if (!acerto)
                 games[interaction.user.id].erros++
 
-            verifica_palavra(client, interaction, user, entrada)
+            await verifica_palavra(client, interaction, user, entrada)
 
             if (games[interaction.user.id].finalizado) {
                 delete games[interaction.user.id]
-                return
             }
         }
     } else { // Chute pela palavra inteira
-        verifica_palavra(client, interaction, user, entrada)
+        await verifica_palavra(client, interaction, user, entrada)
 
         if (games[interaction.user.id].finalizado) {
             delete games[interaction.user.id]
-            return
         }
     }
 }
 
-verifica_palavra = async (client, interaction, user, entrada) => {
+const verifica_palavra = async (client, interaction, user, entrada) => {
 
     // Verifica se a palavra foi completa ou se o chute foi certeiro
     if (entrada === games[interaction.user.id].word || client.replace(games[interaction.user.id].descobertas, null, ["`", "'"]).replaceAll(" ", "") === games[interaction.user.id].word) {
@@ -102,10 +105,9 @@ verifica_palavra = async (client, interaction, user, entrada) => {
 
         games[interaction.user.id].finalizado = true
 
-        user.misc.money += 50
-        await user.save()
+        await addMoney(client, user, 50)
 
-        client.registryStatement(user.uid, "misc.b_historico.jogos_forca", true, 150)
+        client.registryStatement(user.id, "misc.b_historico.jogos_forca", true, 150)
         client.journal("gerado", 150)
 
     } else if (entrada.length > 1 || games[interaction.user.id].erros >= 7) {
@@ -118,7 +120,7 @@ verifica_palavra = async (client, interaction, user, entrada) => {
     }
 }
 
-lista_posicoes = (palavra) => {
+const lista_posicoes = (palavra) => {
 
     let array = []
 
@@ -128,11 +130,11 @@ lista_posicoes = (palavra) => {
     return array.join(" ")
 }
 
-painel_jogo = (interaction) => {
+const painel_jogo = (interaction) => {
     return `\`\`\`${padrao_forca[games[interaction.user.id].erros]}\`\`\``
 }
 
-retorna_jogo = async (client, interaction, user) => {
+const retorna_jogo = async (client, interaction, user) => {
 
     const painel = painel_jogo(interaction)
     let entradas = ""

@@ -2,8 +2,8 @@ const { EmbedBuilder } = require('discord.js')
 
 const { colorsMap, colorsPriceMap } = require('../../formatters/patterns/user')
 
-module.exports = async ({ client, user, interaction, valor }) => {
-
+module.exports = async ({ client, interaction, valor }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     let entrada = interaction.options?.getString("color") || valor
 
     if (user.misc.color === colorsMap[entrada][1])

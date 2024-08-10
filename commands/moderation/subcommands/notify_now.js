@@ -2,8 +2,8 @@ const { PermissionsBitField } = require('discord.js')
 
 const { free_games } = require('../../../core/functions/free_games.js')
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id)
     let guild = await client.getGuild(interaction.guild.id)
 
     if (!guild.games_channel || !guild.games_role)
@@ -24,7 +24,7 @@ module.exports = async ({ client, user, interaction }) => {
 
                 // Enviando os games para anunciar no servidor
                 const guild_channel = guild.games_channel
-                free_games({ client, guild_channel })
+                await free_games({client, guild_channel})
 
             } else // Sem permissão para enviar mensagens no canal
                 return client.tls.reply(interaction, user, "mode.anuncio.permissao_envio", true, client.defaultEmoji("guard"))

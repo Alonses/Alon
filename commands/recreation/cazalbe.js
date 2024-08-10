@@ -37,9 +37,9 @@ module.exports = {
 					{ name: '👾 Gif', value: 'gif' }
 				)
 				.setRequired(true)),
-	async execute({ client, user, interaction }) {
+	async execute({ client, interaction }) {
 
 		// Redirecionando o evento
-		require(`./subcommands/cazalbe_${interaction.options.getString("operation")}`)({ client, user, interaction })
+		require(`./subcommands/cazalbe_${interaction.options.getString("operation")}`)({ client, interaction })
 	}
 }

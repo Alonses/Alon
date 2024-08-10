@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require('discord.js')
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id)
     // Enviando o embed para validação
     const embed = new EmbedBuilder()
         .setTitle(client.tls.phrase(user, "mode.report.automatizado"))

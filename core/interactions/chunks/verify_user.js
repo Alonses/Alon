@@ -5,7 +5,8 @@ const { getUserStrikes } = require("../../database/schemas/User_strikes")
 const { listAllUserWarns } = require('../../database/schemas/User_warns')
 const { listAllGuildWarns } = require('../../database/schemas/Guild_warns')
 
-module.exports = async ({ client, user, interaction, id_cache }) => {
+module.exports = async ({ client, interaction, id_cache }) => {
+    const user = await client.getUser(interaction.user.id)
 
     let id_alvo = id_cache || interaction.options.getUser("user").id
     const user_alvo = await client.getMemberGuild(interaction, id_alvo) // Dados de membro do servidor

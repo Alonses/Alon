@@ -51,8 +51,12 @@ client.discord.on("messageCreate", async message => {
 	// Prevents the bot from interacting with other members when in develop mode or updating commands
 	if ((!process.env.owner_id.includes(message.author.id) && client.x.modo_develop) || client.x.force_update) return
 
-	const user = await checkUser(client, message.author.id)
-	const guild = await client.getGuild(message.guild.id)
+	const user = await client.getUser(message.author.id, {
+		conf: true,
+		erase: true,
+		profile: true
+	})
+	const guild = await client.getGuild(message.guild.id, { spam: true })
 
 	// Responding to the user who just ping the bot
 	if (message.content.includes(client.id()) && message.content.length === 21)
@@ -73,21 +77,23 @@ client.discord.on("messageCreate", async message => {
 			}
 	}
 
-	if (guild.conf.spam) // Server anti-spam system
+	if (guild.spam.enabled) // Server anti-spam system
 		await require("./core/events/spam")({ client, message, guild })
 
 	if (user) { // It only runs if the member is saved in the database
-
 		let user_rank_guild = await getUserRankServer(client, user.id, message.guild.id)
 
 		// Ignoring banned users and those moved to data deletion
-		if (user.conf?.banned || user.erase.valid || user_rank_guild.erase.valid) return
+		if (user.conf?.banned || user.erase.valid || user_rank_guild.erase_valid) return
 
 		// Syncing user data
 		if (!user.profile.avatar || !user.profile.avatar?.includes(message.author.avatar)) {
 
 			const user_guild = await client.getMemberGuild(message, user.id)
-			await updateUser(client, user.id, { avatar: user_guild.user.avatarURL({ dynamic: true }) })
+			await client.prisma.userOptionsProfile.update({
+				where: { id: user.profile_id },
+				data: { avatar: user_guild.user.avatarURL({ dynamic: true }) }
+			})
 		}
 
 		if (!user.nick) {
@@ -133,8 +139,10 @@ client.discord.on("interactionCreate", async interaction => {
 
 	// Removing the user data deletion label
 	if (user.erase.valid) {
-		user.erase.forced = false
-		await user.save()
+		await client.prisma.userOptionsErase.update({
+			where: { id: user.erase_id },
+			data: { forced: false }
+		})
 	}
 
 	if (!command) return
@@ -142,7 +150,7 @@ client.discord.on("interactionCreate", async interaction => {
 
 	try {
 		// Executing the command
-		await action({ client, user, interaction })
+		await action({ client, interaction })
 		await require("./core/events/log")({ client, interaction, command })
 
 		// Updating the last interaction

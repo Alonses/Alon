@@ -12,9 +12,9 @@ module.exports = {
             "pt-BR": '⌠🌎⌡ Tudo começa por aqui',
             "ru": '⌠🌎⌡ Все начинается здесь'
         }),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         // Redirecionando o evento
-        require('../../core/interactions/chunks/browse_help')({ client, user, interaction })
+        await require('../../core/interactions/chunks/browse_help')({client, interaction})
     }
 }

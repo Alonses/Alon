@@ -7,9 +7,9 @@ const { getGuildStrike, updateGuildStrike} = require("../../database/schemas/Gui
 const { loggerMap } = require("../../formatters/patterns/guild")
 const { spamTimeoutMap, defaultRoleTimes } = require("../../formatters/patterns/timeout")
 
-module.exports = async ({ client, user, interaction, dados }) => {
-
-    const id_strike = dados.split(".")[2]
+module.exports = async ({ client, interaction, dados }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
+    const id_strike = parseInt(dados.split(".")[2])
     const strike = await getGuildStrike(client, interaction.guild.id, id_strike)
 
     const embed = new EmbedBuilder()

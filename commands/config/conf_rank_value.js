@@ -11,7 +11,7 @@ module.exports = {
                 .setMinValue(1))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild | PermissionFlagsBits.Administrator),
 
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         if (!client.x.owners.includes(interaction.user.id)) return
 

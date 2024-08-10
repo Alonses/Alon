@@ -8,13 +8,15 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const escolha = parseInt(dados.split(".")[1])
 
     // Fixando a badge escolhida pelo usuário
-    user.misc.fixed_badge = escolha
-    await user.save()
+    await client.prisma.userOptionsMisc.update({
+        where: { id: user.misc_id },
+        data: { fixed_badge: escolha }
+    })
 
     const new_badge = busca_badges(client, badgeTypes.SINGLE, escolha)
 
     // Atualizando a lista de badges fixas em cache
-    atualiza_fixed_badges(client)
+    await atualiza_fixed_badges(client)
 
     interaction.update({
         content: `${new_badge.emoji} | Badge \`${new_badge.name}\` ${client.tls.phrase(user, "dive.badges.badge_fixada")}`,

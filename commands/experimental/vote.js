@@ -23,8 +23,8 @@ module.exports = {
             "pt-BR": '⌠📡⌡ Vote num novo idioma!',
             "ru": '⌠📡⌡ Голосуйте за новый язык!'
         }),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, { conf: true })
         const votos = await getVotes(client)
 
         let maior = {

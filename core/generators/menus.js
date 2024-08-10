@@ -3,7 +3,7 @@ const { ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js')
 function create_menus({ client, interaction, user, data, pagina, multi_select, guild }) {
 
     // Menu sem dados para listar
-    const disabled = data.values.length < 1 ? true : false
+    const disabled = data.values.length < 1
     const itens_menu = [], alvo = data.alvo
 
     let insersoes = [], i = 0, indice_start = pagina * 24 || 0
@@ -36,7 +36,7 @@ function create_menus({ client, interaction, user, data, pagina, multi_select, g
                 insersoes.push(valor)
             }
 
-            if (x == (24 + indice_start)) break
+            if (x === (24 + indice_start)) break
         }
     else
         itens_menu.push({

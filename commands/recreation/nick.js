@@ -20,8 +20,8 @@ module.exports = {
             "pt-BR": '⌠😂⌡ Embaralha seu apelido!',
             "ru": '⌠😂⌡ Перемешайте свой никнейм!'
         }),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, { conf: true })
         if (interaction.guild.ownerId === interaction.user.id)
             return client.tls.reply(interaction, user, "dive.nick.permissao_1", true, client.emoji(0))
 

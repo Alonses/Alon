@@ -1,17 +1,17 @@
 const { PermissionsBitField, ChannelType } = require('discord.js')
 
-module.exports = async ({ client, user, interaction, channel, solicitante, canal_servidor }) => {
-
+module.exports = async ({ client, interaction, channel, solicitante, canal_servidor }) => {
+    const user = await client.getUser(interaction.user.id)
     // Verificando se o canal ativo existe no servidor
-    let verificacao = interaction.guild.channels.cache.find(c => c.id === channel.cid) || 404
+    let verificacao = interaction.guild.channels.cache.find(c => c.id === channel.channel_id) || 404
 
     if (verificacao === 404)
-        channel.cid = null
+        channel.channel_id = null
 
-    if (channel.cid !== null) { // Re-exibindo o canal já existente ao usuário
-        canal_servidor.permissionOverwrites.edit(solicitante, { ViewChannel: true })
+    if (channel.channel_id !== null) { // Re-exibindo o canal já existente ao usuário
+        await canal_servidor.permissionOverwrites.edit(solicitante, {ViewChannel: true})
 
-        return client.tls.reply(interaction, user, "mode.denuncia.canal_aberto", true, 48, channel.cid)
+        return client.tls.reply(interaction, user, "mode.denuncia.canal_aberto", true, 48, channel.channel_id)
     }
 
     const everyone = interaction.guild.roles.cache.find(r => r.name === '@everyone')
@@ -41,8 +41,15 @@ module.exports = async ({ client, user, interaction, channel, solicitante, canal
         .then(async new_channel => {
             client.tls.reply(interaction, user, "mode.denuncia.introducao", true, 7, new_channel.id)
 
-            channel.cid = new_channel.id
-            await channel.save()
+            await client.prisma.userTickets.update({
+                where: {
+                    id: {
+                        user_id: channel.user_id,
+                        server_id: channel.server_id
+                    }
+                },
+                data: { channel_id: new_channel.id }
+            })
         })
         .catch(() => client.tls.reply(interaction, user, "mode.denuncia.erro_1", true, 4))
 }

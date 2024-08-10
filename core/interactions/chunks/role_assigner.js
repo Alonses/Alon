@@ -2,8 +2,8 @@ const { EmbedBuilder, PermissionsBitField } = require('discord.js')
 
 const { getRoleAssigner } = require('../../database/schemas/Guild_role_assigner')
 
-module.exports = async ({ client, user, interaction, caso }) => {
-
+module.exports = async ({ client, interaction, caso }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     if (!caso) return interaction.reply({ content: "Ixi! Os dados dessa interação sumiram! Por gentileza, use o comando novamente", ephemeral: true })
 
     const embed = new EmbedBuilder()

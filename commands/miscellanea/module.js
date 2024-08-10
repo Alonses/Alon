@@ -156,14 +156,14 @@ module.exports = {
                     "pt-BR": '⌠🎉⌡ Navegue por seus módulos',
                     "ru": '⌠🎉⌡ Смотрите свои модули'
                 })),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         if (interaction.options.getSubcommand() === "add") // Criando um módulo novo
-            require('./subcommands/module_add')({ client, user, interaction })
+            await require('./subcommands/module_add')({client, interaction})
         else { // Navegando pelos módulos
 
             let autor_original = true
-            require('../../core/interactions/chunks/modulos')({ client, user, interaction, autor_original })
+            await require('../../core/interactions/chunks/modulos')({client, interaction, autor_original})
         }
     }
 }

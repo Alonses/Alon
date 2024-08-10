@@ -7,8 +7,8 @@ const { listAllSuspiciousLinks } = require('../../database/schemas/Spam_links')
 
 const { activities } = require('../../../files/json/text/activities.json')
 
-module.exports = async ({ client, user, interaction, caso }) => {
-
+module.exports = async ({ client, interaction, caso }) => {
+    const user = await client.getUser(interaction.user.id)
     const bot = await client.getBot(client)
     let botoes = [], ouvindo_agora = "", pagina = parseInt(caso) || 0
 

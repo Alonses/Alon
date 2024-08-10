@@ -1,7 +1,10 @@
 const { EmbedBuilder } = require('discord.js')
 
-module.exports = async ({ client, user, interaction, texto_entrada }) => {
-
+module.exports = async ({ client, interaction, texto_entrada }) => {
+    const user = await client.getUser(interaction.user.id, {
+        conf: true,
+        misc: true
+    })
     let cor_embed = client.embed_color(user.misc.color)
 
     const caracteres = duplicateCount(texto_entrada)
@@ -64,7 +67,7 @@ module.exports = async ({ client, user, interaction, texto_entrada }) => {
     })
 }
 
-duplicateCount = (texto_entrada) => {
+const duplicateCount = (texto_entrada) => {
     const charMap = {}
 
     for (const char of texto_entrada.toLowerCase())

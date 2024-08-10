@@ -7,8 +7,11 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("cantada")
         .setDescription("⌠😂|🇧🇷⌡ Uma cantada aleatória do Vai dar namoro™️"),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, {
+            conf: true,
+            misc: true
+        })
         fetch(`${process.env.url_apisal}/random?cantadas`)
             .then(response => response.json())
             .then(async res => {

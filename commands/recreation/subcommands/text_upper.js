@@ -1,5 +1,5 @@
-module.exports = async ({ client, user, interaction, texto_entrada }) => {
-
+module.exports = async ({ client, interaction, texto_entrada }) => {
+    const user = await client.getUser(interaction.user.id, { conf: true })
     // Torna o texto nesse formato "A A A A A A"
     interaction.reply({
         content: texto_entrada.toUpperCase().split('').join(" ").trim(),

@@ -1,7 +1,7 @@
 const { dropReport, checkUserGuildReported } = require('../../../database/schemas/User_reports')
 
-module.exports = async ({ client, user, interaction, dados, pagina }) => {
-
+module.exports = async ({ client, interaction, dados, pagina }) => {
+    const user = await client.getUser(interaction.user.id)
     const operacao = parseInt(dados.split(".")[1])
 
     // Códigos de operação

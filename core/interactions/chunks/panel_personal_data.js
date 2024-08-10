@@ -7,8 +7,13 @@ const { listAllGuildHoster } = require('../../database/schemas/Guild')
 
 const { defaultUserEraser } = require('../../formatters/patterns/timeout')
 
-module.exports = async ({ client, user, interaction, operador, pagina_guia }) => {
-
+module.exports = async ({ client, interaction, operador, pagina_guia }) => {
+    const user = await client.getUser(interaction.user.id, {
+        conf: true,
+        erase: true,
+        misc: true,
+        social: true
+    })
     const pagina = pagina_guia || 0
     const ranking = [], guilds_ranking = await getUserRankServers(interaction.user.id)
 
@@ -120,7 +125,7 @@ module.exports = async ({ client, user, interaction, operador, pagina_guia }) =>
     })
 }
 
-lista_servidores = (servidores, linha_corte, client, user) => {
+const lista_servidores = (servidores, linha_corte, client, user) => {
 
     let nome_servidores = servidores.join(", ")
 

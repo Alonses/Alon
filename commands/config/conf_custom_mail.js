@@ -16,7 +16,7 @@ module.exports = {
             option.setName("imagem")
                 .setDescription("A imagem que será usada"))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild | PermissionFlagsBits.Administrator),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         if (interaction.user.id !== client.x.owners[0]) return
 

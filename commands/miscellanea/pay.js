@@ -59,8 +59,8 @@ module.exports = {
                     "ru": 'Сумма к переводу'
                 })
                 .setRequired(true)),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, { misc: true })
         let user_alvo = interaction.options.getUser("user")
         let bufunfas = interaction.options.getNumber("amount")
 
@@ -106,7 +106,7 @@ module.exports = {
 
         // Criando os botões para o menu de transferências
         const row = client.create_buttons([
-            { id: "bank_transfer", name: client.tls.phrase(user, "menu.botoes.confirmar"), type: 2, emoji: client.emoji(10), data: `1|${alvo.uid}[${bufunfas}` },
+            { id: "bank_transfer", name: client.tls.phrase(user, "menu.botoes.confirmar"), type: 2, emoji: client.emoji(10), data: `1|${alvo.id}[${bufunfas}` },
             { id: "bank_transfer", name: client.tls.phrase(user, "menu.botoes.cancelar"), type: 3, emoji: client.emoji(0), data: 0 }
         ], interaction)
 

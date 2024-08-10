@@ -46,7 +46,8 @@ module.exports = {
                 })
                 .setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild | PermissionFlagsBits.ManageChannels | PermissionFlagsBits.Administrator),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id)
 
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.ManageGuild) && interaction.user.id !== client.x.owners[0])
             return client.tls.reply(interaction, user, "mode.xp.permissao", true, 3)
@@ -56,7 +57,7 @@ module.exports = {
         const user_c = await getUserRankServer(client, alvo.id, interaction.guild.id)
 
         // Validando se o usuário tem o ranking habilitado
-        if (!await client.verifyUserRanking(user_c.uid))
+        if (!await client.verifyUserRanking(user_c.user_id))
             return client.tls.reply(interaction, user, "mode.ranking.error", true, 5)
 
         const novo_exp = parseFloat(interaction.options.get('xp').value)

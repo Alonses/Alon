@@ -119,12 +119,12 @@ module.exports = {
                             { name: '🍀 Overworld', value: '0' },
                             { name: '🔥 Nether', value: '1' }
                         ))),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         // Redirecionando o evento
         if (interaction.options.getSubcommand() === "item")
-            return require('../../core/formatters/chunks/model_mine')(client, user, interaction)
+            return require('../../core/formatters/chunks/model_mine')(client, interaction)
 
-        require(`./subcommands/mine_${interaction.options.getSubcommand()}`)({ client, user, interaction })
+        require(`./subcommands/mine_${interaction.options.getSubcommand()}`)({ client, interaction })
     }
 }

@@ -7,8 +7,8 @@ const { getUserPreWarn, listAllUserPreWarns, updatePreWarn } = require('../../da
 const { spamTimeoutMap, defaultEraser } = require('../patterns/timeout')
 const { default_emoji } = require('../../../files/json/text/emojis.json')
 
-module.exports = async ({ client, user, interaction, guild, user_warns, guild_member }) => {
-
+module.exports = async ({ client, interaction, guild, user_warns, guild_member }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     const descricao_warn = interaction.options.getString("reason")
     const guild_warns = await listAllGuildWarns(client, interaction.guild.id)
 

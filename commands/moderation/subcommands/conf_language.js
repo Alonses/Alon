@@ -1,8 +1,8 @@
 const { languagesMap } = require("../../../core/formatters/patterns/user")
 const {updateGuild} = require("../../../core/database/schemas/Guild");
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id)
     const guild = await client.getGuild(interaction.guild.id)
     const update = { }
     let novo_idioma = interaction.options.getString("language")

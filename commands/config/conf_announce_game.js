@@ -39,7 +39,8 @@ module.exports = {
                     { name: 'DLC/Expansão', value: 'dlc' },
                 ))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild | PermissionFlagsBits.Administrator),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id)
 
         if (interaction.user.id !== client.x.owners[0])
             return client.tls.reply(interaction, user, "inic.error.comando_restrito", true, 18)
@@ -66,6 +67,6 @@ module.exports = {
         const objetos_anunciados = [item]
         await createGame(client, item)
 
-        dispara_anuncio({ client, interaction, objetos_anunciados })
+        await dispara_anuncio({client, interaction, objetos_anunciados})
     }
 }

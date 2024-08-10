@@ -7,12 +7,12 @@ const {updateGuild} = require("../../../database/schemas/Guild");
 // 2 -> Ativar ou desativar a expiração de anotações
 
 const operations = {
-    1: { action: "warn.hierarchy.status", page: 0 },
-    2: { action: "warn.hierarchy.timed", page: 0 }
+    1: { action: "warn.hierarchy_status", page: 0 },
+    2: { action: "warn.hierarchy_timed", page: 0 }
 }
 
-module.exports = async ({ client, user, interaction, dados, pagina }) => {
-
+module.exports = async ({ client, interaction, dados, pagina }) => {
+    const user = await client.getUser(interaction.user.id)
     let operacao = parseInt(dados.split(".")[1]), reback = "panel_guild_warns.0", pagina_guia = 0
     let guild = await client.getGuild(interaction.guild.id, { warn: true })
 
@@ -91,7 +91,7 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
 
         // Escolhendo o tempo de expiração dos avisos de advertência
         const valores = []
-        Object.keys(defaultEraser).forEach(key => { if (parseInt(key) !== guild.warn_hierarchy_reset) valores.push(`${key}.${defaultEraser[key]}`) })
+        Object.keys(defaultEraser).forEach(key => { if (parseInt(key) !== guild.warn.hierarchy_reset) valores.push(`${key}.${defaultEraser[key]}`) })
 
         const data = {
             title: { tls: "mode.warn.definir_tempo" },
@@ -112,8 +112,11 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     }
 
     // Salvando os dados atualizados
-    if (operations[operacao]) await updateGuild(client, guild.id, guild)
+    if (operations[operacao]) await client.prisma.guildOptionsWarn.update({
+        where: { id: guild.warn_id },
+        data: guild.warn
+    })
 
     // Redirecionando a função para o painel das advertências com hierarquia
-    require('../../chunks/panel_guild_hierarchy_warns')({ client, user, interaction, pagina_guia })
+    await require('../../chunks/panel_guild_hierarchy_warns')({client, interaction, pagina_guia})
 }

@@ -16,7 +16,7 @@ async function registryStatement(client, uid, operation, type, value) {
 
     const statements = await getUserStatements(client, uid)
     if (statements.length > 9) //  Exclui a última movimentação após 10 novas entradas
-        await dropUserStatement(uid, statements[9].timestamp)
+        await dropUserStatement(client, uid, statements[9].timestamp)
 
     await client.prisma.userStatement.create({
         data: {

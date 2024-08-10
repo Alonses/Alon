@@ -106,9 +106,9 @@ module.exports = {
                     { name: 'Encode', value: '0' },
                     { name: 'Decode', value: '1' }
                 )),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         // Redirecionando para a opção respectiva
-        require(`./subcommands/translate_${interaction.options.getString("key")}`)({ client, user, interaction })
+        require(`./subcommands/translate_${interaction.options.getString("key")}`)({ client, interaction })
     }
 }

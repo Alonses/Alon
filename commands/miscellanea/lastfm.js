@@ -34,9 +34,9 @@ module.exports = {
                     "pt-BR": 'Mencione outro usuário',
                     "ru": 'Упомянуть другого пользователя'
                 })),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         // Redirecionando o evento
-        require("../../core/formatters/chunks/model_lastfm")({ client, user, interaction })
+        await require("../../core/formatters/chunks/model_lastfm")({client, interaction})
     }
 }

@@ -1,7 +1,7 @@
 const { colorsMap, colorsPriceMap } = require("../../../formatters/patterns/user")
 
-module.exports = async ({ client, user, interaction, dados }) => {
-
+module.exports = async ({ client, interaction, dados }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     const operacao = parseInt(dados.split(".")[1])
 
     // Códigos de operação
@@ -28,14 +28,17 @@ module.exports = async ({ client, user, interaction, dados }) => {
                 ephemeral: true
             })
 
-        user.misc.money -= preco
-
         // Salvando a cor de embed customizada
-        user.misc.color = !dados.includes("-") ? colorsMap[cor][0] : dados.split("-")[1]
-        await user.save()
+        await client.prisma.userOptionsMisc.update({
+            where: { id: user.misc_id },
+            data: {
+                color: !dados.includes("-") ? colorsMap[cor][0] : dados.split("-")[1],
+                money: { increment: -preco }
+            }
+        })
 
         // Registrando as movimentações de bufunfas para o usuário
-        client.registryStatement(user.uid, "misc.b_historico.cor_perfil", false, preco)
+        client.registryStatement(user.id, "misc.b_historico.cor_perfil", false, preco)
         client.journal("reback", preco)
 
         interaction.update({

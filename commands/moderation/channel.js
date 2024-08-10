@@ -51,19 +51,19 @@ module.exports = {
         })
         .setType(ApplicationCommandType.Message)
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
         // Permissões para gerenciar canais e cargos necessária para a função de bloqueio do chat do servidor
-        if (!await client.permissions(interaction, client.id(), [PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.ManageRoles]))
+        if (!await client.permissions(interaction, client.id(), [PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.ManageRoles])) {
+            const user = await client.getUser(interaction.user.id)
             return client.tls.reply(interaction, user, "mode.ticket.permissao", true, 3)
-
+        }
         const channel = await client.discord.channels.cache.get(interaction.channel.id)
 
         // Solicitando a função e executando
-        require(`./subcommands/channel_${interaction.options.getSubcommand()}`)({ client, user, interaction, channel })
+        require(`./subcommands/channel_${interaction.options.getSubcommand()}`)({ client, interaction, channel })
     },
-    async menu({ client, user, interaction }) {
-
+    async menu({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id)
         // Verificando se o bot pode gerenciar as mensagens do servidor
         if (!await client.permissions(interaction, client.id(), [PermissionsBitField.Flags.ManageMessages]))
             return client.tls.reply(interaction, user, "mode.clear.permissao", true, 3)

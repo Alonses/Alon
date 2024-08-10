@@ -1,6 +1,7 @@
-module.exports = async ({ client, user, interaction, channel }) => {
+module.exports = async ({ client, interaction, channel }) => {
+    const user = await client.getUser(interaction.user.id)
 
-    channel.permissionOverwrites.edit(
+    await channel.permissionOverwrites.edit(
         interaction.guild.id,
         {
             SendMessages: false,

@@ -39,10 +39,10 @@ module.exports = {
                     "pt-BR": 'Insira um local',
                     "ru": 'введите местоположение'
                 })),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, { conf: true })
         await interaction.deferReply({ ephemeral: client.decider(user?.conf.ghost_mode, 0) })
 
-        require('../../core/formatters/chunks/model_weather')(client, user, interaction)
+        await require('../../core/formatters/chunks/model_weather')(client, interaction)
     }
 }

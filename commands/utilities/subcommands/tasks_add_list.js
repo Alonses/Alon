@@ -1,7 +1,7 @@
 const { createGroup, checkUserGroup } = require('../../../core/database/schemas/User_tasks_group')
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id, { conf: true })
     let check_list
 
     // Verificando se o usuário desabilitou as tasks globais

@@ -1,11 +1,16 @@
 const { EmbedBuilder, ChannelType, PermissionsBitField } = require('discord.js')
 
-module.exports = async ({ client, user, interaction, dados, autor_original }) => {
+module.exports = async ({ client, interaction, dados, autor_original }) => {
 
     // Códigos de operação
     // 0 -> Geral
     // 1 -> Cargos
     // 2 -> Estatísticas
+
+    const user = await client.getUser(interaction.user.id, {
+        conf: true,
+        misc: true
+    })
 
     let operador = dados ? parseInt(dados.split(".")[1]) : 0
     const guild = await client.getGuild(interaction.guild.id)
@@ -29,7 +34,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
 
         dono_sv = `\`${dono_membro.user.username.replace(/ /g, "")}#${dono_membro.user.discriminator}\``
 
-        if (dono_membro.user.discriminator == 0)
+        if (dono_membro.user.discriminator === 0)
             dono_sv = `\`@${dono_membro.user.username.replace(/ /g, "")}\``
 
         const data_entrada = `<t:${Math.floor(interaction.guild.joinedTimestamp / 1000)}:f>` // Entrada do bot no server
@@ -70,7 +75,7 @@ module.exports = async ({ client, user, interaction, dados, autor_original }) =>
             if (inviter_membro) {
                 let inviter = `\`${inviter_membro.user.username.replace(/ /g, "")}#${inviter_membro.user.discriminator}\``
 
-                if (inviter_membro.user.discriminator == 0)
+                if (inviter_membro.user.discriminator === 0)
                     inviter = `\`@${inviter_membro.user.username.replace(/ /g, "")}\``
 
                 infos_sv.addFields(

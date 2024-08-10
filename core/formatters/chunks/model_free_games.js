@@ -4,8 +4,11 @@ const { getGames, verifyInvalidGames } = require("../../database/schemas/Game")
 
 const { redes } = require('../../../files/json/text/anuncio.json')
 
-module.exports = async (client, user, interaction, pagina_guia) => {
-
+module.exports = async (client, interaction, pagina_guia) => {
+    const user = await client.getUser(interaction.user.id, {
+        conf: true,
+        misc: true
+    })
     // Verificando pelos games que já expiraram
     await verifyInvalidGames(client)
 

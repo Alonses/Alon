@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js')
 
 const { languagesMap } = require('../../core/formatters/patterns/user')
+const {updateUser} = require("../../core/database/schemas/User");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -53,18 +54,24 @@ module.exports = {
                     { name: '🇷🇺 Русский', value: 'ru' }
                 )
                 .setRequired(true)),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, { misc: true })
         let novo_idioma = interaction.options.getString("language")
         let frase_idioma
 
         if (novo_idioma === "hp") {
 
             if (!user.misc.second_lang) { // Definindo um idioma secundário
-                user.misc.second_lang = "pt-hp"
+                await client.prisma.userOptionsMisc.update({
+                    where: { id: user.misc_id },
+                    data: { second_lang: "pt-hp" }
+                })
                 frase_idioma = languagesMap["hp"][1]
             } else { // Removendo o idioma secundário
-                user.misc.second_lang = null
+                await client.prisma.userOptionsMisc.update({
+                    where: { id: user.misc_id },
+                    data: { second_lang: null }
+                })
                 frase_idioma = client.tls.phrase(user, "mode.idiomas.idioma_secundario_removido", 11)
             }
         } else {
@@ -72,11 +79,9 @@ module.exports = {
             const matches = novo_idioma.match(/al|de|en|es|fr|it|pt|ru/)
 
             // Resgata os dados do idioma válido
-            user.lang = languagesMap[matches[0]][0]
+            await updateUser(client, user.id, { lang: languagesMap[matches[0]][0] })
             frase_idioma = languagesMap[matches[0]][1]
         }
-
-        await user.save()
 
         interaction.reply({
             content: frase_idioma,

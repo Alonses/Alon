@@ -29,8 +29,8 @@ module.exports = {
                 )
                 .setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild | PermissionFlagsBits.Administrator),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, { misc: true })
         if (!client.x.owners.includes(interaction.user.id)) return
 
         let id_alvo = interaction.options.getUser("usuario").id

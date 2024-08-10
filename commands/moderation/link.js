@@ -55,9 +55,8 @@ module.exports = {
                     "ru": '⌠💂⌡ Просмотр ссылок на серверы'
                 }))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
         // Solicitando a função e executando
-        require(`./subcommands/link_${interaction.options.getSubcommand()}`)({ client, user, interaction })
+        require(`./subcommands/link_${interaction.options.getSubcommand()}`)({ client, interaction })
     }
 }

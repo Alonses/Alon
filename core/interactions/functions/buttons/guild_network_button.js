@@ -1,6 +1,6 @@
 const { ChannelType, PermissionsBitField, EmbedBuilder } = require('discord.js')
 
-const { getNetworkedGuilds, updateGuild} = require('../../../database/schemas/Guild')
+const { getNetworkedGuilds } = require('../../../database/schemas/Guild')
 
 const { banMessageEraser } = require('../../../formatters/patterns/timeout')
 
@@ -53,8 +53,9 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
             })
 
         // Ativa ou desativa o network do servidor
-        await updateGuild(client, guild.id, {
-            conf_network: !guild.conf_network
+        await client.prisma.guildOptionsNetwork.update({
+            where: { id: guild.network_id },
+            data: { enabled: !guild.network.enabled }
         })
     } else if (operacao === 2) {
         const eventos = []

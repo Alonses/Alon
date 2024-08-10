@@ -101,7 +101,7 @@ module.exports = async ({ client, message, caso }) => {
         user.xp += client.cached.ranking_value
         user.ixp += client.cached.ranking_value
 
-        user.lastInteraction = message.createdTimestamp
+        user.lastInteraction = new Date(message.createdTimestamp)
         user.warns = 0
     } else if (caso === "comando") { // Experiência obtida executando comandos
         user.xp += client.cached.ranking_value * 1.5

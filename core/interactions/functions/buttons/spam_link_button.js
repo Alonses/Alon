@@ -2,8 +2,8 @@ const { EmbedBuilder } = require("discord.js")
 
 const { getAllGuildSuspiciousLinks, listAllSuspiciousLinks } = require("../../../database/schemas/Spam_links")
 
-module.exports = async ({ client, user, interaction, dados, pagina }) => {
-
+module.exports = async ({ client, interaction, dados, pagina }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     pagina = pagina || 0
 
     // Gerenciamento de links suspeitos

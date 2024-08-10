@@ -7,8 +7,8 @@ const { modulePrices } = require('../../../core/formatters/patterns/user')
 
 const formata_horas = require('../../../core/formatters/formata_horas')
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     if (user.misc.money < 20)
         return client.tls.reply(interaction, user, "misc.modulo.sem_bufunfa", true, client.emoji(0))
 
@@ -21,7 +21,7 @@ module.exports = async ({ client, user, interaction }) => {
         return client.tls.reply(interaction, user, "misc.modulo.limite_modulos", true, 4)
 
     // Prevenção de erros
-    if (type == 0 && !user.misc.locale)
+    if (type === 0 && !user.misc.locale)
         return client.tls.reply(interaction, user, "misc.modulo.sem_locale", true, client.emoji(0))
 
     const corpo_modulo = await createModule(client, interaction.user.id, type)

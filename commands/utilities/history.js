@@ -22,8 +22,8 @@ module.exports = {
                 .addStringOption(option =>
                     option.setName("data")
                         .setDescription("Uma data específica, neste formato 21/01"))),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, { conf: true })
         let data = ""
 
         if (interaction.options.getString("data")) // Data customizada
@@ -33,7 +33,7 @@ module.exports = {
         await interaction.deferReply({ ephemeral: client.decider(user?.conf.ghost_mode, 0) })
 
         if (interaction.options.getSubcommand() === "lista") // Lista de eventos
-            require('../../core/formatters/chunks/model_history.js')(client, user, data, interaction)
+            await require('../../core/formatters/chunks/model_history')(client, data, interaction)
         else {
 
             // Apenas um acontecimento
@@ -51,7 +51,7 @@ module.exports = {
                 especifico: especifico
             }
 
-            require('../../core/formatters/chunks/model_history')(client, user, dados, interaction)
+            await require('../../core/formatters/chunks/model_history')(client, dados, interaction)
         }
     }
 }

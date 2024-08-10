@@ -154,24 +154,32 @@ module.exports = {
                             { name: '📝 List', value: 'list' }
                         )
                         .setRequired(true))),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
         let autor_original = true
 
         if (interaction.options.getSubcommand() === "browse") {
             const operador = `${interaction.options.getString("status")}|tarefas`
 
             if (interaction.options.getString("status") === "l")
-                require('../../core/interactions/chunks/listas_navegar')({ client, user, interaction, autor_original })
+                await require('../../core/interactions/chunks/listas_navegar')({
+                    client,
+                    interaction,
+                    autor_original
+                })
             else
-                require('../../core/interactions/chunks/tarefas')({ client, user, interaction, operador, autor_original })
+                await require('../../core/interactions/chunks/tarefas')({
+                    client,
+                    interaction,
+                    operador,
+                    autor_original
+                })
         } else {
 
             // Listando qual será o escopo da função
             const operacao = interaction.options.getSubcommand()
             const alvo = interaction.options.getString("scope")
 
-            require(`./subcommands/tasks_${operacao}_${alvo}`)({ client, user, interaction, autor_original })
+            require(`./subcommands/tasks_${operacao}_${alvo}`)({ client, interaction, autor_original })
         }
     }
 }

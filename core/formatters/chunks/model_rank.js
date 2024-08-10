@@ -9,7 +9,11 @@ const { medals, badgeTypes } = require('../patterns/user')
 
 let paginas, pagina
 
-module.exports = async ({ client, user, interaction, pagina_guia, caso, defer, autor_original }) => {
+module.exports = async ({ client, interaction, pagina_guia, caso, defer, autor_original }) => {
+    const user = await client.getUser(interaction.user.id, {
+        conf: true,
+        misc: true
+    })
 
     let usuario_alvo = [], i = 0, data_usuarios, remover = 0
     const usernames = [], experiencias = [], levels = [], ids = [], deferido = defer ? true : false
@@ -61,8 +65,8 @@ module.exports = async ({ client, user, interaction, pagina_guia, caso, defer, a
 
             let fixed_badge = ""
 
-            if (client.cached.fixed_badges[user_interno.uid]) // Procurando a Badge fixada do usuário
-                fixed_badge = busca_badges(client, badgeTypes.SINGLE, client.cached.fixed_badges[user_interno.uid]).emoji
+            if (client.cached.fixed_badges[user_interno.id]) // Procurando a Badge fixada do usuário
+                fixed_badge = busca_badges(client, badgeTypes.SINGLE, client.cached.fixed_badges[user_interno.id]).emoji
 
             const nome_usuario = user_interno.nickname ? user_interno.nickname : client.tls.phrase(user, "util.steam.undefined")
 
@@ -71,7 +75,7 @@ module.exports = async ({ client, user, interaction, pagina_guia, caso, defer, a
             else
                 usernames.push(`${medals[i] || ":medal:"} #${i + 1} \`${(nome_usuario).replace(/ /g, "")}\` ${fixed_badge}`)
 
-            ids.push(user_interno.uid)
+            ids.push(user_interno.id)
             experiencias.push(`\`${client.locale(parseInt(user_interno.xp))} EXP\``)
 
             if (escopo === "server")

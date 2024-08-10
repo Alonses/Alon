@@ -1,9 +1,10 @@
 const { PermissionsBitField, ChannelType } = require('discord.js')
 const { updateGuild } = require("../../../core/database/schemas/Guild")
 
-module.exports = async ({ client, user, interaction }) => {
-    let canal_alvo
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id)
     const guild = await client.getGuild(interaction.guild.id)
+    let canal_alvo
 
     // Categoria alvo para o bot criar os canais
     if (interaction.options.getChannel("value")) {

@@ -158,7 +158,10 @@ async function getGameChannelById(client, gcid) {
 }
 
 async function getReportChannels(client) {
-    return await client.prisma.guild.findMany({ where: { reports: { enabled: true }}})
+    return await client.prisma.guild.findMany({
+        where: { reports: { enabled: true }},
+        include: { reports: true }
+    })
 }
 
 async function getReportNetworkChannels(client, link) {

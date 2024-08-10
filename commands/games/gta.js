@@ -12,9 +12,9 @@ module.exports = {
             "pt-BR": '⌠🎲⌡ Informações do GTA Online',
             "ru": '⌠🎲⌡ ГТА Онлайн информация'
         }),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         // Redirecionando o evento
-        require('../../core/interactions/chunks/gta_resume')({ client, user, interaction })
+        await require('../../core/interactions/chunks/gta_resume')({client, interaction})
     }
 }

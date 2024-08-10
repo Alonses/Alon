@@ -11,8 +11,8 @@ module.exports = {
             option.setName("codigo")
                 .setDescription("O código do pacote")
                 .setRequired(true)),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, { misc: true })
         const texto_entrada = interaction.options.getString("codigo")
 
         fetch(`https://proxyapp.correios.com.br/v1/sro-rastro/${texto_entrada}`)
@@ -70,7 +70,7 @@ module.exports = {
     }
 }
 
-emoji_status = (urlIcone) => {
+const emoji_status = (urlIcone) => {
 
     urlIcone = urlIcone.split('/public-resources/img/')[1].split("-")[0].split(".png")[0]
 

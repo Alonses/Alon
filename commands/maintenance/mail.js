@@ -50,8 +50,8 @@ module.exports = {
                     "pt-BR": 'Anexe arquivos se precisar',
                     "ru": 'Прикрепите файлы, если необходимо'
                 })),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id)
         const corpo_mensagem = {
             text: interaction.options.getString("text"),
             file: interaction.options.getAttachment("file"),
@@ -87,7 +87,7 @@ module.exports = {
     }
 }
 
-formataArquivo = async (attachment) => {
+const formataArquivo = async (attachment) => {
     const response = await fetch(attachment.attachment)
     const data = await response.text()
 

@@ -74,14 +74,14 @@ module.exports = {
                     "pt-BR": 'Mencione outro usuário',
                     "ru": 'Упомянуть другого пользователя'
                 })),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
         if (interaction.options.getString("scope") !== "bank") {
-
+            const user = await client.getUser(interaction.user.id, { conf: true })
             const defer = true
             await interaction.deferReply({ ephemeral: client.decider(user?.conf.ghost_mode, 0) })
-            require('../../core/formatters/chunks/model_rank')({ client, user, interaction, defer })
+            return await require('../../core/formatters/chunks/model_rank')({client, interaction, defer})
+        }
 
-        } else require('../../core/formatters/chunks/model_bank')({ client, user, interaction })
+        await require('../../core/formatters/chunks/model_bank')({client, interaction})
     }
 }

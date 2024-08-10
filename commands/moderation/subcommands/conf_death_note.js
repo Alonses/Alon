@@ -1,7 +1,7 @@
 const { PermissionsBitField, ChannelType } = require('discord.js')
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id)
     const death_note = await client.getGuild(interaction.guild.id, { death_note: true }).death_note
 
     let canal_alvo

@@ -1,5 +1,5 @@
 model User {
-  id     String   @id
+  id     Bytes    @id
   lang   String?
   hoster Boolean  @default(false)
   nick   String?
@@ -86,22 +86,22 @@ model UserOptionsConf {
 }
 
 model UserRankGlobal {
-  user_id   String  @id
+  user_id   Bytes   @id
   server_id String?
   nickname  String?
   xp        Int     @default(0)
 }
 
 model UserRankGuild {
-  user_id           String
+  user_id           Bytes
   server_id         String
   nickname          String?
-  lastInteraction   Int?
-  warns             Int     @default(0)
-  caldeira_de_ceira Boolean @default(false)
-  xp                Int     @default(0)
-  ixp               Int     @default(0)
-  erase_valid       Boolean @default(false)
+  lastInteraction   DateTime?
+  warns             Int       @default(0)
+  caldeira_de_ceira Boolean   @default(false)
+  xp                Int       @default(0)
+  ixp               Int       @default(0)
+  erase_valid       Boolean   @default(false)
   erase_on          Int?
 
   @@id(name: "id", [user_id, server_id])
@@ -112,8 +112,8 @@ model UserBadges {
   badge     Int
   timestamp Int
 
-  user    User?  @relation(fields: [user_id], references: [id])
-  user_id String
+  user    User? @relation(fields: [user_id], references: [id])
+  user_id Bytes
 }
 
 model UserModules {
@@ -126,8 +126,8 @@ model UserModules {
   hour      String?
   active    Boolean @default(false)
 
-  user    User?  @relation(fields: [user_id], references: [id])
-  user_id String
+  user    User? @relation(fields: [user_id], references: [id])
+  user_id Bytes
 }
 
 model UserPreWarns {
@@ -141,8 +141,8 @@ model UserPreWarns {
   relatory      String?
   timestamp     Int
 
-  user    User?  @relation(fields: [user_id], references: [id])
-  user_id String
+  user    User? @relation(fields: [user_id], references: [id])
+  user_id Bytes
 }
 
 model UserWarns {
@@ -157,12 +157,12 @@ model UserWarns {
   relatory      String?
   timestamp     Int
 
-  user    User?  @relation(fields: [user_id], references: [id])
-  user_id String
+  user    User? @relation(fields: [user_id], references: [id])
+  user_id Bytes
 }
 
 model UserReports {
-  user_id   String
+  user_id   Bytes
   server_id String
 
   nick        String?
@@ -179,7 +179,7 @@ model UserReports {
 model UserRoles {
   id Int @id @default(autoincrement())
 
-  user_id   String
+  user_id   Bytes
   server_id String
   role_id   String
 
@@ -199,12 +199,12 @@ model UserStatement {
   value     Float   @default(0)
   timestamp Int?
 
-  user    User?  @relation(fields: [user_id], references: [id])
-  user_id String
+  user    User? @relation(fields: [user_id], references: [id])
+  user_id Bytes
 }
 
 model UserStrikes {
-  user_id   String
+  user_id   Bytes
   server_id String
   strikes   Int    @default(0)
 
@@ -213,7 +213,7 @@ model UserStrikes {
 
 model UserTasks {
   id          Int     @id @default(autoincrement())
-  user_id     String
+  user_id     Bytes
   server_id   String
   text        String
   timestamp   Int
@@ -222,7 +222,7 @@ model UserTasks {
 }
 
 model UserTasksGroup {
-  user_id   String
+  user_id   Bytes
   server_id String
   name      String
   timestamp Int
@@ -231,7 +231,7 @@ model UserTasksGroup {
 }
 
 model UserTickets {
-  user_id   String
+  user_id   Bytes
   server_id String
 
   channel_id String?

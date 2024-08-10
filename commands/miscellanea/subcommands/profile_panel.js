@@ -1,7 +1,8 @@
-module.exports = async ({ client, user, interaction }) => {
+module.exports = async ({ client, interaction }) => {
 
     // Enviando o embed para validação
     const id_alvo = interaction.user.id, operador = 0
+    const user = await client.getUser(id_alvo, { profile: true })
     const embed = await client.create_profile({ interaction, user, id_alvo, operador })
 
     // Criando os botões para customizar o perfil

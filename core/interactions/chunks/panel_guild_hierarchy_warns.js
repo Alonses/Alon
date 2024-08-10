@@ -5,8 +5,8 @@ const { listAllGuildWarns } = require("../../database/schemas/Guild_warns")
 const { defaultEraser } = require('../../formatters/patterns/timeout')
 const { default_emoji } = require('../../../files/json/text/emojis.json')
 
-module.exports = async ({ client, user, interaction, pagina_guia }) => {
-
+module.exports = async ({ client, interaction, pagina_guia }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     const guild = await client.getGuild(interaction.guild.id, { warn: true })
     let botoes = [], texto_rodape = client.tls.phrase(user, "manu.painel.rodape")
 

@@ -3,7 +3,7 @@ const { PermissionsBitField, ChannelType } = require('discord.js')
 const { readdirSync } = require('fs')
 
 const { alea_hex } = require('./core/functions/hex_color')
-
+const crypto = require('crypto');
 const { getBot, updateBot } = require('./core/database/schemas/Bot')
 const { getUser, updateUser} = require('./core/database/schemas/User')
 
@@ -41,8 +41,8 @@ function internal_functions(client) {
     client.error = async (err, local) => { require("./core/events/error")(client, err, local) }
 
     client.atualiza_dados = async (alvo, interaction) => {
-        if (!alvo.sid) {
-            alvo.sid = interaction.guild.id
+        if (!alvo.id) {
+            alvo.id = interaction.guild.id
             await alvo.save()
         }
     }
@@ -51,11 +51,11 @@ function internal_functions(client) {
     client.checkUserInvites = async (guild, id_user) => {
 
         // Removendo o cargo ao usuário que recebeu a advertência
-        if (!await client.permissions(guild.sid, client.id(), [PermissionsBitField.Flags.ManageGuild]))
+        if (!await client.permissions(guild.id, client.id(), [PermissionsBitField.Flags.ManageGuild]))
             return client.notify(guild.logger.channel, { content: client.tls.phrase(guild, "mode.invites.sem_permissao_2", 7) })
 
         // Excluindo os convites que o membro expulso/banido criou
-        const cached_guild = await client.guilds(guild.sid)
+        const cached_guild = await client.guilds(guild.id)
         cached_guild.invites.fetch().then(invites => {
 
             let convites = 0
@@ -114,8 +114,8 @@ function internal_functions(client) {
         // Emojis customizados
         if (isNaN(parseInt(dados))) { // Emoji por nome próprio do JSON de emojis
 
-            if (dados == "emojis_dancantes") dados = emojis_dancantes[client.random(emojis_dancantes)]
-            else if (dados == "emojis_negativos") dados = emojis_negativos[client.random(emojis_negativos)]
+            if (dados === "emojis_dancantes") dados = emojis_dancantes[client.random(emojis_dancantes)]
+            else if (dados === "emojis_negativos") dados = emojis_negativos[client.random(emojis_negativos)]
             else dados = aliases[dados]
 
             return client.formatEmoji(dados, client.discord.emojis.cache.get(dados))
@@ -238,18 +238,18 @@ function internal_functions(client) {
     client.getMemberGuildsByPermissions = async ({ interaction, user, permissions }) => {
 
         const guilds_user = []
-        let servidores = await listAllUserGuilds(user.uid)
+        let servidores = await listAllUserGuilds(client, user.id)
 
         if (servidores.length < 1) // Membro não possui servidores salvos em cache
             servidores = await client.guilds()
 
         for await (let server of servidores) {
 
-            const guild = server.sid ? await client.guilds(server.sid) : server[1]
+            const guild = server.id ? await client.guilds(server.id) : server[1]
 
             if (guild?.id) // verificando se o servidor possui os dados corretos
                 if (guild.id !== interaction.guild.id) {
-                    const membro_guild = await guild.members.fetch(user.uid)
+                    const membro_guild = await guild.members.fetch(user.id)
                         .catch(() => { return null })
 
                     if (membro_guild) { // Listando as guilds que o usuário é moderador
@@ -261,7 +261,7 @@ function internal_functions(client) {
                         }
 
                         // Registrando os servidores que o usuário faz parte
-                        registerUserGuild(user.uid, guild.id)
+                        await registerUserGuild(client, user.id, guild.id)
                     }
                 }
         }
@@ -294,7 +294,13 @@ function internal_functions(client) {
     }
 
     // Registra os eventos no diário do bot
-    client.journal = async (caso, quantia) => { require('./core/auto/edit_journal')({ client, caso, quantia }) }
+    client.journal = async (caso, quantia) => { await require('./core/auto/edit_journal')({client, caso, quantia}) }
+
+    client.hash = (input) => {
+        const hash = crypto.createHash('sha3-512');
+        hash.update(input);
+        return hash.digest();
+    }
 
     // Cria uma lista com vírgulas e & no último elemento
     client.list = (valores, tamanho_maximo) => {
@@ -375,7 +381,7 @@ function internal_functions(client) {
         // Verificando se o bot possui permissões para enviar mensagens ou ver o canal
         if (!await client.permissions(null, client.id(), [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages], canal)) return
 
-        canal.send(conteudo)
+        await canal.send(conteudo)
     }
 
     client.permissions = async (interaction, id_alvo, permissao, canal) => {
@@ -407,7 +413,7 @@ function internal_functions(client) {
 
     client.registryBadge = async (user, id_badge) => {
 
-        const all_badges = [], badges_user = await getUserBadges(user.uid)
+        const all_badges = [], badges_user = await getUserBadges(client, user.id)
 
         // Listando todas as badges que o usuário possui
         if (badges_user.length > 0)
@@ -416,10 +422,10 @@ function internal_functions(client) {
         if (!all_badges.includes(id_badge)) {
 
             // Atribuindo a badge reporter ao usuário
-            await createBadge(user.uid, id_badge, client.timestamp())
+            await createBadge(client, user.id, id_badge, client.timestamp())
             const badge = busca_badges(client, badgeTypes.SINGLE, id_badge)
 
-            client.sendDM(user, { content: client.tls.phrase(user, "dive.badges.new_badge", client.emoji("emojis_dancantes"), [badge.name, badge.emoji]) })
+            await client.sendDM(user.id, {content: client.tls.phrase(user, "dive.badges.new_badge", client.emoji("emojis_dancantes"), [badge.name, badge.emoji])})
         }
     }
 
@@ -525,6 +531,7 @@ function internal_functions(client) {
     }
 
     client.switcher = ({ guild, operations, operacao }) => {
+        console.log(operations[operacao].action)
         // Inverte o valor de botões liga/desliga
         const local = (operations[operacao].action).split('.')
         local.reduce((acc, key, index) => {

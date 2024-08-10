@@ -27,8 +27,8 @@ module.exports = {
                     "ru": ':название смайлика:'
                 })
                 .setRequired(true)),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, { conf: true })
         const dados = interaction.options.getString("emoji")
 
         try {

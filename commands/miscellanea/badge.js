@@ -38,8 +38,8 @@ module.exports = {
                     { name: '❌ Remove', value: 'remove' }
                 )
                 .setRequired(true)),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id)
         const badges = await client.getUserBadges(interaction.user.id)
 
         // Validando se o usuário possui badges
@@ -67,11 +67,13 @@ module.exports = {
             })
 
         // Removendo a badge fixada
-        user.misc.fixed_badge = null
-        await user.save()
+        await client.prisma.userOptionsMisc.update({
+            where: { id: user.misc_id },
+            data: { fixed_badge: null }
+        })
 
         // Atualizando a lista de badges fixas em cache
-        atualiza_fixed_badges(client)
+        await atualiza_fixed_badges(client)
 
         interaction.reply({
             content: `:medal: | Badge ${client.tls.phrase(user, "dive.badges.badge_removida")}`,

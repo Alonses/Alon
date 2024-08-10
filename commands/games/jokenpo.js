@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js')
+const {addMoney} = require("../../core/database/schemas/User");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -59,7 +60,11 @@ module.exports = {
                 })
                 .setMinValue(0.01)
                 .setMaxValue(1000)),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, {
+            conf: true,
+            misc: true
+        })
 
         const idioma_definido = client.idioma.getLang(interaction)
         let jooj = ["pedra", "papel", "tesoura", "pedra"]
@@ -96,15 +101,14 @@ module.exports = {
         if (idioma_definido !== "pt-br" && idioma_definido !== "al-br")
             mensagem = `Jokenpo! \n[ ${emojis[bot]} ] Bot\n[ ${emojis[player]} ] <- You\n[ ${ganhador} ]\n[Profit: \`B$ ${profit}\`]`
 
-        user.misc.money += profit
-        await user.save()
+        await addMoney(client, user, profit)
 
         // Registrando as movimentações de bufunfas para o usuário
         if (profit > 0) {
-            await client.registryStatement(user.uid, "misc.b_historico.jogos_jokenpo", true, profit)
+            await client.registryStatement(user.id, "misc.b_historico.jogos_jokenpo", true, profit)
             client.journal("gerado", profit)
         } else if (profit < 0) {
-            await client.registryStatement(user.uid, "misc.b_historico.jogos_jokenpo", false, profit * -1)
+            await client.registryStatement(user.id, "misc.b_historico.jogos_jokenpo", false, profit * -1)
             client.journal("reback", profit * -1)
         }
 

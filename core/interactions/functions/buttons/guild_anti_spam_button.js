@@ -13,16 +13,16 @@ const {updateGuild} = require("../../../database/schemas/Guild");
 // 25 -> Altera o tipo de varredura do anti-spam
 
 const operations = {
-    1: { action: "conf.spam", page: 0 },
+    1: { action: "spam.enabled", page: 0 },
     2: { action: "spam.strikes", page: 0 },
-    3: { action: "spam.suspicious.links", page: 1 },
+    3: { action: "spam.suspicious_links", page: 1 },
     7: { action: "spam.notify", page: 2 },
-    8: { action: "spam.manage.mods", page: 1 },
-    25: { action: "spam.scanner.links", page: 0 }
+    8: { action: "spam.manage_mods", page: 1 },
+    25: { action: "spam.scanner_links", page: 0 }
 }
 
-module.exports = async ({ client, user, interaction, dados, pagina }) => {
-
+module.exports = async ({ client, interaction, dados, pagina }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     let operacao = parseInt(dados.split(".")[1]), reback = "panel_guild_anti_spam", pagina_guia = 0
     let guild = await client.getGuild(interaction.guild.id, {
         logger: true,
@@ -155,8 +155,11 @@ module.exports = async ({ client, user, interaction, dados, pagina }) => {
     if (operacao === 10) pagina_guia = 1
 
     // Salvando os dados atualizados
-    if (operations[operacao]) await updateGuild(client, guild.id, guild)
+    if (operations[operacao]) await client.prisma.guildOptionsSpam.update({
+        where: { id: guild.spam_id },
+        data: guild.spam
+    })
 
     // Redirecionando a função para o painel de anti-spam
-    require('../../chunks/panel_guild_anti_spam')({ client, user, interaction, pagina_guia })
+    await require('../../chunks/panel_guild_anti_spam')({client, interaction, pagina_guia})
 }

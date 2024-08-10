@@ -12,8 +12,8 @@ module.exports = {
             "pt-BR": '⌠😂⌡ Louvado seja!',
             "ru": '⌠😂⌡ Слава!'
         }),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, { conf: true })
         const baidu = new AttachmentBuilder("./files/img/baidu.png")
         interaction.reply({
             content: client.tls.phrase(user, "dive.baidu"),

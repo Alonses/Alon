@@ -106,10 +106,10 @@ module.exports = {
                         )
                         .setRequired(true)))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
         const funcao = interaction.options.getString("operation") || interaction.options.getSubcommand()
 
         // Solicitando a função e executando
-        require(`./subcommands/conf_${funcao}`)({ client, user, interaction })
+        require(`./subcommands/conf_${funcao}`)({ client, interaction })
     }
 }

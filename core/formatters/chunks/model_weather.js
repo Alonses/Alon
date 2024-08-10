@@ -8,7 +8,11 @@ const direcao_cardial = require("../../functions/cardinal_direction")
 const getCountryISO3 = require("country-iso-2-to-3")
 const formata_horas = require('../formata_horas')
 
-module.exports = async (client, user, interaction) => {
+module.exports = async (client, interaction) => {
+    const user = await client.getUser(interaction.user.id, {
+        conf: true,
+        misc: true
+    })
 
     let idioma_definido = user.lang === "al-br" ? "pt-br" : user.lang || "pt-br", pesquisa, pesquisa_bruta
     let lang_min = idioma_definido.slice(0, 2) === "ru" ? "en" : idioma_definido.slice(0, 2)

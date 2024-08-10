@@ -9,8 +9,8 @@ module.exports = {
                 .setDescription("O canal que será enviado")
                 .setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild | PermissionFlagsBits.Administrator),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id)
         if (!client.x.owners.includes(interaction.user.id)) return
 
         const id_alvo = interaction.options.getString("canal")

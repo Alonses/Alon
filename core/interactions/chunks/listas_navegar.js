@@ -1,8 +1,8 @@
 const { listAllUserGroups } = require('../../database/schemas/User_tasks_group')
 const { listAllUserGroupTasks } = require('../../database/schemas/User_tasks')
 
-module.exports = async ({ client, user, interaction, autor_original }) => {
-
+module.exports = async ({ client, interaction, autor_original }) => {
+    const user = await client.getUser(interaction.user.id, { conf: true })
     // Navegando por listas de tarefas
     // Verificando se o usuário desabilitou as tasks globais
     let listas = await (user?.conf.global_tasks ? listAllUserGroups(client, interaction.user.id) : listAllUserGroups(client, interaction.user.id, interaction.guild.id))

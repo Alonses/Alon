@@ -37,8 +37,8 @@ module.exports = {
                     "ru": 'Упомянуть другого пользователя'
                 })
                 .setRequired(true)),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id)
         const alvo = interaction.options.getUser("user")
 
         if (client.id() === alvo.id) // Usuário marcou o bot

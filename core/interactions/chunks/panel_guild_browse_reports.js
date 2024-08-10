@@ -2,8 +2,8 @@ const { EmbedBuilder } = require('discord.js')
 
 const { getReportedUsers, checkUserGuildReported } = require('../../database/schemas/User_reports')
 
-module.exports = async ({ client, user, interaction, pagina }) => {
-
+module.exports = async ({ client, interaction, pagina }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     pagina = pagina || 0
 
     await client.deferedResponse({ interaction })

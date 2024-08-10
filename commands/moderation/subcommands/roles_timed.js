@@ -3,8 +3,8 @@ const { PermissionsBitField } = require('discord.js')
 const { getUserRole } = require('../../../core/database/schemas/User_roles.js')
 const {updateUserRole} = require("../../../core/database/schemas/User_roles");
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id)
     // Permissão para atualizar os cargos de membros do servidor
     if (!await client.permissions(interaction, client.id(), [PermissionsBitField.Flags.ManageRoles, PermissionsBitField.Flags.ModerateMembers]))
         return client.tls.reply(interaction, user, "mode.roles.sem_permissao", true, 7)
@@ -59,5 +59,5 @@ module.exports = async ({ client, user, interaction }) => {
 
     await updateUserRole(client, role.id, update)
 
-    return require('../../../core/interactions/chunks/role_timed_assigner.js')({ client, user, interaction })
+    return require('../../../core/interactions/chunks/role_timed_assigner.js')({ client, interaction })
 }

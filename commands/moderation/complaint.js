@@ -52,14 +52,14 @@ module.exports = {
                     "pt-BR": '⌠💂⌡ Encerre seu chat de denúncia',
                     "ru": '⌠💂⌡ Закрыть чат жалоб'
                 })),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
         const guild = await client.getGuild(interaction.guild.id, { tickets: true })
 
         // Verificando se as denúncias em canais privados estão ativas no servidor
-        if (!guild.tickets.enabled)
+        if (!guild.tickets.enabled) {
+            const user = await client.getUser(interaction.user.id)
             return client.tls.reply(interaction, user, "mode.denuncia.desativado", true, 3)
-
+        }
         const channel = await getTicket(client, interaction.guild.id, interaction.user.id)
         const solicitante = await client.getMemberGuild(interaction, interaction.user.id)
 
@@ -67,6 +67,6 @@ module.exports = {
         const canal_servidor = interaction.guild.channels.cache.find(c => c.id === channel.channel_id)
 
         // Solicitando a função e executando
-        require(`./subcommands/complaint_${interaction.options.getSubcommand()}`)({ client, user, interaction, channel, solicitante, canal_servidor })
+        require(`./subcommands/complaint_${interaction.options.getSubcommand()}`)({ client, interaction, channel, solicitante, canal_servidor })
     }
 }

@@ -104,14 +104,14 @@ module.exports = {
                             "ru": 'Причина удаления предупреждения'
                         })))
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id)
         const guild = await client.getGuild(interaction.guild.id, { warn: true })
 
         if (!guild.warn.enabled || !guild.warn.channel) // Verificando se o comando está configurado
             return client.tls.reply(interaction, user, "mode.warn.nao_configurado_2", true, 7)
 
         // Redirecionando o evento
-        require(`./subcommands/warn_${interaction.options.getSubcommand()}`)({ client, user, interaction, guild })
+        require(`./subcommands/warn_${interaction.options.getSubcommand()}`)({ client, interaction, guild })
     }
 }

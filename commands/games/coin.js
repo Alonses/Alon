@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js')
+const {addMoney} = require("../../core/database/schemas/User");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -59,7 +60,11 @@ module.exports = {
                 })
                 .setMinValue(0.01)
                 .setMaxValue(200)),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, {
+            conf: true,
+            misc: true
+        })
 
         const escolha = parseInt(interaction.options.getString("choise"))
         const bet = interaction.options.getNumber("bet") ?? 0
@@ -80,15 +85,14 @@ module.exports = {
             resultado = `[ ${emoji_exib} ] ${client.tls.phrase(user, "game.cara.errou")} ${client.emoji("epic_embed_fail2")}\n[Lucro: \`B$ ${profit}\`]`
         }
 
-        user.misc.money += profit
-        await user.save()
+        await addMoney(client, user, profit)
 
         // Registrando as movimentações de bufunfas para o usuário
         if (profit > 0) {
-            await client.registryStatement(user.uid, "misc.b_historico.jogos_cara", true, profit)
+            await client.registryStatement(user.id, "misc.b_historico.jogos_cara", true, profit)
             await client.journal("gerado", profit)
         } else if (profit < 0) {
-            await client.registryStatement(user.uid, "misc.b_historico.jogos_cara", false, profit * -1)
+            await client.registryStatement(user.id, "misc.b_historico.jogos_cara", false, profit * -1)
             await client.journal("reback", profit * -1)
         }
 

@@ -1,8 +1,8 @@
 const { EmbedBuilder, PermissionsBitField } = require("discord.js")
 const {updateGuild} = require("../../database/schemas/Guild");
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     const guild = await client.getGuild(interaction.guild.id)
 
     // Permissões do bot no servidor

@@ -2,8 +2,8 @@ const { EmbedBuilder } = require('discord.js')
 
 const math = require('mathjs')
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id, { misc: true })
     await interaction.deferReply({ ephemeral: true })
 
     const operacao = interaction.options.getString("input")

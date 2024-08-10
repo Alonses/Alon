@@ -31,8 +31,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     if (operacao === 1) {
 
         // Adicionando e reportando para outros servidores
-        alvo.archived = false
-        await alvo.save()
+        await updateUserReport(client, alvo, { archived: false })
 
         texto_retorno = client.tls.phrase(user, "mode.report.usuario_add", client.defaultEmoji("guard"))
         await require('../../../auto/send_report')({client, alvo})
@@ -41,8 +40,7 @@ module.exports = async ({ client, user, interaction, dados }) => {
     if (operacao === 2) {
 
         // Adicionando sem anunciar para outros servidores
-        alvo.archived = false
-        await alvo.save()
+        await updateUserReport(client, alvo, { archived: false })
 
         texto_retorno = client.tls.phrase(user, "mode.report.adicionado_silenciosamente", client.defaultEmoji("guard"))
     }

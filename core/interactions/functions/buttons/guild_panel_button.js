@@ -1,8 +1,8 @@
 const { PermissionsBitField } = require('discord.js')
 const {updateGuild} = require("../../../database/schemas/Guild");
 
-module.exports = async ({ client, user, interaction, dados }) => {
-
+module.exports = async ({ client, interaction, dados }) => {
+    const user = await client.getUser(interaction.user.id)
     const escolha = parseInt(dados.split(".")[1])
     const guild = await client.getGuild(interaction.guild.id)
 
@@ -28,5 +28,5 @@ module.exports = async ({ client, user, interaction, dados }) => {
     }
 
     const pagina_guia = 2
-    require('../../chunks/panel_guild')({ client, user, interaction, pagina_guia })
+    await require('../../chunks/panel_guild')({client, user, interaction, pagina_guia})
 }

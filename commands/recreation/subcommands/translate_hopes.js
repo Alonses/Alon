@@ -2,8 +2,11 @@ const { EmbedBuilder } = require("discord.js")
 
 const { data } = require('../../../files/languages/pt-hp.json')
 
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
+    const user = await client.getUser(interaction.user.id, {
+        conf: true,
+        misc: true
+    })
     let aviso = ""
 
     const codificar = {

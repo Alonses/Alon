@@ -1,6 +1,6 @@
-module.exports = async ({ client, user, interaction }) => {
+module.exports = async ({ client, interaction }) => {
 
     // Redirecionando o evento
     const autor_original = true
-    require('../../../core/interactions/chunks/listas_remover')({ client, user, interaction, autor_original })
+    await require('../../../core/interactions/chunks/listas_remover')({client, interaction, autor_original})
 }

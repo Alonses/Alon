@@ -28,8 +28,8 @@ module.exports = async ({ client, user, interaction, dados }) => {
     const user_i = await client.getCachedUser(alvo.id)
 
     // Registrando as movimentações de bufunfas para os usuários
-    await client.registryStatement(user.uid, `misc.b_historico.deposito_enviado|${user_i.username}`, false, bufunfas)
-    await client.registryStatement(alvo.uid, `misc.b_historico.deposito_recebido|${interaction.user.username}`, true, bufunfas)
+    await client.registryStatement(user.id, `misc.b_historico.deposito_enviado|${user_i.username}`, false, bufunfas)
+    await client.registryStatement(alvo.id, `misc.b_historico.deposito_recebido|${interaction.user.username}`, true, bufunfas)
     await client.journal("movido", bufunfas)
 
     interaction.update({

@@ -1,5 +1,4 @@
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
     // Redirecionando o evento
-    require('../../../core/interactions/chunks/verify_user')({ client, user, interaction })
+    await require('../../../core/interactions/chunks/verify_user')({client, interaction})
 }

@@ -1,5 +1,4 @@
-module.exports = async ({ client, user, interaction }) => {
-
+module.exports = async ({ client, interaction }) => {
     // Redirecionando o evento
-    require('../../../core/formatters/chunks/model_charada')(client, user, interaction)
+    await require('../../../core/formatters/chunks/model_charada')(client, interaction)
 }

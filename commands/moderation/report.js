@@ -78,9 +78,9 @@ module.exports = {
                 })
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         // Redirecionando o evento
-        require(`./subcommands/report_${interaction.options.getSubcommand()}`)({ client, user, interaction })
+        require(`./subcommands/report_${interaction.options.getSubcommand()}`)({ client, interaction })
     }
 }

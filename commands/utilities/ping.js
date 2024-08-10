@@ -12,8 +12,8 @@ module.exports = {
             "pt-BR": '⌠💡⌡ Veja seu ping',
             "ru": '⌠💡⌡ Проверьте свой пинг'
         }),
-    async execute({ client, user, interaction }) {
-
+    async execute({ client, interaction }) {
+        const user = await client.getUser(interaction.user.id, { conf: true })
         const m = await interaction.reply({
             content: "Ping?",
             fetchReply: true,

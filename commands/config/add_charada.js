@@ -15,7 +15,7 @@ module.exports = {
                 .setDescription("A resposta da charada")
                 .setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild | PermissionFlagsBits.Administrator),
-    async execute({ client, user, interaction }) {
+    async execute({ client, interaction }) {
 
         if (!client.x.owners.includes(interaction.user.id)) return
 

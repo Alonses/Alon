@@ -7,7 +7,11 @@ const { badgeTypes, medals } = require('../patterns/user')
 
 let paginas, pagina, last_update
 
-module.exports = async ({ client, user, interaction, dados, autor_original }) => {
+module.exports = async ({ client, interaction, dados, autor_original }) => {
+    const user = await client.getUser(interaction.user.id, {
+        conf: true,
+        misc: true
+    })
 
     const usernames = [], bufunfas = [], ids = []
     const date1 = new Date()
